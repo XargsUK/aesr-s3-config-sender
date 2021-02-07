@@ -1,0 +1,17 @@
+{
+  "name": "AESR Configuration Sender",
+  "version": "0.0.1",
+  "description": "Config sender example",
+  "short_name": "AESR Sender",
+  "background": {
+    "scripts": [
+      "js/background.js"
+    ],
+    "persistent": false
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "manifest_version": 2
+}
