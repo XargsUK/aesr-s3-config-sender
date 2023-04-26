@@ -4,7 +4,7 @@
   "description": "Pulls S3 switchroles config and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
   "background": {
-    "page": "background.html",
+    "service_worker": "background.js",
     "persistent": false,
     "permissions": [
       "storage",
