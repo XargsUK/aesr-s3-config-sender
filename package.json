@@ -4,8 +4,7 @@
   "description": "AWS Extend Switch Roles config sender",
   "main": "index.js",
   "scripts": {
-    "archive": "./bin/build.sh; ./bin/archive.sh",
-    "build": "./bin/build.sh"
+    "build": "webpack --mode development"
   },
   "author": "Toshimitsu Takahashi",
   "license": "MIT",
