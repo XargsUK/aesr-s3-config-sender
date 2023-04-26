@@ -1,13 +1,18 @@
 {
   "name": "AESR Configuration Sender",
   "version": "0.0.1",
-  "description": "Config sender example",
+  "description": "Pulls S3 switchroles config and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
   "background": {
-    "scripts": [
-      "js/background.js"
-    ],
-    "persistent": false
+    "page": "background.html",
+    "persistent": false,
+    "permissions": [
+      "storage",
+      "<all_urls>",
+      "webRequest",
+      "webRequestBlocking",
+      "https://ans-account-switcher.s3.eu-west-2.amazonaws.com/*"
+    ]
   },
   "options_ui": {
     "page": "options.html",

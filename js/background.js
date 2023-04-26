@@ -1,27 +1,28 @@
-/*
-const AESR_ExtensionId = "xxxxxxxxxxxxxx";
-
-  const rawIniStr = `
-[profile marketingadmin]
-role_arn = arn:aws:iam::123456789012:role/marketingadmin
-color = ffaaee
-
-[anotheraccount]
-aws_account_id = 987654321987
-role_name = anotherrole
-region=ap-northeast-1
-
-[athirdaccount]
-aws_account_id = 987654321988
-role_name = athirdrole
-image = "https://via.placeholder.com/150"
-`;
-
-  chrome.runtime.sendMessage(AESR_ExtensionId, {
-      action: 'updateConfig',
-      dataType: 'ini',
-      data: rawIniStr
-    }, function(response) {
-      console.log(response)
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'fetchS3FileContent') {
+    AWS.config.update({
+      accessKeyId: request.accessKeyId,
+      secretAccessKey: request.secretAccessKey,
+      region: request.region,
     });
-*/
+
+    const s3 = new AWS.S3();
+    const params = {
+      Bucket: request.bucket,
+      Key: request.key,
+    };
+
+    s3.getObject(params, (err, data) => {
+      if (err) {
+        console.error('Failed to fetch S3 file content:', err);
+        sendResponse({ success: false, error: err.message });
+      } else {
+        const content = data.Body.toString('utf-8');
+        console.log('Received S3 file content:', content);
+        sendResponse({ success: true, content });
+      }
+    });
+
+    return true;
+  }
+});

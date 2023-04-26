@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>AESR Config Sender</title>
+<script src="js/aws-sdk.min.js"></script>
 <script src="js/options.js"></script>
 <style>
 html { padding: 0 }
@@ -80,21 +81,49 @@ code {
 </head>
 <body>
 <div class="pane" id="settingPane">
- <section>
-  <h1>Configuration</h1>
-  <textarea id="awsConfigTextArea" spellcheck="false"></textarea>
-  <div style="margin-top:12px">
-   <button id="saveButton">&nbsp; Send to AESR &nbsp;</button>
-   <span id="msgSpan" style="margin-left:12px"></span>
-  </div>
- </section>
- <section id="api">
-  <h1>Extension API</h1>
-  <div>
-   <label for="aesrIdText">AESR extension ID:</label>
-   <input id="aesrIdText" type="text" maxlength="48" style="width: 48ex">
-  </div>
- </section>
+  <!-- Add hidden input fields for AWS credentials and region -->
+  <section id="awsCredentials">
+    <h1>AWS Credentials</h1>
+    <div>
+      <label for="awsAccessKey">Access Key:</label>
+      <input id="awsAccessKey" type="text">
+    </div>
+    <div>
+      <label for="awsSecretKey">Secret Key:</label>
+      <input id="awsSecretKey" type="password">
+    </div>
+    <div>
+      <label for="awsRegion">Region:</label>
+      <input id="awsRegion" type="text">
+    </div>
+    <div>
+      <label for="bucketName">Bucket Name:</label>
+      <input id="bucketName" type="text">
+    </div>
+    <div>
+      <label for="fileKey">File Key:</label>
+      <input id="fileKey" type="text">
+    </div>
+    <div>
+      <button id="pullS3ConfigButton">&nbsp; Pull Config from S3 &nbsp;</button>
+    </div>
+  </section>
+  
+  <section>
+    <h1>Configuration</h1>
+    <textarea id="awsConfigTextArea" spellcheck="false"></textarea>
+    <div style="margin-top:12px">
+      <button id="saveButton">&nbsp; Send to AESR &nbsp;</button>
+      <span id="msgSpan" style="margin-left:12px"></span>
+    </div>
+  </section>
+  <section id="api">
+    <h1>Extension API</h1>
+    <div>
+      <label for="aesrIdText">AESR extension ID:</label>
+      <input id="aesrIdText" type="text" maxlength="48" style="width: 48ex">
+    </div>
+  </section>
 </div>
 </body>
 </html>
