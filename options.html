@@ -1,129 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>AESR Config Sender</title>
-<script src="js/aws-sdk.min.js"></script>
-<script src="js/options.js"></script>
-<style>
-html { padding: 0 }
-body {
-  background-color: #666;
-  font-size: 14px;
-  line-height: 1.25;
-  display: flex;
-  justify-content: center;
-  padding: 0;
-  margin: 0;
-}
-.pane {
-  box-sizing: border-box;
-  height: 100vh;
-  max-width: 660px;
-  width: 100%;
-  padding: 10px 20px;
-}
-#settingPane { background-color: #fff }
-#howto {
-  background-color: #eee;
-  color: #444;
-  overflow-y: scroll;
-  padding-bottom: 25px;
-}
-a { text-decoration: none }
-.head {
-  font-size: 13px;
-  font-weight: bold;
-  margin: 5px 0;
-}
-#settingPane h1 {
-  font-size: 20px;
-  line-height: 1.125;
-  margin: 1em 0 .68em;
-}
-#settings ul {
-  list-style: none;
-  margin: 0 0; padding: 0;
-}
-#settings ul li {
-  margin: 0;
-  padding: 0;
-  line-height: 26px;
-}
-#settings input {
-  position: relative;
-  top: 2px;
-}
-#awsConfigTextArea {
-  box-sizing: border-box;
-  font-size: 14px;
-  font-family: Consolas, "Courier New", Courier, Monaco, monospace;
-  padding: 0.5ex;
-  resize: none;
-  white-space: pre;
-  width: 100%;
-  height: calc(100vh - 400px);
-  max-height: 800px;
-}
-pre {
-  border: 1px solid #484848;
-  box-sizing: border-box;
-  font-size: 14px;
-  font-family: Consolas, "Courier New", Courier, Monaco, monospace;
-  padding: 0.5ex;
-}
-input, button { font-size: 16px }
-code {
-  color: #222;
-  font-weight: bold;
-}
-</style>
+  <link href="css/icon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/materialize.min.css">
+  <script src="js/aws-sdk.min.js"></script>
+  <script src="js/materialize.min.js"></script>
+  <script src="js/options.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AESR Config Sender</title>
 </head>
 <body>
-<div class="pane" id="settingPane">
-  <!-- Add hidden input fields for AWS credentials and region -->
-  <section id="awsCredentials">
-    <h1>AWS Credentials</h1>
-    <div>
-      <label for="awsAccessKey">Access Key:</label>
-      <input id="awsAccessKey" type="text">
+  <div id="banner"></div>
+  <div class="container">
+    <div class="row">
+      <div id="sendConfig" class="col s12 card">
+        <div class="card-content">
+          <span class="card-title">Send Config</span>
+          <div class="input-field">
+            <textarea id="awsConfigTextArea" spellcheck="false" class="materialize-textarea"></textarea>
+            <label for="awsConfigTextArea">Configuration</label>
+          </div>
+          <div class="button-container">
+            <button id="saveButton" class="btn waves-effect waves-light teal lighten-2">Send to AESR</button>
+            <button id="pullS3ConfigButton" class="btn waves-effect waves-light teal lighten-2">Pull Config from S3</button>
+            <div class="right">
+              <select id="profileList">
+                <option value="" disabled selected>Select a Profile</option>
+                <option value="test">test</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>     
+      <div id="configuration" class="col s12 card">
+        <div class="card-content">
+          <span class="card-title">Configuration</span>
+          <div class="input-field">
+            <input id="profileName" type="text">
+            <label for="profileName">Profile Name</label>
+          </div>
+          <div class="input-field">
+            <input id="awsAccessKey" type="text">
+            <label for="awsAccessKey">Access Key</label>
+          </div>
+          <div class="input-field">
+            <input id="awsSecretKey" type="password">
+            <label for="awsSecretKey">Secret Key</label>
+          </div>
+          <div class="input-field">
+            <input id="awsRegion" type="text">
+            <label for="awsRegion">Region</label>
+          </div>
+          <div class="input-field">
+            <input id="bucketName" type="text">
+            <label for="bucketName">Bucket Name</label>
+          </div>
+          <div class="input-field">
+            <input id="fileKey" type="text">
+            <label for="fileKey">File Key</label>
+          </div>
+          <div class="input-field">
+            <input id="aesrIdText" type="text" maxlength="48">
+            <label for="aesrIdText">AESR extension ID</label>
+          </div>
+          <div class="button-container">
+            <button id="saveProfileButton" class="btn waves-effect waves-light teal lighten-2">Save Profile</button>
+            <button id="loadProfileButton" class="btn waves-effect waves-light teal lighten-2">Load Profile</button>
+            <button id="deleteProfileButton" class="btn waves-effect waves-light teal lighten-2">Delete Profile</button>
+            <button id="setDefaultProfileButton" class="btn waves-effect waves-light teal lighten-2">Set Default</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div>
-      <label for="awsSecretKey">Secret Key:</label>
-      <input id="awsSecretKey" type="password">
-    </div>
-    <div>
-      <label for="awsRegion">Region:</label>
-      <input id="awsRegion" type="text">
-    </div>
-    <div>
-      <label for="bucketName">Bucket Name:</label>
-      <input id="bucketName" type="text">
-    </div>
-    <div>
-      <label for="fileKey">File Key:</label>
-      <input id="fileKey" type="text">
-    </div>
-    <div>
-      <button id="pullS3ConfigButton">&nbsp; Pull Config from S3 &nbsp;</button>
-    </div>
-  </section>
-  
-  <section>
-    <h1>Configuration</h1>
-    <textarea id="awsConfigTextArea" spellcheck="false"></textarea>
-    <div style="margin-top:12px">
-      <button id="saveButton">&nbsp; Send to AESR &nbsp;</button>
-      <span id="msgSpan" style="margin-left:12px"></span>
-    </div>
-  </section>
-  <section id="api">
-    <h1>Extension API</h1>
-    <div>
-      <label for="aesrIdText">AESR extension ID:</label>
-      <input id="aesrIdText" type="text" maxlength="48" style="width: 48ex">
-    </div>
-  </section>
-</div>
+  </div>
 </body>
 </html>
+
