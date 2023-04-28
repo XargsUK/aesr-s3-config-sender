@@ -1,0 +1,106 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #666;
+}
+
+.container {
+  background-color: #fff;
+  padding: 2rem;
+  max-width: 100%;
+  box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+
+.input-field textarea.materialize-textarea {
+  height: 12.5rem;
+}
+
+.card {
+  margin-bottom: 1.25rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.9375rem;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 1.25rem;
+}
+
+.select-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.right {
+  display: inline-block;
+  margin-left: 1rem;
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+
+.input-field label {
+  position: initial;
+  font-size: 0.8rem;
+  transform: translate(0, 1.5rem) scale(1);
+  pointer-events: none;
+  color: #aaa;
+}
+
+.input-field input:focus + label, .input-field input:valid + label {
+  transform: translate(0, 0.25rem) scale(0.8);
+}
+
+.btn {
+  margin-right: 0.5rem;
+}
+
+#banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1em;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  text-align: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+#banner.show {
+  opacity: 1;
+}
+
+#banner span {
+  font-size: 1.5em;
+  font-weight: bold;
+}
