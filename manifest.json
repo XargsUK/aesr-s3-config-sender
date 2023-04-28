@@ -3,23 +3,15 @@
   "version": "0.0.1",
   "description": "Pulls S3 switchroles config and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
-  "background": {
-    "page": "background.html",
-    "persistent": false,
-    "permissions": [
-      "storage",
-      "<all_urls>",
-      "webRequest",
-      "webRequestBlocking",
-      "https://ans-account-switcher.s3.eu-west-2.amazonaws.com/*"
-    ]
-  },
+  "permissions": [
+    "storage"
+  ],
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
   },
-  "permissions": [
-    "storage"
-  ],
-  "manifest_version": 2
+  "manifest_version": 3,
+  "content_security_policy": {
+    "worker-src": "'self'"
+  }
 }
