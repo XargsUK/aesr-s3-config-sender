@@ -149,29 +149,6 @@ window.onload = function () {
   loadProfiles(); // Load the saved profiles initially
 };
 
-function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key) {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(
-      {
-        action: "fetchS3FileContent",
-        accessKeyId,
-        secretAccessKey,
-        region,
-        bucket,
-        key,
-      },
-      (response) => {
-        if (response.success) {
-          console.log("Received S3 file content:", response.content);
-          resolve(response.content);
-        } else {
-          console.error("Failed to fetch S3 file content:", response.error);
-          reject(response.error);
-        }
-      }
-    );
-  });
-}
 
 function updateMessage(el, msg, color) {
   console.log('updateMessage called with', el, msg, color);
