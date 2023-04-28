@@ -6,6 +6,10 @@
   "permissions": [
     "storage"
   ],
+  "icons" : {
+    "48": "icons/Icon_48x48.png",
+    "128": "icons/Icon_128x128.png"
+  },
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
