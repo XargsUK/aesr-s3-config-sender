@@ -59,16 +59,37 @@ async function loadProfiles() {
     chrome.storage.sync.get(null, (items) => resolve(items))
   );
 
+  const defaultProfileName = await new Promise((resolve) =>
+    chrome.storage.sync.get('defaultProfile', (result) => resolve(result.defaultProfile))
+  );
+
   const profileList = elById("profileList");
-  profileList.innerHTML = '<option value="" disabled selected>Select a Profile</option>';
+  profileList.innerHTML = '<option value="" disabled>Select a Profile</option>';
 
   for (const profileName in profiles) {
+    if (profileName === "defaultProfile") continue;
+
     const option = document.createElement("option");
     option.value = profileName;
-    option.textContent = profileName;
+    option.textContent = profileName === defaultProfileName ? `${profileName} (default)` : profileName;
+
+    if (profileName === defaultProfileName) {
+      option.style.fontWeight = "bold";
+    }
+
     profileList.appendChild(option);
   }
+
+  if (defaultProfileName) {
+    profileList.value = defaultProfileName; // Set the default profile as selected in the dropdown
+    loadProfile(defaultProfileName);
+  } else {
+    profileList.selectedIndex = 0; // Set the 'Select a Profile' option as selected if there's no default profile
+  }
 }
+
+
+
 
 window.onload = function () {
   const textArea = elById('awsConfigTextArea');
@@ -101,24 +122,29 @@ window.onload = function () {
     const region = elById('awsRegion').value;
     const bucket = elById('bucketName').value;
     const key = elById('fileKey').value;
-
+  
     const msgSpan = document.getElementById('message');
-
+  
     try {
       const content = await fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key);
       textArea.value = content;
       M.textareaAutoResize(textArea);
+      window.getComputedStyle(document.body).height;
+  
       const label = textArea.nextElementSibling;
       label.classList.add('active');
     } catch (error) {
       console.error('Error fetching S3 file content:', error);
     }
   };
+  
+
 
   elById("saveProfileButton").onclick = saveProfile;
   elById("loadProfileButton").onclick = () => loadProfile(elById("profileList").value);
   elById("deleteProfileButton").onclick = () => deleteProfile(elById("profileList").value);
   elById("profileList").onchange = () => loadProfile(elById("profileList").value);
+  elById("setDefaultProfileButton").onclick = setDefaultProfile;
 
   loadProfiles(); // Load the saved profiles initially
 };
@@ -190,3 +216,44 @@ function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key) {
     }
   });
 }
+async function setDefaultProfile() {
+  let selectedProfile = profileList.options[profileList.selectedIndex].text;
+  if (selectedProfile) {
+    chrome.storage.sync.set({ defaultProfile: selectedProfile }, function () {
+      M.toast({ html: 'Default profile set to: ' + selectedProfile });
+      refreshSelect();
+      selectDefaultProfile();
+    });
+  } else {
+    M.toast({ html: 'Please select a profile first!' });
+  }
+};
+
+
+async function loadDefaultProfile() {
+  const defaultProfile = await new Promise((resolve) =>
+    chrome.storage.sync.get("defaultProfile", (result) =>
+      resolve(result.defaultProfile)
+    )
+  );
+
+  if (defaultProfile) {
+    elById("profileList").value = defaultProfile;
+    loadProfile(defaultProfile);
+  }
+}
+document.addEventListener('DOMContentLoaded', function () {
+  const bodyObserver = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList') {
+        const hiddenDiv = document.querySelector('.hiddendiv.common');
+        if (hiddenDiv) {
+          hiddenDiv.style.position = 'absolute';
+          hiddenDiv.style.left = '-9999px';
+        }
+      }
+    }
+  });
+
+  bodyObserver.observe(document.body, { childList: true });
+});
