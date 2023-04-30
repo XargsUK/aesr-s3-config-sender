@@ -64,6 +64,6 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).```
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 Please note that this is subject to change depending on the specific license chosen for the project.
