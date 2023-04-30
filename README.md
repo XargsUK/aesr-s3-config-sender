@@ -74,4 +74,5 @@ AWS Extend Switch Roles was developed and distributed by [tilfinltd](https://git
 
 - [Chrome Extension](https://chrome.google.com/webstore/detail/aws-extend-switch-roles/jpmkfafbacpgapdghgdpembnojdlgkdl)
 - [Firefox Add-on](https://addons.mozilla.org/firefox/addon/aws-extend-switch-roles3/)
-
+- [Github: AWS Extend Switch Roles](https://github.com/tilfinltd/aws-extend-switch-roles)
+- [Github: AESR Config Sender](https://github.com/tilfinltd/aesr-config-sender)
