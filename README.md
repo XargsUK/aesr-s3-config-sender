@@ -56,7 +56,7 @@ To send the AWS configuration to AWS Extend Switch Roles, enter the AESR ID in t
 
 ## Appearance
 
-![Screen Shot 1](https://github.com/XargsUK/aesr-s3-config-sender/blob/images/screenshot-1.png)
+![Screen Shot 1](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/screenshot-1.png)
 
 ## Contributing
 
