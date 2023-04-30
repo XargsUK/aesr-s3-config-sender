@@ -1,3 +1,4 @@
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 const elById = (id) => document.getElementById(id);
 
 async function saveProfile() {
@@ -149,29 +150,6 @@ window.onload = function () {
   loadProfiles(); // Load the saved profiles initially
 };
 
-function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key) {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(
-      {
-        action: "fetchS3FileContent",
-        accessKeyId,
-        secretAccessKey,
-        region,
-        bucket,
-        key,
-      },
-      (response) => {
-        if (response.success) {
-          console.log("Received S3 file content:", response.content);
-          resolve(response.content);
-        } else {
-          console.error("Failed to fetch S3 file content:", response.error);
-          reject(response.error);
-        }
-      }
-    );
-  });
-}
 
 function updateMessage(el, msg, color) {
   console.log('updateMessage called with', el, msg, color);
@@ -186,36 +164,36 @@ function updateMessage(el, msg, color) {
   }
 }
 
-function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      AWS.config.update({
+async function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key) {
+  try {
+    // Create a new S3 client
+    const s3Client = new S3Client({
+      region,
+      credentials: {
         accessKeyId,
         secretAccessKey,
-        region,
-      });
+      },
+    });
 
-      const s3 = new AWS.S3();
-      const params = {
-        Bucket: bucket,
-        Key: key,
-      };
+    // Create the GetObjectCommand with the required parameters
+    const getObjectCommand = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
 
-      s3.getObject(params, (err, data) => {
-        if (err) {
-          console.error("Failed to fetch S3 file content:", err);
-          reject({ success: false, error: err.message });
-        } else {
-          const content = data.Body.toString("utf-8");
-          console.log("Received S3 file content:", content);
-          resolve(content);
-        }
-      });
-    } catch (error) {
-      reject({ success: false, error: error.message });
-    }
-  });
+    // Send the command and get the response
+    const response = await s3Client.send(getObjectCommand);
+    const content = new TextDecoder("utf-8").decode(await new Response(response.Body).arrayBuffer());
+
+    return content;
+  } catch (error) {
+    console.error('Error fetching S3 file content:', error);
+    throw { success: false, error: error.message };
+  }
 }
+
+
+
 async function setDefaultProfile() {
   let selectedProfile = profileList.options[profileList.selectedIndex].text;
   if (selectedProfile) {
