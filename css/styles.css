@@ -245,3 +245,6 @@
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
 }
+body {
+  min-width: 700px; /* Adjust the value according to your desired width */
+}
