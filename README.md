@@ -1,5 +1,7 @@
 # AESR S3 Config Sender
 
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+
 AESR S3 Config Sender is a Google Chrome extension that enables you to easily update your AESR configuration by pulling the latest configuration from an S3 bucket. 
 
 ## Installation
@@ -51,6 +53,10 @@ To pull the latest AWS configuration from an S3 bucket, enter the required infor
 ### Sending Configurations to AWS Extend Switch Roles
 
 To send the AWS configuration to AWS Extend Switch Roles, enter the AESR ID in the field provided, and click the "Save" button. The configuration will be sent to the specified AESR ID.
+
+## Appearance
+
+![Screen Shot 1](https://github.com/XargsUK/aesr-s3-config-sender/blob/images/screenshot-1.png)
 
 ## Contributing
 
