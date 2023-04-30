@@ -1,18 +1,25 @@
 {
-  "name": "AESR Configuration Sender",
+  "name": "AESR S3 Config Sender",
   "version": "0.0.1",
   "description": "Pulls S3 switchroles config and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
   "permissions": [
     "storage"
   ],
-  "icons" : {
+  "icons": {
     "48": "icons/Icon_48x48.png",
     "128": "icons/Icon_128x128.png"
   },
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
+  },
+  "action": {
+    "default_popup": "options.html",
+    "default_icon": {
+      "48": "icons/Icon_48x48.png",
+      "128": "icons/Icon_128x128.png"
+    }
   },
   "manifest_version": 3,
   "content_security_policy": {
