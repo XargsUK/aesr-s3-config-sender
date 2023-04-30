@@ -1,3 +1,63 @@
-# AESR Config Sender
+# AESR S3 Config Sender
 
-A config sender extension example for AWS Extend Switch Roles
+AESR S3 Config Sender is a Google Chrome extension that enables you to easily update your AESR configuration by pulling the latest configuration from an S3 bucket. 
+
+## Installation
+
+This extension is currently pending approval for the Chrome Web Store. In the meantime, you can follow these steps to load the extension as an unpacked extension:
+
+1. Clone the repository or download the source code as a ZIP file.
+2. Extract the contents of the ZIP file (if necessary) to a local directory on your computer.
+3. Open Google Chrome and type `chrome://extensions` in the address bar.
+4. Turn on the "Developer mode" toggle switch (if it's not already on).
+5. Click the "Load unpacked" button and select the directory where you extracted the source code in step 2.
+6. The extension should now be loaded as an unpacked extension and ready to use.
+
+Alternatively, you can wait until the extension is approved on the Chrome Web Store and install it from there.
+
+## Usage
+
+### Saving Profiles
+
+To save a new AWS configuration profile, enter the required information in the fields provided (access key, secret key, region, S3 bucket name, S3 file key, and AESR ID), and click the "Save Profile" button. The profile will be saved to your browser's local storage.
+
+| Field Name | Description                                                                                              | Example                                       |
+|------------|----------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| Profile Name | A user-defined name for the AWS configuration profile being saved.                                      | `my-aws-profile`                              |
+| AWS Access Key | The access key ID for the AWS account being used.                                                       | `AKIAYourAccessKey`                           |
+| AWS Secret Key | The secret access key for the AWS account being used.                                                   | `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`   |
+| AWS Region | The region where the AWS resources being used are located.                                              | `us-west-2`                                   |
+| S3 Bucket Name | The name of the S3 bucket where the AWS configuration file is stored.                                   | `my-s3-bucket`                                |
+| S3 File Key | The object key for the AWS configuration file stored in the S3 bucket.                                  | `my-aws-config.ini`                           |
+| AESR ID | The chrome extension ID of AWS Extend Switch Roles         | `jpmkfafbacpgapdghgdpembnojdlgkdl`                          |
+
+You will also need to copy the extension ID of AESR S3 Config Reader in the URL bar, and paste this in the Extension API field in AWS Extend Switch Roles.
+
+### Loading Profiles
+
+To load an existing AWS configuration profile, select it from the dropdown list, and click the "Load Profile" button. The fields will be populated with the saved configuration details.
+
+### Deleting Profiles
+To delete an existing AWS configuration profile, select it from the dropdown list, and click the "Delete Profile" button.
+
+### Setting a Default Profile
+
+To set a default AWS configuration profile, select it from the dropdown list, and click the "Set Default Profile" button. The default profile will be saved to your browser's local storage.
+
+### Pulling Configurations from S3
+
+To pull the latest AWS configuration from an S3 bucket, enter the required information in the fields provided (access key, secret key, region, S3 bucket name, and S3 file key), and click the "Pull S3 Config" button. The latest configuration will be displayed in the text area below.
+
+### Sending Configurations to AWS Extend Switch Roles
+
+To send the AWS configuration to AWS Extend Switch Roles, enter the AESR ID in the field provided, and click the "Save" button. The configuration will be sent to the specified AESR ID.
+
+## Contributing
+
+Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request on [GitHub](https://github.com/XargsUK/aesr-s3-config-sender/).
+
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).```
+
+Please note that this is subject to change depending on the specific license chosen for the project.
