@@ -112,7 +112,7 @@ window.onload = function () {
     }, function (response) {
       if (response) {
       } else {
-        showErrorBanner('Failed to send data');
+        showErrorBanner('Failed to send data' + error.message);
       }
     });
   };
@@ -124,8 +124,6 @@ window.onload = function () {
     const bucket = elById('bucketName').value;
     const key = elById('fileKey').value;
   
-    const msgSpan = document.getElementById('message');
-  
     try {
       const content = await fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key);
       textArea.value = content;
@@ -135,11 +133,10 @@ window.onload = function () {
       const label = textArea.nextElementSibling;
       label.classList.add('active');
     } catch (error) {
-      showErrorBanner('Error fetching S3 file content:', error);
+      showErrorBanner('Error fetching S3 file content: ' + error.message);
     }
   };
   
-
 
   elById("saveProfileButton").onclick = saveProfile;
   elById("loadProfileButton").onclick = () => loadProfile(elById("profileList").value);
@@ -183,14 +180,19 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, 
 
     // Send the command and get the response
     const response = await s3Client.send(getObjectCommand);
-    const content = new TextDecoder("utf-8").decode(await new Response(response.Body).arrayBuffer());
 
+    // Check the response status and throw an error if needed
+    if (response.$metadata.httpStatusCode === 403) {
+      throw new Error('Failed to load resource: the server responded with a status of 403 (Forbidden)');
+    }
+
+    const content = new TextDecoder("utf-8").decode(await new Response(response.Body).arrayBuffer());
     return content;
   } catch (error) {
-    showErrorBanner('Error fetching S3 file content:', error);
-    throw { success: false, error: error.message };
+    throw new Error(error.message);
   }
 }
+
 
 
 
