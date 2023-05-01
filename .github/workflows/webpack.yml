@@ -29,4 +29,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: webpacked-files
-        path: dist
+        path: js
+        if-no-files-found: warn
