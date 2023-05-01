@@ -235,3 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   bodyObserver.observe(document.body, { childList: true });
 });
+document.addEventListener('DOMContentLoaded', function () {
+  const extensionIdElement = document.getElementById('extensionId');
+  extensionIdElement.textContent += chrome.runtime.id;
+});
