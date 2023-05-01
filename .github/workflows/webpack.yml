@@ -24,8 +24,6 @@ jobs:
 
     - name: Run Webpack
       run: npx webpack --config webpack.config.js
-      with:
-        node-version: 20
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
