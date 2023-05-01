@@ -1,4 +1,7 @@
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  GetObjectCommand
+} from "@aws-sdk/client-s3";
 const elById = (id) => document.getElementById(id);
 
 async function saveProfile() {
@@ -17,12 +20,15 @@ async function saveProfile() {
   };
 
   await new Promise((resolve) =>
-    chrome.storage.sync.set({ [profileName]: profileData }, resolve)
+    chrome.storage.sync.set({
+      [profileName]: profileData
+    }, resolve)
   );
 
   loadProfiles();
 }
 
+// Loads and populates user's saved profile data from Chrome storage.
 async function loadProfile(profileName) {
   const profileData = await new Promise((resolve) =>
     chrome.storage.sync.get(profileName, (result) => resolve(result[profileName]))
@@ -37,7 +43,7 @@ async function loadProfile(profileName) {
     elById("fileKey").value = profileData.key;
     elById("aesrIdText").value = profileData.aesrId;
 
-    const inputIds = ["profileName","awsAccessKey", "awsSecretKey", "awsRegion", "bucketName", "fileKey", "aesrIdText"];
+    const inputIds = ["profileName", "awsAccessKey", "awsSecretKey", "awsRegion", "bucketName", "fileKey", "aesrIdText"];
     inputIds.forEach((id) => {
       const input = elById(id);
       if (input.value) {
@@ -50,11 +56,13 @@ async function loadProfile(profileName) {
   }
 }
 
+// Deletes a profile from Chrome storage and refreshes the profiles list on the page.
 async function deleteProfile(profileName) {
   await new Promise((resolve) => chrome.storage.sync.remove(profileName, resolve));
   loadProfiles();
 }
 
+// Loads all profiles saved in Chrome storage and creates a dropdown list of profiles, setting the default profile if it exists.
 async function loadProfiles() {
   const profiles = await new Promise((resolve) =>
     chrome.storage.sync.get(null, (items) => resolve(items))
@@ -82,17 +90,17 @@ async function loadProfiles() {
   }
 
   if (defaultProfileName) {
-    profileList.value = defaultProfileName; // Set the default profile as selected in the dropdown
+    profileList.value = defaultProfileName;
     loadProfile(defaultProfileName);
   } else {
-    profileList.selectedIndex = 0; // Set the 'Select a Profile' option as selected if there's no default profile
+    profileList.selectedIndex = 0;
   }
 }
 
 
 
-
-window.onload = function () {
+// Initializes page elements and sends updated config data to the background script.
+window.onload = function() {
   const textArea = elById('awsConfigTextArea');
   const msgSpan = elById('msgSpan');
   const saveButton = elById('saveButton');
@@ -102,14 +110,14 @@ window.onload = function () {
   textArea.setAttribute('rows', '20');
   textArea.style.overflowY = 'scroll';
 
-  saveButton.onclick = function () {
+  saveButton.onclick = function() {
     const aesrSenderId = elById('aesrIdText').value;
 
     chrome.runtime.sendMessage(aesrSenderId, {
       action: 'updateConfig',
       dataType: 'ini',
       data: textArea.value,
-    }, function (response) {
+    }, function(response) {
       if (response) {
         localStorage.setItem('lastSentTimestamp', new Date().toISOString());
         updateLastSentTimestamp(Date.now());
@@ -119,26 +127,27 @@ window.onload = function () {
     });
   };
 
-  pullS3ConfigButton.onclick = async function () {
+  // Pulls AWS config data from S3 and updates the AWS config text area on the page.
+  pullS3ConfigButton.onclick = async function() {
     const accessKeyId = elById('awsAccessKey').value;
     const secretAccessKey = elById('awsSecretKey').value;
     const region = elById('awsRegion').value;
     const bucket = elById('bucketName').value;
     const key = elById('fileKey').value;
-  
+
     try {
       const content = await fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key);
       textArea.value = content;
       M.textareaAutoResize(textArea);
       window.getComputedStyle(document.body).height;
-  
+
       const label = textArea.nextElementSibling;
       label.classList.add('active');
     } catch (error) {
       showErrorBanner('Error fetching S3 file content: ' + error.message);
     }
   };
-  
+
 
   elById("saveProfileButton").onclick = saveProfile;
   // elById("loadProfileButton").onclick = () => loadProfile(elById("profileList").value);
@@ -149,7 +158,7 @@ window.onload = function () {
   loadProfiles(); // Load the saved profiles initially
 };
 
-
+// Updates the text and color of an HTML element with the specified message and color.
 function updateMessage(el, msg, color) {
   console.log('updateMessage called with', el, msg, color);
   const span = document.createElement('span');
@@ -163,6 +172,7 @@ function updateMessage(el, msg, color) {
   }
 }
 
+// Fetches the content of an S3 file using AWS credentials and returns it as a string.
 async function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key) {
   try {
     // Create a new S3 client
@@ -195,20 +205,27 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, 
   }
 }
 
+// Sets the user's default profile to the currently selected profile in the dropdown list.
 async function setDefaultProfile() {
   let selectedProfile = profileList.options[profileList.selectedIndex].text;
   if (selectedProfile) {
-    chrome.storage.sync.set({ defaultProfile: selectedProfile }, function () {
-      M.toast({ html: 'Default profile set to: ' + selectedProfile });
+    chrome.storage.sync.set({
+      defaultProfile: selectedProfile
+    }, function() {
+      M.toast({
+        html: 'Default profile set to: ' + selectedProfile
+      });
       refreshSelect();
       selectDefaultProfile();
     });
   } else {
-    M.toast({ html: 'Please select a profile first!' });
+    M.toast({
+      html: 'Please select a profile first!'
+    });
   }
 };
 
-
+// Loads the user's default profile from Chrome storage.
 async function loadDefaultProfile() {
   const defaultProfile = await new Promise((resolve) =>
     chrome.storage.sync.get("defaultProfile", (result) =>
@@ -221,7 +238,9 @@ async function loadDefaultProfile() {
     loadProfile(defaultProfile);
   }
 }
-document.addEventListener('DOMContentLoaded', function () {
+
+// Creates a MutationObserver to hide a .hiddendiv.common on the page when a childList mutation occurs.
+document.addEventListener('DOMContentLoaded', function() {
   const bodyObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.type === 'childList') {
@@ -234,13 +253,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  bodyObserver.observe(document.body, { childList: true });
+  bodyObserver.observe(document.body, {
+    childList: true
+  });
 });
-document.addEventListener('DOMContentLoaded', function () {
+
+// Retrieves an HTML element with the ID "extensionId" and appends the extension's runtime ID to the text content of the element.
+document.addEventListener('DOMContentLoaded', function() {
   const extensionIdElement = document.getElementById('extensionId');
   extensionIdElement.textContent += chrome.runtime.id;
 });
 
+// Displays an error banner on the page with the specified message.
 function showErrorBanner(message) {
   const errorBanner = document.getElementById("errorBanner");
   const errorMessage = document.getElementById("errorMessage");
@@ -254,13 +278,17 @@ function showErrorBanner(message) {
   };
 }
 
+// Saves a timestamp to local storage as the last time data was sent.
 function updateLastSentTimestamp(timestamp) {
   if (timestamp) {
-    chrome.storage.local.set({ lastSentTimestamp: timestamp }, () => {
+    chrome.storage.local.set({
+      lastSentTimestamp: timestamp
+    }, () => {
       console.log('Last sent timestamp saved:', timestamp);
     });
   }
 
+  // Retrieves a timestamp from local storage and displays it on the page as "Last sent: [date and time]" or "Last sent: Never".
   chrome.storage.local.get(['lastSentTimestamp'], (result) => {
     const lastSentElement = document.getElementById('lastSent');
     if (result.lastSentTimestamp) {
@@ -271,16 +299,13 @@ function updateLastSentTimestamp(timestamp) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  // Initialize tooltips
+// Initializes Materialize tooltips and collapsibles and updates the last sent timestamp displayed on the page.
+document.addEventListener('DOMContentLoaded', function() {
   var elems = document.querySelectorAll('.tooltipped');
   var instances = M.Tooltip.init(elems);
 
-  // Initialize collapsible elements
   var elems = document.querySelectorAll('.collapsible');
   var instances = M.Collapsible.init(elems);
 
-  // Update the last sent timestamp
   updateLastSentTimestamp();
 });
-
