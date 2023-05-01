@@ -1,13 +1,12 @@
 # AESR S3 Config Sender
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![Chrome Web Store](https://chrome.google.com/webstore/detail/aesr-s3-config-sender/ikmgjpefodojiccmidahcblifopeimjf?utm_source=github)
 
 AESR S3 Config Sender is a Google Chrome extension that enables you to easily update your AESR configuration by pulling the latest configuration from an S3 bucket. 
 
 ## Installation
-
-This extension is currently pending approval for the Chrome Web Store. In the meantime, you can follow these steps to load the extension as an unpacked extension:
-
+### Manual Unpacked
 1. Clone the repository or download the source code as a ZIP file.
 2. Extract the contents of the ZIP file (if necessary) to a local directory on your computer.
 3. Open Google Chrome and type `chrome://extensions` in the address bar.
@@ -15,7 +14,9 @@ This extension is currently pending approval for the Chrome Web Store. In the me
 5. Click the "Load unpacked" button and select the directory where you extracted the source code in step 2.
 6. The extension should now be loaded as an unpacked extension and ready to use.
 
-Alternatively, you can wait until the extension is approved on the Chrome Web Store and install it from there.
+### Chrome Web Store
+
+You can download the latest stable version from the [Chrome Web Store here](https://chrome.google.com/webstore/detail/aesr-s3-config-sender/ikmgjpefodojiccmidahcblifopeimjf?hl=en-GB&authuser=0).
 
 ## Usage
 
@@ -34,10 +35,6 @@ To save a new AWS configuration profile, enter the required information in the f
 | AESR ID | The chrome extension ID of AWS Extend Switch Roles         | `jpmkfafbacpgapdghgdpembnojdlgkdl`                          |
 
 You will also need to copy the extension ID of AESR S3 Config Reader in the URL bar, and paste this in the Extension API field in AWS Extend Switch Roles.
-
-### Loading Profiles
-
-To load an existing AWS configuration profile, select it from the dropdown list, and click the "Load Profile" button. The fields will be populated with the saved configuration details.
 
 ### Deleting Profiles
 To delete an existing AWS configuration profile, select it from the dropdown list, and click the "Delete Profile" button.
