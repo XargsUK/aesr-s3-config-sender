@@ -1,7 +1,7 @@
 {
   "name": "AESR S3 Config Sender",
-  "version": "0.0.1",
-  "description": "Pulls S3 switchroles config and pushes to Extend Switch Roles",
+  "version": "0.0.2",
+  "description": "Downloads Extend Switch Role configurations from S3 and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
   "permissions": [
     "storage"
