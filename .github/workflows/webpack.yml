@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - code-cleanup
+    paths:
+      - '**.js'
 
 jobs:
   build:
