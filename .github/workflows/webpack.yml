@@ -31,4 +31,3 @@ jobs:
         name: webpacked-files
         path: js
         if-no-files-found: warn
-        node-version: 20
