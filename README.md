@@ -37,11 +37,11 @@ To save a new AWS configuration profile, enter the required information in the f
 You will also need to copy the extension ID of AESR S3 Config Reader in the URL bar, and paste this in the Extension API field in AWS Extend Switch Roles.
 
 ### Deleting Profiles
-To delete an existing AWS configuration profile, select it from the dropdown list, and click the "Delete Profile" button.
+To delete an existing AESR S3 Config Sender profile, select it from the dropdown list, and click the "Delete Profile" button.
 
 ### Setting a Default Profile
 
-To set a default AWS configuration profile, select it from the dropdown list, and click the "Set Default Profile" button. The default profile will be saved to your browser's local storage.
+To set a default AESR S3 Config Sender profile, select it from the dropdown list, and click the "Set Default Profile" button. The default profile will be saved to your browser's local storage.
 
 ### Pulling Configurations from S3
 
@@ -67,7 +67,7 @@ Please note that this is subject to change depending on the specific license cho
 
 ## Acknowledgements and Credits
 
-AWS Extend Switch Roles was developed and distributed by [tilfinltd](https://github.com/tilfinltd/), who without their work, this plugin wouldn't have been possible. I would like to acknowledge and thank tilfinltd for their contribution. 
+AWS Extend Switch Roles was developed and distributed by [tilfinltd](https://github.com/tilfinltd/), who without their work, this plugin wouldn't have been possible. I would like to acknowledge and thank tilfinltd for their contribution.
 
 - [Chrome Extension](https://chrome.google.com/webstore/detail/aws-extend-switch-roles/jpmkfafbacpgapdghgdpembnojdlgkdl)
 - [Firefox Add-on](https://addons.mozilla.org/firefox/addon/aws-extend-switch-roles3/)
