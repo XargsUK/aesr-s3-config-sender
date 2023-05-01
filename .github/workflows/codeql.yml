@@ -11,6 +11,10 @@
 #
 name: "CodeQL"
 on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '**.js'
   pull_request:
     branches: [ "main" ]
     paths:
