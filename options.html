@@ -14,32 +14,45 @@
     <span id="errorMessage"></span>
     <i id="errorClose" class="material-icons right">close</i>
   </div>
+  <div id="banner" class="blue-grey darken-1">
+    <div class="container">
+      <div class="row">
+        <div class="col s12 center-align">
+          <h3 class="white-text">AESR Config Sender</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
   
   <div class="container">
     <div class="row">
       <div id="sendConfig" class="col s12 card">
         <div class="card-content">
-          <span class="card-title">Send Config</span>
+          <span class="card-title">AESR Configuration</span>
+          <div class="button-container">
+            <button id="pullS3ConfigButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Downloads your switch role config from S3">Pull Config from S3</button>
+            <button id="saveButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Sends above configuration to AWS Extend Switch Roles">Send to AESR</button>
+          </div>
           <div class="input-field">
             <textarea id="awsConfigTextArea" spellcheck="false" class="materialize-textarea"></textarea>
             <label for="awsConfigTextArea">Configuration</label>
           </div>
-          <div class="button-container">
-            <!-- Moved pullS3ConfigButton before saveButton and added tooltip -->
-            <button id="pullS3ConfigButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Downloads your switch role config from S3">Pull Config from S3</button>
-            <button id="saveButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Sends above configuration to AWS Extend Switch Roles">Send to AESR</button>
-            <div class="right">
+        </div>
+      </div>    
+      <div id="configuration" class="col s12 card">
+        <div class="card-content">
+          <div class="row">
+            <div class="col s8">
+              <span class="card-title">S3 Configuration</span>
+            </div>
+            <div class="col s4">
               <select id="profileList">
                 <option value="" disabled selected>Select a Profile</option>
                 <option value="test">test</option>
               </select>
             </div>
           </div>
-        </div>
-      </div>     
-      <div id="configuration" class="col s12 card">
-        <div class="card-content">
-          <span class="card-title">Configuration</span>
           <div class="input-field">
             <input id="profileName" type="text">
             <label for="profileName">Profile Name</label>
@@ -77,9 +90,91 @@
           </div>
         </div>
       </div>
+      <div id="instructions" class="col s12 card">
+        <div class="card-content">
+          <span class="card-title">Instructions</span>
+        <br>
+          <ul class="collapsible">
+            <li>
+              <div class="collapsible-header"><i class="material-icons">expand_more</i>What is AESR Config Sender?</div>
+              <div class="collapsible-body">
+                <p>AESR Config Sender is a Chrome extension that allows you to send your AWS Extend Switch Roles configuration to the AWS Extend Switch Roles Chrome extension, using S3 as a source.</p>
+              </div>
+            </li>
+            <li>
+              <div class="collapsible-header"><i class="material-icons">expand_more</i>How does AESR Config Sender do this?</div>
+              <div class="collapsible-body">
+                <p>AESR Config Sender uses a user-specified IAM user Access Key, Secret Key, and the S3 bucket information to download the configuration, and then using the extension ID of AESR, pushes the configuration to AESR. The user-specified information can be saved to Chrome local storage as a profile.</p>
+              </div>
+            </li>
+            <li>
+              <div class="collapsible-header"><i class="material-icons">expand_more</i>Initial Setup</div>
+              <div class="collapsible-body">
+                <ol>
+                  <li>Fill in the fields in the S3 Configuration section. See "What do I put into the fields?" for what to enter.</li>
+                  <li>Copy the extension ID at the bottom of the S3 Configuration section. Open the AWS Extend Switch Roles configuration page and paste the ID into the <b>Extension API</b> field.</li>
+                  <li>Copy the extension ID of AWS Extend Switch Roles and paste into the <b>AESR extension ID</b> field. After this, click <b>Save Profile</b>.</li>
+                  <li>Click "Pull Config from S3" to download your switch role config from the specified S3 bucket.</li>
+                  <li>Click "Send to AESR" to send the configuration to AWS Extend Switch Roles. This will overwrite your current configuration in AESR.</li>
+                </ol>
+              </div>
+            </li>
+            <li>
+              <div class="collapsible-header"><i class="material-icons">expand_more</i>What do I put into the fields?</div>
+              <div class="collapsible-body">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Field</th>
+                      <th>Description</th>
+                      <th>Example</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Profile Name</td>
+                      <td>Name of the profile to be saved or loaded</td>
+                      <td>AdminProfile</td>
+                    </tr>
+                    <tr>
+                      <td>Access Key</td>
+                      <td>Your AWS access key ID</td>
+                      <td>AKIAIOSFODNN7EXAMPLE</td>
+                    </tr>
+                    <tr>
+                      <td>Secret Key</td>
+                      <td>Your AWS secret access key</td>
+                      <td>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</td>
+                    </tr>
+                    <tr>
+                      <td>Region</td>
+                      <td>AWS region where your S3 bucket is located</td>
+                      <td>eu-west-2</td>
+                    </tr>
+                    <tr>
+                      <td>Bucket Name</td>
+                      <td>Name of your S3 bucket containing the configuration file</td>
+                      <td>my-config-bucket</td>
+                    </tr>
+                    <tr>
+                      <td>File Key</td>
+                      <td>The key (path) to the configuration file in your S3 bucket</td>
+                      <td>my-folder/browser-plugin-config.txt</td>
+                    </tr>
+                    <tr>
+                      <td>AESR extension ID</td>
+                      <td>The ID of your AWS Extend Switch Roles extension. Open AWS Extend Switch Roles, click options, and copy the extension ID in the URL.</td>
+                      <td>eiephjnabgbnmffmlopgdnnfaimfllpk</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
   <script src="js/initTooltips.js"></script>
 </body>
 </html>
-
