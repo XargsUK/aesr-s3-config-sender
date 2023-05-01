@@ -111,6 +111,8 @@ window.onload = function () {
       data: textArea.value,
     }, function (response) {
       if (response) {
+        localStorage.setItem('lastSentTimestamp', new Date().toISOString());
+        updateLastSentTimestamp(Date.now());
       } else {
         showErrorBanner('Failed to send data' + error.message);
       }
@@ -139,7 +141,7 @@ window.onload = function () {
   
 
   elById("saveProfileButton").onclick = saveProfile;
-  elById("loadProfileButton").onclick = () => loadProfile(elById("profileList").value);
+  // elById("loadProfileButton").onclick = () => loadProfile(elById("profileList").value);
   elById("deleteProfileButton").onclick = () => deleteProfile(elById("profileList").value);
   elById("profileList").onchange = () => loadProfile(elById("profileList").value);
   elById("setDefaultProfileButton").onclick = setDefaultProfile;
@@ -192,9 +194,6 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, 
     throw new Error(error.message);
   }
 }
-
-
-
 
 async function setDefaultProfile() {
   let selectedProfile = profileList.options[profileList.selectedIndex].text;
@@ -254,3 +253,34 @@ function showErrorBanner(message) {
     errorBanner.style.display = "none";
   };
 }
+
+function updateLastSentTimestamp(timestamp) {
+  if (timestamp) {
+    chrome.storage.local.set({ lastSentTimestamp: timestamp }, () => {
+      console.log('Last sent timestamp saved:', timestamp);
+    });
+  }
+
+  chrome.storage.local.get(['lastSentTimestamp'], (result) => {
+    const lastSentElement = document.getElementById('lastSent');
+    if (result.lastSentTimestamp) {
+      lastSentElement.textContent = 'Last sent: ' + new Date(Number(result.lastSentTimestamp)).toLocaleString();
+    } else {
+      lastSentElement.textContent = 'Last sent: Never';
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Initialize tooltips
+  var elems = document.querySelectorAll('.tooltipped');
+  var instances = M.Tooltip.init(elems);
+
+  // Initialize collapsible elements
+  var elems = document.querySelectorAll('.collapsible');
+  var instances = M.Collapsible.init(elems);
+
+  // Update the last sent timestamp
+  updateLastSentTimestamp();
+});
+
