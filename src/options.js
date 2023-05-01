@@ -112,7 +112,7 @@ window.onload = function () {
     }, function (response) {
       if (response) {
       } else {
-        console.error('Failed to send data');
+        showErrorBanner('Failed to send data');
       }
     });
   };
@@ -135,7 +135,7 @@ window.onload = function () {
       const label = textArea.nextElementSibling;
       label.classList.add('active');
     } catch (error) {
-      console.error('Error fetching S3 file content:', error);
+      showErrorBanner('Error fetching S3 file content:', error);
     }
   };
   
@@ -187,7 +187,7 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, 
 
     return content;
   } catch (error) {
-    console.error('Error fetching S3 file content:', error);
+    showErrorBanner('Error fetching S3 file content:', error);
     throw { success: false, error: error.message };
   }
 }
@@ -239,3 +239,16 @@ document.addEventListener('DOMContentLoaded', function () {
   const extensionIdElement = document.getElementById('extensionId');
   extensionIdElement.textContent += chrome.runtime.id;
 });
+
+function showErrorBanner(message) {
+  const errorBanner = document.getElementById("errorBanner");
+  const errorMessage = document.getElementById("errorMessage");
+  const errorClose = document.getElementById("errorClose");
+
+  errorMessage.textContent = message;
+  errorBanner.style.display = "block";
+
+  errorClose.onclick = () => {
+    errorBanner.style.display = "none";
+  };
+}
