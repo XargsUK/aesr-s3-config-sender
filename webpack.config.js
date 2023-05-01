@@ -3,7 +3,8 @@ const path = require('path');
 module.exports = {
   mode: 'production',
   entry: {
-    options: './src/options.js'
+    options: './src/options.js',
+    materialize: './src/materialize.js'
   },
   output: {
     filename: '[name].bundle.js',
