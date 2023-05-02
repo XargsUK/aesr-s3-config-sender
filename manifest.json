@@ -21,5 +21,8 @@
       "128": "icons/Icon_128x128.png"
     }
   },
-  "manifest_version": 3
+  "manifest_version": 3,
+  "content_security_policy": {
+    "worker-src": "'self'"
+  }
 }
