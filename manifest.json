@@ -4,7 +4,8 @@
   "description": "Downloads Extend Switch Role configurations from S3 and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab"
   ],
   "icons": {
     "48": "icons/Icon_48x48.png",
@@ -19,10 +20,8 @@
     "default_icon": {
       "48": "icons/Icon_48x48.png",
       "128": "icons/Icon_128x128.png"
-    }
+    },
+    "content_security_policy": "script-src 'self'; object-src 'self'"
   },
-  "manifest_version": 3,
-  "content_security_policy": {
-    "worker-src": "'self'"
-  }
+  "manifest_version": 3
 }
