@@ -2,6 +2,8 @@ import {
   S3Client,
   GetObjectCommand
 } from "@aws-sdk/client-s3";
+import './materialize';
+
 const elById = (id) => document.getElementById(id);
 
 async function saveProfile() {
@@ -138,7 +140,7 @@ window.onload = function() {
     try {
       const content = await fetchS3FileContent(accessKeyId, secretAccessKey, region, bucket, key);
       textArea.value = content;
-      M.textareaAutoResize(textArea);
+      N.textareaAutoResize(textArea);
       window.getComputedStyle(document.body).height;
 
       const label = textArea.nextElementSibling;
@@ -308,4 +310,11 @@ document.addEventListener('DOMContentLoaded', function() {
   var instances = M.Collapsible.init(elems);
 
   updateLastSentTimestamp();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('.tooltipped');
+  var instances = M.Tooltip.init(elems, {
+    // specify options here
+  });
 });
