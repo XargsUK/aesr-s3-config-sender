@@ -3,7 +3,7 @@
 <head>
   <link href="css/styles.css" rel="stylesheet">
   <link rel="stylesheet" href="css/materialize.min.css">
-  <script src="js/materialize.bundle.js"></script>
+  <!-- <script src="js/materialize.bundle.js"></script> -->
   <script src="js/options.bundle.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,20 +27,43 @@
   
   <div class="container">
     <div class="row">
+      <div id="actionsSection" class="col s12 card">
+        <div class="card-content">
+          <div class="row">
+            <div class="col s8">
+              <span class="card-title">AESR Actions</span>
+            </div>
+            <div class="col s4">
+              <select id="profileList">
+                <option value="" disabled selected>Select a Profile</option>
+                <option value="test">test</option>
+              </select>
+            </div>
+          </div>
+        <div class="button-container">
+          <button id="cognitoSignInButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Authenticates with Cognito, pulls credentials">Cognito Signin</button>
+          <button id="pullS3ConfigButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Downloads config from S3">Pull Config from S3</button>
+          <button id="saveButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Sends configuration to AWS Extend Switch Roles">Push to AESR</button> <br>
+          <p id="lastSent" style="margin-top: 10px;">Last sent: Never</p>
+        </div>
+      </div>
+    </div>
+    
       <div id="sendConfig" class="col s12 card">
         <div class="card-content">
           <span class="card-title">AESR Configuration</span>
-          <div class="button-container">
-            <button id="pullS3ConfigButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Downloads your switch role config from S3">Pull Config from S3</button>
-            <button id="saveButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Sends above configuration to AWS Extend Switch Roles">Send to AESR</button> <br>
-            <p id="lastSent" style="margin-top: 10px;">Last sent: Never</p>
-          </div>
           <div class="input-field">
             <textarea id="awsConfigTextArea" spellcheck="false" class="materialize-textarea"></textarea>
             <label for="awsConfigTextArea">Configuration</label>
           </div>
+          <div class="input-field">
+            <input id="aesrIdText" type="text" maxlength="48">
+            <label for="aesrIdText">AESR extension ID</label>
+            <p id="extensionId">Extension ID: </p>
+          </div>
         </div>
       </div>    
+
       <div id="configuration" class="col s12 card">
         <div class="card-content">
           <div class="row">
@@ -59,14 +82,6 @@
             <label for="profileName">Profile Name</label>
           </div>
           <div class="input-field">
-            <input id="awsAccessKey" type="text">
-            <label for="awsAccessKey">Access Key</label>
-          </div>
-          <div class="input-field">
-            <input id="awsSecretKey" type="password">
-            <label for="awsSecretKey">Secret Key</label>
-          </div>
-          <div class="input-field">
             <input id="awsRegion" type="text">
             <label for="awsRegion">Region</label>
           </div>
@@ -78,11 +93,6 @@
             <input id="fileKey" type="text">
             <label for="fileKey">File Key</label>
           </div>
-          <div class="input-field">
-            <input id="aesrIdText" type="text" maxlength="48">
-            <label for="aesrIdText">AESR extension ID</label>
-            <p id="extensionId">Extension ID: </p>
-          </div>
           <div class="button-container">
             <button id="saveProfileButton" class="btn waves-effect waves-light teal lighten-2">Save Profile</button>
             <!-- <button id="loadProfileButton" class="btn waves-effect waves-light teal lighten-2">Load Profile</button> -->
@@ -91,6 +101,60 @@
           </div>
         </div>
       </div>
+      
+      <div id="credentials" class="col s12 card">
+        <div class="card-content">
+          <span class="card-title">Credentials</span>
+          <div id="credentialsForm">
+            <div class="input-field">
+              <input id="awsAccessKey" type="text" required>
+              <label for="awsAccessKey">Access Key</label>
+            </div>
+            <div class="input-field">
+              <input id="awsSecretKey" type="password" required>
+              <label for="awsSecretKey">Secret Key</label>
+            </div>
+            <div class="input-field">
+              <input id="awsSessionToken" type="text">
+              <label for="awsSessionToken">Cognito Session Token</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cognitoSignIn" class="col s12 card">
+        <div class="card-content">
+          <span class="card-title">Cognito Sign In</span>
+          <div id="signInForm">
+            <div class="input-field">
+              <input id="cognitoUsername" type="text" class="validate" required>
+              <label for="cognitoUsername">Username</label>
+            </div>
+            <div class="input-field">
+              <input id="cognitoPassword" type="password" class="validate" required>
+              <label for="cognitoPassword">Password</label>
+            </div>
+            <div class="input-field">
+              <input id="cognitoUserPoolId" type="text">
+              <label for="cognitoUserPoolId">User Pool ID</label>
+            </div>
+            <div class="input-field">
+              <input id="cognitoClientAppId" type="text">
+              <label for="cognitoClientAppId">Cognito User Pool Client App ID:</label>
+            </div>
+            <div class="input-field">
+              <input id="cognitoIdentityPoolId" type="text">
+              <label for="cognitoIdentityPoolId">Cognito Identity Pool ID</label>
+            </div>            
+            <div class="input-field">
+              <input id="cognitoRegion" type="text">
+              <label for="cognitoRegion">Cognito Region:</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
       <div id="instructions" class="col s12 card">
         <div class="card-content">
           <span class="card-title">Instructions</span>
