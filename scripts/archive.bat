@@ -1,7 +1,7 @@
 @echo off
 REM archive.bat
 
-call npm install webpack webpack-cli webpack-dev-server @babel/core @babel/preset-env babel-loader @materializecss/materialize --save-dev
+call npm install webpack webpack-cli webpack-dev-server @babel/core @babel/preset-env babel-loader --save-dev
 call npx webpack --config webpack.config.js
 set zipfile=aesr-s3-config-sender.zip
 

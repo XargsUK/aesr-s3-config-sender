@@ -2,10 +2,6 @@ import {
   S3Client,
   GetObjectCommand
 } from "@aws-sdk/client-s3";
-import * as materialize from "@materializecss/materialize";
-
-
-
 const elById = (id) => document.getElementById(id);
 
 async function saveProfile() {
