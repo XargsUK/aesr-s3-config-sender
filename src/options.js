@@ -1,7 +1,4 @@
-import {
-  S3Client,
-  GetObjectCommand
-} from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import './materialize';
 import { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand } from "@aws-sdk/client-cognito-identity";
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
@@ -28,6 +25,7 @@ async function saveProfile() {
   const profileData = {
     accessKeyId: cognitoFilled ? "" : elById("awsAccessKey").value,
     secretAccessKey: cognitoFilled ? "" : elById("awsSecretKey").value,
+    sessionToken: cognitoFilled ? "" : elById("awsSessionToken").value,
     region: elById("awsRegion").value,
     bucket: elById("bucketName").value,
     key: elById("fileKey").value,
@@ -66,6 +64,7 @@ async function loadProfile(profileName) {
     elById("profileName").value = profileName;
     elById("awsAccessKey").value = profileData.accessKeyId;
     elById("awsSecretKey").value = profileData.secretAccessKey;
+    elById("awsSessionToken").value = profileData.sessionToken;
     elById("awsRegion").value = profileData.region;
     elById("bucketName").value = profileData.bucket;
     elById("fileKey").value = profileData.key;
@@ -127,6 +126,7 @@ async function setDefaultProfile() {
       defaultProfile: selectedProfile
     }, function() {
       showToastMessage('green', 'Default profile set to: ' + selectedProfile)
+      loadProfiles();
       refreshSelect();
       selectDefaultProfile();
     });
