@@ -409,7 +409,8 @@ pullS3ConfigButton.onclick = async function() {
   try {
     const content = await fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key);
     textArea.value = content;
-    activateLabel("awsConfigTextArea");
+    activateLabel('awsConfigTextArea');
+    M.textareaAutoResize(textArea);
     showToastMessage('green', 'Config downloaded')
   } catch (error) {
     showToastMessage('red', 'Error fetching S3 file content: ' + error.message)
@@ -423,7 +424,6 @@ pullS3ConfigButton.onclick = async function() {
   elById("profileList").onchange = () => loadProfile(elById("profileList").value);
   elById("setDefaultProfileButton").onclick = setDefaultProfile;
   elById("cognitoSignInButton").onclick = handleCognitoSignIn;
-
   loadProfiles(); // Load the saved profiles initially
   loadDefaultProfile(); // Load the default profile initially
 
