@@ -9,6 +9,7 @@ import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/cli
 
 const elById = (id) => document.getElementById(id);
 
+// PROFILE MANAGEMENT
 // Saves profile to Chrome storage and refreshes the profiles list on the page.
 async function saveProfile() {
   const profileName = elById("profileName").value.trim();
@@ -148,70 +149,7 @@ async function loadDefaultProfile() {
   }
 }
 
-// Initializes page elements and sends updated config data to the background script.
-window.onload = function() {
-  const textArea = elById('awsConfigTextArea');
-  const msgSpan = elById('msgSpan');
-  const saveButton = elById('saveButton');
-  const pullS3ConfigButton = elById('pullS3ConfigButton');
-
-  // set the rows attribute and overflow-y property
-  textArea.setAttribute('rows', '20');
-  textArea.style.overflowY = 'scroll';
-
-  saveButton.onclick = function() {
-    const aesrSenderId = elById('aesrIdText').value;
-
-    chrome.runtime.sendMessage(aesrSenderId, {
-      action: 'updateConfig',
-      dataType: 'ini',
-      data: textArea.value,
-    }, function(response) {
-      if (response) {
-        localStorage.setItem('lastSentTimestamp', new Date().toISOString());
-        updateLastSentTimestamp(Date.now());
-      } else {
-        showErrorBanner('Failed to send data' + error.message);
-      }
-    });
-  };
-
-  // Pulls AWS config data from S3 and updates the AWS config text area on the page.
-  pullS3ConfigButton.onclick = async function() {
-    const accessKeyId = elById('awsAccessKey').value;
-    const secretAccessKey = elById('awsSecretKey').value;
-    const sessionToken = elById('awsSessionToken').value;
-    const region = elById('awsRegion').value;
-    const bucket = elById('bucketName').value;
-    const key = elById('fileKey').value;
-  
-    if (!accessKeyId || !secretAccessKey || !region || !bucket || !key) {
-      showErrorBanner("Please fill in all required fields.");
-      return;
-    }
-  
-    try {
-      const content = await fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key);
-      textArea.value = content;
-      activateLabel("awsConfigTextArea");
-      showToastMessage('green', 'Config downloaded')
-    } catch (error) {
-      showToastMessage('red', 'Error fetching S3 file content: ' + error.message)
-    }
-  };
-  
-
-
-  elById("saveProfileButton").onclick = saveProfile;
-  elById("deleteProfileButton").onclick = () => deleteProfile(elById("profileList").value);
-  elById("profileList").onchange = () => loadProfile(elById("profileList").value);
-  elById("setDefaultProfileButton").onclick = setDefaultProfile;
-  elById("cognitoSignInButton").onclick = handleCognitoSignIn;
-
-  loadProfiles(); // Load the saved profiles initially
-  loadDefaultProfile(); // Load the default profile initially
-
-};
+// Handles user sign-in using Cognito authentication service
 
 async function handleCognitoSignIn(event) {
   console.log("Cognito sign in button clicked.");
@@ -330,32 +268,6 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, re
   }
 }
 
-
-// Creates a MutationObserver to hide a .hiddendiv.common on the page when a childList mutation occurs.
-document.addEventListener('DOMContentLoaded', function() {
-  const bodyObserver = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.type === 'childList') {
-        const hiddenDiv = document.querySelector('.hiddendiv.common');
-        if (hiddenDiv) {
-          hiddenDiv.style.position = 'absolute';
-          hiddenDiv.style.left = '-9999px';
-        }
-      }
-    }
-  });
-
-  bodyObserver.observe(document.body, {
-    childList: true
-  });
-});
-
-// Retrieves an HTML element with the ID "extensionId" and appends the extension's runtime ID to the text content of the element.
-document.addEventListener('DOMContentLoaded', function() {
-  const extensionIdElement = document.getElementById('extensionId');
-  extensionIdElement.textContent += chrome.runtime.id;
-});
-
 // Displays an error banner on the page with the specified message.
 function showErrorBanner(message) {
   const errorBanner = document.getElementById("errorBanner");
@@ -369,6 +281,7 @@ function showErrorBanner(message) {
     errorBanner.style.display = "none";
   };
 }
+
 
 // Saves a timestamp to local storage as the last time data was sent.
 function updateLastSentTimestamp(timestamp) {
@@ -390,23 +303,6 @@ function updateLastSentTimestamp(timestamp) {
     }
   });
 }
-
-// Initializes Materialize tooltips and collapsibles and updates the last sent timestamp displayed on the page.
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('.tooltipped');
-  var instances = M.Tooltip.init(elems);
-
-  var elems = document.querySelectorAll('.collapsible');
-  var instances = M.Collapsible.init(elems);
-
-  updateLastSentTimestamp();
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('.tooltipped');
-  var instances = M.Tooltip.init(elems, {
-  });
-});
 
 function showToastMessage(color, message) {
   const toastWrapper = document.createElement('div');
@@ -449,3 +345,101 @@ function activateLabels(inputIds) {
     activateLabel(id);
   });
 }
+
+
+window.onload = function() {
+  const textArea = elById('awsConfigTextArea');
+  const saveButton = elById('saveButton');
+  const pullS3ConfigButton = elById('pullS3ConfigButton');
+  textArea.setAttribute('rows', '20');
+  textArea.style.overflowY = 'scroll';
+
+  saveButton.onclick = function() {
+    const aesrSenderId = elById('aesrIdText').value;
+
+    chrome.runtime.sendMessage(aesrSenderId, {
+      action: 'updateConfig',
+      dataType: 'ini',
+      data: textArea.value,
+    }, function(response) {
+      if (response) {
+        localStorage.setItem('lastSentTimestamp', new Date().toISOString());
+        updateLastSentTimestamp(Date.now());
+      } else {
+        showErrorBanner('Failed to send data' + error.message);
+      }
+    });
+};
+
+// Pulls AWS config data from S3 and updates the AWS config text area on the page.
+pullS3ConfigButton.onclick = async function() {
+  const accessKeyId = elById('awsAccessKey').value;
+  const secretAccessKey = elById('awsSecretKey').value;
+  const sessionToken = elById('awsSessionToken').value;
+  const region = elById('awsRegion').value;
+  const bucket = elById('bucketName').value;
+  const key = elById('fileKey').value;
+
+  if (!accessKeyId || !secretAccessKey || !region || !bucket || !key) {
+    showErrorBanner("Please fill in all required fields.");
+    return;
+  }
+
+  try {
+    const content = await fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key);
+    textArea.value = content;
+    activateLabel("awsConfigTextArea");
+    showToastMessage('green', 'Config downloaded')
+  } catch (error) {
+    showToastMessage('red', 'Error fetching S3 file content: ' + error.message)
+  }
+};
+  
+
+
+  elById("saveProfileButton").onclick = saveProfile;
+  elById("deleteProfileButton").onclick = () => deleteProfile(elById("profileList").value);
+  elById("profileList").onchange = () => loadProfile(elById("profileList").value);
+  elById("setDefaultProfileButton").onclick = setDefaultProfile;
+  elById("cognitoSignInButton").onclick = handleCognitoSignIn;
+
+  loadProfiles(); // Load the saved profiles initially
+  loadDefaultProfile(); // Load the default profile initially
+
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Creates a MutationObserver to hide a .hiddendiv.common on the page when a childList mutation occurs.
+  const bodyObserver = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList') {
+        const hiddenDiv = document.querySelector('.hiddendiv.common');
+        if (hiddenDiv) {
+          hiddenDiv.style.position = 'absolute';
+          hiddenDiv.style.left = '-9999px';
+        }
+      }
+    }
+  });
+
+  bodyObserver.observe(document.body, {
+    childList: true
+  });
+
+  // Retrieves an HTML element with the ID "extensionId" and appends the extension's runtime ID to the text content of the element.
+  const extensionIdElement = document.getElementById('extensionId');
+  extensionIdElement.textContent += chrome.runtime.id;
+
+  // Initializes Materialize tooltips and collapsibles and updates the last sent timestamp displayed on the page.
+  var elems = document.querySelectorAll('.tooltipped');
+  var instances = M.Tooltip.init(elems);
+
+  elems = document.querySelectorAll('.collapsible');
+  instances = M.Collapsible.init(elems);
+
+  updateLastSentTimestamp();
+
+  // Initializes tooltips with custom options.
+  elems = document.querySelectorAll('.tooltipped');
+  instances = M.Tooltip.init(elems, {});
+});
