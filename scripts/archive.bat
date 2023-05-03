@@ -1,7 +1,7 @@
 @echo off
 REM archive.bat
 
-call npm install webpack webpack-cli webpack-dev-server @babel/core @babel/preset-env babel-loader @aws-sdk/client-cognito-identity @aws-sdk/client-cognito-identity-provider  @aws-sdk/credential-provider-cognito-identity @aws-sdk/client-sts --save-dev
+call npm install webpack webpack-cli webpack-dev-server @babel/core @babel/preset-env babel-loader @aws-sdk/client-cognito-identity @aws-sdk/client-cognito-identity-provider @aws-sdk/credential-provider-cognito-identity @aws-sdk/client-sts npm install bootstrap@5.3.0-alpha3 css-loader style-loader mini-css-extract-plugin @popperjs/core jquery
 call npx webpack --config webpack.config.js
 set zipfile=aesr-s3-config-sender.zip
 
