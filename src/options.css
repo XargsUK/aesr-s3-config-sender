@@ -1,0 +1,4 @@
+@import '~bootstrap/dist/css/bootstrap.min.css';
+body {
+    min-width: 800px; 
+  }
