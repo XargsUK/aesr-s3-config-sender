@@ -150,7 +150,6 @@ async function loadDefaultProfile() {
 }
 
 // Handles user sign-in using Cognito authentication service
-
 async function handleCognitoSignIn(event) {
   console.log("Cognito sign in button clicked.");
   event.preventDefault();
@@ -304,31 +303,47 @@ function updateLastSentTimestamp(timestamp) {
   });
 }
 
-function showToastMessage(color, message) {
-  const toastWrapper = document.createElement('div');
-  toastWrapper.style.position = 'fixed';
-  toastWrapper.style.top = '10px';
-  toastWrapper.style.left = '50%';
-  toastWrapper.style.transform = 'translateX(-50%)';
-  toastWrapper.style.zIndex = 10000;
-  toastWrapper.style.opacity = 1;
-  toastWrapper.style.transition = 'opacity 0.5s';
+// Shows toast notification with the specified color and message.
+(function () {
+  let currentToast = null; 
+  function showToastMessage(color, message) {
+    // Remove existing toast before creating a new one
+    if (currentToast) {
+      currentToast.remove();
+    }
 
-  const toastElement = document.createElement('div');
-  toastElement.className = `toast ${color}`;
-  toastElement.textContent = message;
+    const toastWrapper = document.createElement('div');
+    toastWrapper.style.position = 'fixed';
+    toastWrapper.style.top = '10px';
+    toastWrapper.style.left = '50%';
+    toastWrapper.style.transform = 'translateX(-50%)';
+    toastWrapper.style.zIndex = 10000;
+    toastWrapper.style.opacity = 1;
+    toastWrapper.style.transition = 'opacity 0.5s';
 
-  toastWrapper.appendChild(toastElement);
-  document.body.appendChild(toastWrapper);
+    const toastElement = document.createElement('div');
+    toastElement.className = `toast ${color}`;
+    toastElement.textContent = message;
 
-  setTimeout(() => {
-    toastWrapper.style.opacity = 0;
-  }, 5500); // Start fading out after 5.5 seconds
+    toastWrapper.appendChild(toastElement);
+    document.body.appendChild(toastWrapper);
 
-  setTimeout(() => {
-    toastWrapper.remove();
-  }, 6000);  // Remove the element after 6 seconds
-}
+    currentToast = toastWrapper; // Update the reference to the current toast
+
+    setTimeout(() => {
+      toastWrapper.style.opacity = 0;
+    }, 3500); // Start fading out after 3.5 seconds
+
+    setTimeout(() => {
+      toastWrapper.remove();
+      if (currentToast === toastWrapper) {
+        currentToast = null; // Clear the reference to the current toast if it's the one being removed
+      }
+    }, 4000);  // Remove the element after 4 seconds
+  }
+  window.showToastMessage = showToastMessage;
+})();
+
 
 function activateLabel(inputId) {
   const input = elById(inputId);
