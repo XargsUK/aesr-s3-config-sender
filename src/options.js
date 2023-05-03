@@ -79,7 +79,7 @@ async function loadProfile(profileName) {
     const inputIds = ["profileName", "awsAccessKey", "awsSecretKey", "awsRegion", "bucketName", "fileKey", "aesrIdText", "cognitoUsername", "cognitoPassword", "cognitoUserPoolId", "cognitoClientAppId", "cognitoIdentityPoolId", "cognitoRegion"];
     activateLabels(inputIds);
   }
-  showToastMessage('green', 'Profile Loaded')
+  // showToastMessage('green', 'Profile Loaded')
 }
 
 // Loads all profiles saved in Chrome storage and creates a dropdown list of profiles, setting the default profile if it exists.
@@ -117,7 +117,6 @@ async function loadProfiles() {
   }
 }
 
-
 // Sets the user's default profile to the currently selected profile in the dropdown list.
 async function setDefaultProfile() {
   let selectedProfile = profileList.options[profileList.selectedIndex].text;
@@ -127,7 +126,6 @@ async function setDefaultProfile() {
     }, function() {
       showToastMessage('green', 'Default profile set to: ' + selectedProfile)
       loadProfiles();
-      refreshSelect();
       selectDefaultProfile();
     });
   } else {
@@ -305,44 +303,45 @@ function updateLastSentTimestamp(timestamp) {
 
 // Shows toast notification with the specified color and message.
 (function () {
-  let currentToast = null; 
+  let currentToast = null;
   function showToastMessage(color, message) {
-    // Remove existing toast before creating a new one
-    if (currentToast) {
-      currentToast.remove();
-    }
-
-    const toastWrapper = document.createElement('div');
-    toastWrapper.style.position = 'fixed';
-    toastWrapper.style.top = '10px';
-    toastWrapper.style.left = '50%';
-    toastWrapper.style.transform = 'translateX(-50%)';
-    toastWrapper.style.zIndex = 10000;
-    toastWrapper.style.opacity = 1;
-    toastWrapper.style.transition = 'opacity 0.5s';
-
-    const toastElement = document.createElement('div');
-    toastElement.className = `toast ${color}`;
-    toastElement.textContent = message;
-
-    toastWrapper.appendChild(toastElement);
-    document.body.appendChild(toastWrapper);
-
-    currentToast = toastWrapper; // Update the reference to the current toast
-
-    setTimeout(() => {
-      toastWrapper.style.opacity = 0;
-    }, 3500); // Start fading out after 3.5 seconds
-
-    setTimeout(() => {
-      toastWrapper.remove();
-      if (currentToast === toastWrapper) {
-        currentToast = null; // Clear the reference to the current toast if it's the one being removed
+      // Remove toast if already e
+      if (currentToast) {
+        currentToast.remove();
       }
-    }, 4000);  // Remove the element after 4 seconds
-  }
+
+      const toastWrapper = document.createElement('div');
+      toastWrapper.style.position = 'fixed';
+      toastWrapper.style.top = '10px';
+      toastWrapper.style.left = '50%';
+      toastWrapper.style.transform = 'translateX(-50%)';
+      toastWrapper.style.zIndex = 10000;
+      toastWrapper.style.opacity = 1;
+      toastWrapper.style.transition = 'opacity 0.5s';
+
+      const toastElement = document.createElement('div');
+      toastElement.className = `toast ${color}`;
+      toastElement.textContent = message;
+
+      toastWrapper.appendChild(toastElement);
+      document.body.appendChild(toastWrapper);
+
+      currentToast = toastWrapper; 
+
+      setTimeout(() => {
+        toastWrapper.style.opacity = 0;
+      }, 1500); // Start fading out after 1.5 seconds
+
+      setTimeout(() => {
+        toastWrapper.remove();
+        if (currentToast === toastWrapper) {
+          currentToast = null; // Clear the reference to the current toast if it's the one being removed
+        }
+      }, 2000);  // Remove the element after 2 seconds
+    }
   window.showToastMessage = showToastMessage;
 })();
+
 
 
 function activateLabel(inputId) {
