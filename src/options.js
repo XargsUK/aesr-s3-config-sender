@@ -5,6 +5,7 @@ import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/cli
 
 
 const elById = (id) => document.getElementById(id);
+const debugMode = false;
 
 // PROFILE MANAGEMENT
 // Saves profile to Chrome storage and refreshes the profiles list on the page.
@@ -79,7 +80,6 @@ async function loadProfile(profileName) {
     const inputIds = ["profileName", "awsAccessKey", "awsSecretKey", "awsRegion", "bucketName", "fileKey", "aesrIdText", "cognitoUsername", "cognitoPassword", "cognitoUserPoolId", "cognitoClientAppId", "cognitoIdentityPoolId", "cognitoRegion"];
     activateLabels(inputIds);
   }
-  // showToastMessage('green', 'Profile Loaded')
 }
 
 // Loads all profiles saved in Chrome storage and creates a dropdown list of profiles, setting the default profile if it exists.
@@ -149,9 +149,10 @@ async function loadDefaultProfile() {
 
 // Handles user sign-in using Cognito authentication service
 async function handleCognitoSignIn(event) {
-  console.log("Cognito sign in button clicked.");
+
+  logDebugMessage("Cognito sign in button clicked.");
   event.preventDefault();
-  console.log("Processing Cognito sign in...");
+  logDebugMessage("Processing Cognito sign in...");
 
   const username = elById("cognitoUsername").value.trim();
   const password = elById("cognitoPassword").value.trim();
@@ -178,7 +179,7 @@ async function handleCognitoSignIn(event) {
       })
     );
 
-    console.log("Auth result:", authResult);
+    logDebugMessage("Auth result:", authResult);
     const idToken = authResult.AuthenticationResult.IdToken;
 
     const cognitoIdentityClient = new CognitoIdentityClient({ region });
@@ -191,7 +192,7 @@ async function handleCognitoSignIn(event) {
         },
       })
     );
-    console.log("Identity result:", identityResult);
+    logDebugMessage("Identity result:", identityResult);
 
     const credentialsResult = await cognitoIdentityClient.send(
       new GetCredentialsForIdentityCommand({
@@ -208,7 +209,7 @@ async function handleCognitoSignIn(event) {
       SessionToken: sessionToken,
     } = credentialsResult.Credentials;
 
-    console.log("Fetched credentials:", accessKeyId, secretAccessKey, sessionToken);
+    logDebugMessage("Fetched credentials:", accessKeyId, secretAccessKey, sessionToken);
 
     elById("awsAccessKey").value = accessKeyId;
     elById("awsSecretKey").value = secretAccessKey;
@@ -224,19 +225,19 @@ async function handleCognitoSignIn(event) {
       }
     }
   );
-    console.log("Populated input fields with credentials:", accessKeyId, secretAccessKey, sessionToken);
+    logDebugMessage("Populated input fields with credentials:", accessKeyId, secretAccessKey, sessionToken);
     showToastMessage('green', 'Credentials stored from Cognito!')
   } catch (error) {
     showToastMessage('red', 'Error during Cognito sign in: ' + error.message)
   }
-  console.log("handleCognitoSignIn function finished.");
+  logDebugMessage("handleCognitoSignIn function finished.");
 }
 
 // Fetches the content of an S3 file using AWS credentials and returns it as a string.
 async function fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key) {
   try {
     // Log the credentials being used
-    console.log('Using credentials for S3 fetch:', accessKeyId, secretAccessKey, sessionToken);
+    logDebugMessage('Using credentials for S3 fetch:', accessKeyId, secretAccessKey, sessionToken);
 
     // Create a new S3 client
     const s3Client = new S3Client({
@@ -248,7 +249,7 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, re
       },
     });
 
-    console.log('S3 Client:', s3Client);
+    logDebugMessage('S3 Client:', s3Client);
 
     // Create the GetObjectCommand with the required parameters
     const getObjectCommand = new GetObjectCommand({
@@ -286,7 +287,7 @@ function updateLastSentTimestamp(timestamp) {
     chrome.storage.local.set({
       lastSentTimestamp: timestamp
     }, () => {
-      console.log('Last sent timestamp saved:', timestamp);
+      logDebugMessage('Last sent timestamp saved:', timestamp);
     });
   }
 
@@ -358,6 +359,12 @@ function activateLabels(inputIds) {
   inputIds.forEach((id) => {
     activateLabel(id);
   });
+}
+
+function logDebugMessage(...messages) {
+  if (debugMode) {
+    console.log(...messages);
+  }
 }
 
 
