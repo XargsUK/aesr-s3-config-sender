@@ -1,8 +1,12 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import './materialize';
+import * as bootstrap from 'bootstrap';
+import './options.css';
 import { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand } from "@aws-sdk/client-cognito-identity";
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 
+window.bootstrap = bootstrap;
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
 const elById = (id) => document.getElementById(id);
 const debugMode = false;
@@ -92,7 +96,7 @@ async function loadProfiles() {
     chrome.storage.sync.get('defaultProfile', (result) => resolve(result.defaultProfile))
   );
 
-  const profileList = elById("profileList");
+  const profileList = document.getElementById("profileList");
   profileList.innerHTML = '<option value="" disabled>Select a Profile</option>';
 
   for (const profileName in profiles) {
@@ -267,18 +271,18 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, re
 }
 
 // Displays an error banner on the page with the specified message.
-function showErrorBanner(message) {
-  const errorBanner = document.getElementById("errorBanner");
-  const errorMessage = document.getElementById("errorMessage");
-  const errorClose = document.getElementById("errorClose");
+// function showErrorBanner(message) {
+//   const errorBanner = document.getElementById("errorBanner");
+//   const errorMessage = document.getElementById("errorMessage");
+//   const errorClose = document.getElementById("errorClose");
 
-  errorMessage.textContent = message;
-  errorBanner.style.display = "block";
+//   errorMessage.textContent = message;
+//   errorBanner.style.display = "block";
 
-  errorClose.onclick = () => {
-    errorBanner.style.display = "none";
-  };
-}
+//   errorClose.onclick = () => {
+//     errorBanner.style.display = "none";
+//   };
+// }
 
 
 // Saves a timestamp to local storage as the last time data was sent.
@@ -372,8 +376,6 @@ window.onload = function() {
   const textArea = elById('awsConfigTextArea');
   const saveButton = elById('saveButton');
   const pullS3ConfigButton = elById('pullS3ConfigButton');
-  textArea.setAttribute('rows', '20');
-  textArea.style.overflowY = 'scroll';
 
   saveButton.onclick = function() {
     const aesrSenderId = elById('aesrIdText').value;
@@ -409,8 +411,7 @@ pullS3ConfigButton.onclick = async function() {
   try {
     const content = await fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key);
     textArea.value = content;
-    activateLabel('awsConfigTextArea');
-    M.textareaAutoResize(textArea);
+    activateLabel('awsConfigTextArea')
     showToastMessage('green', 'Config downloaded')
   } catch (error) {
     showToastMessage('red', 'Error fetching S3 file content: ' + error.message)
@@ -451,16 +452,5 @@ document.addEventListener('DOMContentLoaded', function() {
   const extensionIdElement = document.getElementById('extensionId');
   extensionIdElement.textContent += chrome.runtime.id;
 
-  // Initializes Materialize tooltips and collapsibles and updates the last sent timestamp displayed on the page.
-  var elems = document.querySelectorAll('.tooltipped');
-  var instances = M.Tooltip.init(elems);
-
-  elems = document.querySelectorAll('.collapsible');
-  instances = M.Collapsible.init(elems);
-
   updateLastSentTimestamp();
-
-  // Initializes tooltips with custom options.
-  elems = document.querySelectorAll('.tooltipped');
-  instances = M.Tooltip.init(elems, {});
 });
