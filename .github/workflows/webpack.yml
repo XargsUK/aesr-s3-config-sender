@@ -27,9 +27,16 @@ jobs:
     - name: Run Webpack
       run: npx webpack --config webpack.config.js
 
-    - name: Upload artifacts
+    - name: Upload JS artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: webpacked-files
+        name: webpacked-js-files
         path: js
+        if-no-files-found: warn
+
+    - name: Upload CSS artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: webpacked-css-files
+        path: css
         if-no-files-found: warn
