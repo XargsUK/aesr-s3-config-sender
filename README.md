@@ -6,17 +6,18 @@
 AESR S3 Config Sender is a Google Chrome extension that enables you to easily update your AESR configuration by pulling the latest configuration from an S3 bucket. 
 
 ## Installation
-### Manual Unpacked
+
+### Chrome Web Store
+
+You can download the latest stable version from the [Chrome Web Store here](https://chrome.google.com/webstore/detail/aesr-s3-config-sender/ikmgjpefodojiccmidahcblifopeimjf?hl=en-GB&authuser=0).
+
+### Manual Install: Unpacked Extension
 1. [Download](https://github.com/XargsUK/aesr-s3-config-sender/releases/latest) the latest build.
 2. Extract the contents of the ZIP file to a local directory on your computer.
 3. Open Google Chrome and type `chrome://extensions` in the address bar.
 4. Turn on the "Developer mode" toggle switch (if it's not already on).
 5. Click the "Load unpacked" button and select the directory where you extracted the extension in step 2.
 6. The extension should now be loaded as an unpacked extension and ready to use.
-
-### Chrome Web Store
-
-You can download the latest stable version from the [Chrome Web Store here](https://chrome.google.com/webstore/detail/aesr-s3-config-sender/ikmgjpefodojiccmidahcblifopeimjf?hl=en-GB&authuser=0).
 
 ## Authentication
 
