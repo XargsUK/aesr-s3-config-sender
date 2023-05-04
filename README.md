@@ -17,12 +17,13 @@ AESR S3 Config Sender is a Google Chrome extension that enables you to easily up
 ### Chrome Web Store
 
 You can download the latest stable version from the [Chrome Web Store here](https://chrome.google.com/webstore/detail/aesr-s3-config-sender/ikmgjpefodojiccmidahcblifopeimjf?hl=en-GB&authuser=0).
+
 ## Authentication
 
 Currently, AESR Config Sender supports two authentication methods; IAM access keys and Cognito.
 
 Cognito uses the following flow to authenticate users: 
-![AESR Cognito Authentication Diagram](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/aesr-diagram.png). When filling out the fields, if you are using Cognito, just fill out 
+![AESR Cognito Authentication Diagram](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/aesr-diagram.png). 
 
 ## How to Use
 
