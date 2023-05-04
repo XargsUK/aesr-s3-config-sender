@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AESR Config Sender</title>
-    <link href="js/options.css" rel="stylesheet">
+    <link href="css/options.css" rel="stylesheet">
   </head>
   <body>
     <div class="container mt-4">
@@ -12,9 +12,15 @@
       <div class="card mb-3">
         <div class="card-header">AESR Actions</div>
         <div class="card-body">
-          <button id="cognitoSignInButton" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Authenticates with Cognito, pulls credentials">Cognito Sign-In</button>
-          <button id="pullS3ConfigButton" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Downloads config from S3">Pull Config from S3</button>
-          <button id="saveButton" class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sends configuration to AWS Extend Switch Roles">Push to AESR</button>
+          <button id="cognitoSignInButton" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Authenticates with Cognito, pulls credentials">
+            <i class="fa-solid fa-key" style="color: #ffffff;"></i> Cognito Sign-In
+          </button>
+          <button id="pullS3ConfigButton" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Downloads config from S3">
+            <i class="fa-solid fa-download" style="color: #ffffff;"></i> Pull Config from S3
+          </button>
+          <button id="saveButton" class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sends configuration to AWS Extend Switch Roles">
+            <i class="fa-solid fa-download" style="color: #ffffff;"></i> Push to AESR
+          </button>
           <p id="lastSent" style="margin-top: 10px;">Last sent: Never</p>
           <div class="form-group mt-2">
             <label for="profileList">Choose a Profile:</label>
@@ -59,9 +65,15 @@
               <label for="fileKey">File Key:</label>
               <input id="fileKey" class="form-control" type="text">
             </div>
-            <button id="saveProfileButton" class="btn btn-primary mt-2">Save Profile</button>
-            <button id="deleteProfileButton" class="btn btn-danger mt-2">Delete Profile</button>
-            <button id="setDefaultProfileButton" class="btn btn-secondary mt-2">Set Default</button>
+            <button id="saveProfileButton" class="btn btn-primary mt-2">
+              <i class="fa-solid fa-floppy-disk" style="color: #ffffff;"></i> Save Profile
+            </button>
+            <button id="deleteProfileButton" class="btn btn-danger mt-2">
+              <i class="fa-solid fa-trash" style="color: #ffffff;"></i> Delete Profile
+            </button>
+            <button id="setDefaultProfileButton" class="btn btn-secondary mt-2">
+              <i class="fa-solid fa-house" style="color: #ffffff;"></i> Set Default
+            </button>
           </form>
         </div>
       </div>
