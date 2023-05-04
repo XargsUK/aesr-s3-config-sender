@@ -24,7 +24,8 @@ You can download the latest stable version from the [Chrome Web Store here](http
 Currently, AESR Config Sender supports two authentication methods; IAM access keys and Cognito.
 
 Cognito uses the following flow to authenticate users: 
-![AESR Cognito Authentication Diagram](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/aesr-diagram.png). 
+
+![AESR Cognito Authentication Diagram](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/aesr-diagram.png)
 
 ## How to Use
 
