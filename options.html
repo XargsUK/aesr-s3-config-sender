@@ -1,227 +1,222 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <link href="css/styles.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/materialize.min.css">
-  <script src="js/options.bundle.js"></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AESR Config Sender</title>
-</head>
-<body>
-  <div id="errorBanner" class="card-panel red lighten-1 white-text" style="display: none;">
-    <span id="errorMessage"></span>
-    <i id="errorClose" class="material-icons right">close</i>
-  </div>
-  <div id="banner" class="blue-grey darken-1">
-    <div class="container">
-      <div class="row">
-        <div class="col s12 center-align">
-          <h3 class="white-text">AESR Config Sender</h3>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  
-  <div class="container">
-    <div class="row">
-      <div id="actionsSection" class="col s12 card">
-        <div class="card-content">
-          <div class="row">
-            <div class="col s8">
-              <span class="card-title">AESR Actions</span>
-            </div>
-            <div class="col s4">
-              <select id="profileList">
-                <option value="" disabled selected>Select a Profile</option>
-                <option value="test">test</option>
-              </select>
-            </div>
-          </div>
-        <div class="button-container">
-          <button id="cognitoSignInButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Authenticates with Cognito, pulls credentials">Cognito Signin</button>
-          <button id="pullS3ConfigButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Downloads config from S3">Pull Config from S3</button>
-          <button id="saveButton" class="btn waves-effect waves-light teal lighten-2 tooltipped" data-position="top" data-tooltip="Sends configuration to AWS Extend Switch Roles">Push to AESR</button> <br>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AESR Config Sender</title>
+    <link href="css/options.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h1 class="text-center mb-4">AESR Config Sender</h1>
+      <div class="card mb-3">
+        <div class="card-header">AESR Actions</div>
+        <div class="card-body">
+          <button id="cognitoSignInButton" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Authenticates with Cognito, pulls credentials">
+            <i class="fa-solid fa-key" style="color: #ffffff;"></i> Cognito Sign-In
+          </button>
+          <button id="pullS3ConfigButton" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Downloads config from S3">
+            <i class="fa-solid fa-download" style="color: #ffffff;"></i> Pull Config from S3
+          </button>
+          <button id="saveButton" class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sends configuration to AWS Extend Switch Roles">
+            <i class="fa-solid fa-download" style="color: #ffffff;"></i> Push to AESR
+          </button>
           <p id="lastSent" style="margin-top: 10px;">Last sent: Never</p>
-        </div>
-      </div>
-    </div>
-
-      <div id="sendConfig" class="col s12 card">
-        <div class="card-content">
-          <span class="card-title">AESR Configuration</span>
-          <div class="input-field">
-            <textarea id="awsConfigTextArea" spellcheck="false" class="materialize-textarea"></textarea>
-            <label for="awsConfigTextArea">Configuration</label>
-          </div>
-          <div class="input-field">
-            <input id="aesrIdText" type="text" maxlength="48">
-            <label for="aesrIdText">AESR extension ID</label>
-            <p id="extensionId">Extension ID: </p>
-          </div>
-        </div>
-      </div>    
-
-      <div id="configuration" class="col s12 card">
-        <div class="card-content">
-              <span class="card-title">S3 Configuration</span>
-          <div class="input-field">
-            <input id="profileName" type="text">
-            <label for="profileName">Profile Name</label>
-          </div>
-          <div class="input-field">
-            <input id="awsRegion" type="text">
-            <label for="awsRegion">Region</label>
-          </div>
-          <div class="input-field">
-            <input id="bucketName" type="text">
-            <label for="bucketName">Bucket Name</label>
-          </div>
-          <div class="input-field">
-            <input id="fileKey" type="text">
-            <label for="fileKey">File Key</label>
-          </div>
-          <div class="button-container">
-            <button id="saveProfileButton" class="btn waves-effect waves-light teal lighten-2">Save Profile</button>
-            <button id="deleteProfileButton" class="btn waves-effect waves-light teal lighten-2">Delete Profile</button>
-            <button id="setDefaultProfileButton" class="btn waves-effect waves-light teal lighten-2">Set Default</button>
+          <div class="form-group mt-2">
+            <label for="profileList">Choose a Profile:</label>
+            <select id="profileList" class="form-select">
+            </select>
           </div>
         </div>
       </div>
-      
-      <div id="credentials" class="col s12 card">
-        <div class="card-content">
-          <span class="card-title">Credentials</span>
-          <div id="credentialsForm">
-            <div class="input-field">
-              <input id="awsAccessKey" type="text" required>
-              <label for="awsAccessKey">Access Key</label>
+      <div class="card mb-3">
+        <div class="card-header">AESR Configuration</div>
+        <div class="card-body">
+          <form>
+            <div class="form-group">
+              <label for="awsConfigTextArea">Configuration:</label>
+              <textarea id="awsConfigTextArea" class="form-control" rows="5"></textarea>
             </div>
-            <div class="input-field">
-              <input id="awsSecretKey" type="password" required>
-              <label for="awsSecretKey">Secret Key</label>
+            <div class="form-group mt-2">
+              <label for="aesrIdText">AESR Extension ID:</label>
+              <input id="aesrIdText" class="form-control" type="text">
+              <p id="extensionId">Extension ID: </p>
             </div>
-            <div class="input-field">
-              <input id="awsSessionToken" type="text">
-              <label for="awsSessionToken">Cognito Session Token</label>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
-
-      <div id="cognitoSignIn" class="col s12 card">
-        <div class="card-content">
-          <span class="card-title">Cognito Sign In</span>
-          <div id="signInForm">
-            <div class="input-field">
-              <input id="cognitoUsername" type="text" class="validate" required>
-              <label for="cognitoUsername">Username</label>
+      <div class="card mb-3">
+        <div class="card-header">S3 Configuration</div>
+        <div class="card-body">
+          <form>
+            <div class="form-group">
+              <label for="profileName">Profile Name:</label>
+              <input id="profileName" class="form-control" type="text">
             </div>
-            <div class="input-field">
-              <input id="cognitoPassword" type="password" class="validate" required>
-              <label for="cognitoPassword">Password</label>
+            <div class="form-group mt-2">
+              <label for="awsRegion">Region:</label>
+              <input id="awsRegion" class="form-control" type="text">
             </div>
-            <div class="input-field">
-              <input id="cognitoUserPoolId" type="text">
-              <label for="cognitoUserPoolId">User Pool ID</label>
+            <div class="form-group mt-2">
+              <label for="bucketName">Bucket Name:</label>
+              <input id="bucketName" class="form-control" type="text">
             </div>
-            <div class="input-field">
-              <input id="cognitoClientAppId" type="text">
+            <div class="form-group mt-2">
+              <label for="fileKey">File Key:</label>
+              <input id="fileKey" class="form-control" type="text">
+            </div>
+            <button id="saveProfileButton" class="btn btn-primary mt-2">
+              <i class="fa-solid fa-floppy-disk" style="color: #ffffff;"></i> Save Profile
+            </button>
+            <button id="deleteProfileButton" class="btn btn-danger mt-2">
+              <i class="fa-solid fa-trash" style="color: #ffffff;"></i> Delete Profile
+            </button>
+            <button id="setDefaultProfileButton" class="btn btn-secondary mt-2">
+              <i class="fa-solid fa-house" style="color: #ffffff;"></i> Set Default
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header">Credentials</div>
+        <div class="card-body">
+          <form>
+            <div class="form-group">
+              <label for="awsAccessKey">Access Key:</label>
+              <input id="awsAccessKey" class="form-control" type="text">
+            </div>
+            <div class="form-group mt-2">
+              <label for="awsSecretKey">Secret Key:</label>
+              <input id="awsSecretKey" class="form-control" type="text">
+            </div>
+            <div class="form-group mt-2">
+              <label for="awsSessionToken">Cognito Session Token:</label>
+              <input id="awsSessionToken" class="form-control" type="text">
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header">Cognito Sign In</div>
+        <div class="card-body">
+          <form>
+            <div class="form-group">
+              <label for="cognitoUsername">Username:</label>
+              <input id="cognitoUsername" class="form-control" type="text">
+            </div>
+            <div class="form-group mt-2">
+              <label for="cognitoPassword">Password:</label>
+              <input id="cognitoPassword" class="form-control" type="password">
+            </div>
+            <div class="form-group mt-2">
+              <label for="cognitoUserPoolId">User Pool ID:</label>
+              <input id="cognitoUserPoolId" class="form-control" type="text">
+            </div>
+            <div class="form-group mt-2">
               <label for="cognitoClientAppId">Cognito User Pool Client App ID:</label>
+              <input id="cognitoClientAppId" class="form-control" type="text">
             </div>
-            <div class="input-field">
-              <input id="cognitoIdentityPoolId" type="text">
-              <label for="cognitoIdentityPoolId">Cognito Identity Pool ID</label>
-            </div>            
-            <div class="input-field">
-              <input id="cognitoRegion" type="text">
+            <div class="form-group mt-2">
+              <label for="cognitoIdentityPoolId">Cognito Identity Pool ID:</label>
+              <input id="cognitoIdentityPoolId" class="form-control" type="text">
+            </div>
+            <div class="form-group mt-2">
               <label for="cognitoRegion">Cognito Region:</label>
+              <input id="cognitoRegion" class="form-control" type="text">
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header">Instructions</div>
+        <div class="card-body">
+          <div class="accordion" id="instructionsAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"> What is AESR Config Sender? </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#instructionsAccordion">
+                <div class="accordion-body">
+                  <p>AESR Config Sender is a Chrome extension that allows you to send your AWS Extend Switch Roles configuration to the AWS Extend Switch Roles Chrome extension, using S3 as a source.</p><br>
+                  <p>It does this by using a user-specified IAM user Access Key, Secret Key, and the S3 bucket information to download the configuration, and then using the extension ID of AESR, pushes the configuration to AESR. The user-specified information can be saved to Chrome local storage as a profile.</p>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo"> Initial Setup </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#instructionsAccordion">
+                <div class="accordion-body">
+                  <ol>
+                    <li>Fill in the fields in the S3 Configuration section. See "What do I put into the fields?" for what to enter.</li>
+                    <li>Copy the extension ID at the bottom of the S3 Configuration section. Open the AWS Extend Switch Roles configuration page and paste the ID into the <b>Extension API</b> field.</li>
+                    <li>Copy the extension ID of AWS Extend Switch Roles and paste into the <b>AESR extension ID</b> field. After this, click <b>Save Profile</b>.</li>
+                    <li>Click "Pull Config from S3" to download your switch role config from the specified S3 bucket.</li>
+                    <li>Click "Send to AESR" to send the configuration to AWS Extend Switch Roles. This will overwrite your current configuration in AESR.</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree"> What do I put into the fields? </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#instructionsAccordion">
+                <div class="accordion-body">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Field</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Example</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Profile Name</td>
+                        <td>Name of the profile to be saved or loaded</td>
+                        <td>AdminProfile</td>
+                      </tr>
+                      <tr>
+                        <td>Access Key</td>
+                        <td>Your AWS access key ID</td>
+                        <td>AKIAIOSFODNN7EXAMPLE</td>
+                      </tr>
+                      <tr>
+                        <td>Secret Key</td>
+                        <td>Your AWS secret access key</td>
+                        <td>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</td>
+                      </tr>
+                      <tr>
+                        <td>Region</td>
+                        <td>AWS region where your S3 bucket is located</td>
+                        <td>eu-west-2</td>
+                      </tr>
+                      <tr>
+                        <td>Bucket Name</td>
+                        <td>Name of your S3 bucket containing the configuration file</td>
+                        <td>my-config-bucket</td>
+                      </tr>
+                      <tr>
+                        <td>File Key</td>
+                        <td>The key (path) to the configuration file in your S3 bucket</td>
+                        <td>my-folder/browser-plugin-config.txt</td>
+                      </tr>
+                      <tr>
+                        <td>AESR extension ID</td>
+                        <td>The ID of your AWS Extend Switch Roles extension. Open AWS Extend Switch Roles, click options, and copy the extension ID in the URL.</td>
+                        <td>eiephjnabgbnmffmlopgdnnfaimfllpk</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-
-      <div id="instructions" class="col s12 card">
-        <div class="card-content">
-          <span class="card-title">Instructions</span>
-        <br>
-          <ul class="collapsible">
-            <li>
-              <div class="collapsible-header"><i class="material-icons">expand_more</i>What is AESR Config Sender?</div>
-              <div class="collapsible-body">
-                <p>AESR Config Sender is a Chrome extension that allows you to send your AWS Extend Switch Roles configuration to the AWS Extend Switch Roles Chrome extension, using S3 as a source.</p><br>
-                <p>It does this by using a user-specified IAM user Access Key, Secret Key, and the S3 bucket information to download the configuration, and then using the extension ID of AESR, pushes the configuration to AESR. The user-specified information can be saved to Chrome local storage as a profile.</p>
-              </div>
-            </li>
-            <li>
-              <div class="collapsible-header"><i class="material-icons">expand_more</i>Initial Setup</div>
-              <div class="collapsible-body">
-                <ol>
-                  <li>Fill in the fields in the S3 Configuration section. See "What do I put into the fields?" for what to enter.</li>
-                  <li>Copy the extension ID at the bottom of the S3 Configuration section. Open the AWS Extend Switch Roles configuration page and paste the ID into the <b>Extension API</b> field.</li>
-                  <li>Copy the extension ID of AWS Extend Switch Roles and paste into the <b>AESR extension ID</b> field. After this, click <b>Save Profile</b>.</li>
-                  <li>Click "Pull Config from S3" to download your switch role config from the specified S3 bucket.</li>
-                  <li>Click "Send to AESR" to send the configuration to AWS Extend Switch Roles. This will overwrite your current configuration in AESR.</li>
-                </ol>
-              </div>
-            </li>
-            <li>
-              <div class="collapsible-header"><i class="material-icons">expand_more</i>What do I put into the fields?</div>
-              <div class="collapsible-body">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Field</th>
-                      <th>Description</th>
-                      <th>Example</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Profile Name</td>
-                      <td>Name of the profile to be saved or loaded</td>
-                      <td>AdminProfile</td>
-                    </tr>
-                    <tr>
-                      <td>Access Key</td>
-                      <td>Your AWS access key ID</td>
-                      <td>AKIAIOSFODNN7EXAMPLE</td>
-                    </tr>
-                    <tr>
-                      <td>Secret Key</td>
-                      <td>Your AWS secret access key</td>
-                      <td>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</td>
-                    </tr>
-                    <tr>
-                      <td>Region</td>
-                      <td>AWS region where your S3 bucket is located</td>
-                      <td>eu-west-2</td>
-                    </tr>
-                    <tr>
-                      <td>Bucket Name</td>
-                      <td>Name of your S3 bucket containing the configuration file</td>
-                      <td>my-config-bucket</td>
-                    </tr>
-                    <tr>
-                      <td>File Key</td>
-                      <td>The key (path) to the configuration file in your S3 bucket</td>
-                      <td>my-folder/browser-plugin-config.txt</td>
-                    </tr>
-                    <tr>
-                      <td>AESR extension ID</td>
-                      <td>The ID of your AWS Extend Switch Roles extension. Open AWS Extend Switch Roles, click options, and copy the extension ID in the URL.</td>
-                      <td>eiephjnabgbnmffmlopgdnnfaimfllpk</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
     </div>
-  </div>
-</body>
+    <script src="js/options.bundle.js"></script>
+  </body>
 </html>
