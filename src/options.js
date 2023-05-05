@@ -5,8 +5,15 @@ import { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand }
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 
 window.bootstrap = bootstrap;
+
+// Tooltips for buttons, only show on hover
 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+tooltipTriggerList.forEach(tooltipTriggerEl => {
+  new bootstrap.Tooltip(tooltipTriggerEl, {
+    trigger: 'hover' // Show tooltip only on hover
+  });
+});
+
 
 const elById = (id) => document.getElementById(id);
 const debugMode = false;
