@@ -5,11 +5,19 @@ import { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand }
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 
 window.bootstrap = bootstrap;
+
+// Tooltips for buttons, only show on hover
 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+tooltipTriggerList.forEach(tooltipTriggerEl => {
+  new bootstrap.Tooltip(tooltipTriggerEl, {
+    trigger: 'hover' // Show tooltip only on hover
+  });
+});
+
 
 const elById = (id) => document.getElementById(id);
 const debugMode = false;
+let currentToast;
 
 // PROFILE MANAGEMENT
 // Saves profile to Chrome storage and refreshes the profiles list on the page.
@@ -87,7 +95,7 @@ async function loadProfile(profileName) {
 }
 
 // Loads all profiles saved in Chrome storage and creates a dropdown list of profiles, setting the default profile if it exists.
-async function loadProfiles() {
+async function loadProfiles(selectedProfileName) {
   const profiles = await new Promise((resolve) =>
     chrome.storage.sync.get(null, (items) => resolve(items))
   );
@@ -111,6 +119,9 @@ async function loadProfiles() {
     }
 
     profileList.appendChild(option);
+    if (profileName === selectedProfileName) {
+      option.selected = true;
+    }
   }
 
   if (defaultProfileName) {
@@ -149,6 +160,78 @@ async function loadDefaultProfile() {
     elById("profileList").value = defaultProfile;
     loadProfile(defaultProfile);
   }
+}
+
+// Allows users to import a profile from a JSON file.
+function importProfile() {
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = ".json";
+  fileInput.style.display = "none"; 
+
+  fileInput.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      const reader = new FileReader();
+
+      // Use a Promise to wait for the file to be read
+      const fileContent = await new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsText(file);
+      });
+
+      const importedProfile = JSON.parse(fileContent);
+      const profileName = Object.keys(importedProfile)[0];
+
+      if (typeof importedProfile[profileName] !== "object") {
+        throw new Error("Invalid profile data");
+      }
+
+      chrome.storage.sync.set(importedProfile, () => {
+        loadProfiles(); 
+        showToastMessage('green', 'Profile imported successfully');
+        });
+        setTimeout(() => {
+          loadProfile(profileName); 
+          elById("profileList").value = profileName;
+        }, 100);
+      }
+    catch (error) {
+        showToastMessage('red', 'Invalid profile JSON file');
+    } finally {
+        // Remove the file input element after it's been used
+        fileInput.remove();
+    }
+  });
+
+  // Append the file input element to the document
+  document.body.appendChild(fileInput);
+  fileInput.click();
+}
+
+// Allows users to export a profile to a JSON file.
+function exportProfile() {
+  const profileName = elById("profileList").value;
+  if (!profileName) {
+    showToastMessage('yellow', 'Select a profile to export first!');
+    return;
+  }
+
+  chrome.storage.sync.get(profileName, (result) => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(result));
+    const downloadAnchorNode = document.createElement("a");
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", profileName + ".json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+    showToastMessage('green', 'Profile exported successfully');
+  });
 }
 
 // Handles user sign-in using Cognito authentication service
@@ -266,24 +349,10 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, re
     const content = new TextDecoder("utf-8").decode(await new Response(response.Body).arrayBuffer());
     return content;
   } catch (error) {
-    console.error('Error fetching file from S3:', error);
+    logDebugMessage('Error fetching file from S3:', error);
+    showToastMessage('red', 'Error fetching file from S3: ' + error.message);
   }
 }
-
-// Displays an error banner on the page with the specified message.
-// function showErrorBanner(message) {
-//   const errorBanner = document.getElementById("errorBanner");
-//   const errorMessage = document.getElementById("errorMessage");
-//   const errorClose = document.getElementById("errorClose");
-
-//   errorMessage.textContent = message;
-//   errorBanner.style.display = "block";
-
-//   errorClose.onclick = () => {
-//     errorBanner.style.display = "none";
-//   };
-// }
-
 
 // Saves a timestamp to local storage as the last time data was sent.
 function updateLastSentTimestamp(timestamp) {
@@ -307,45 +376,48 @@ function updateLastSentTimestamp(timestamp) {
 }
 
 // Shows toast notification with the specified color and message.
-(function () {
-  let currentToast = null;
-  function showToastMessage(color, message) {
-      // Remove toast if already e
-      if (currentToast) {
-        currentToast.remove();
-      }
+function showToastMessage(color, message) {
+  // Remove toast if already exists
+  if (currentToast) {
+    currentToast.hide();
+  }
 
-      const toastWrapper = document.createElement('div');
-      toastWrapper.style.position = 'fixed';
-      toastWrapper.style.top = '10px';
-      toastWrapper.style.left = '50%';
-      toastWrapper.style.transform = 'translateX(-50%)';
-      toastWrapper.style.zIndex = 10000;
-      toastWrapper.style.opacity = 1;
-      toastWrapper.style.transition = 'opacity 0.5s';
+  // Create a wrapper for the toast message
+  const toastWrapper = document.createElement("div");
+  toastWrapper.style.position = "fixed";
+  toastWrapper.style.top = "10px";
+  toastWrapper.style.left = "50%";
+  toastWrapper.style.transform = "translateX(-50%)";
+  toastWrapper.style.zIndex = 10000;
 
-      const toastElement = document.createElement('div');
-      toastElement.className = `toast ${color}`;
-      toastElement.textContent = message;
+  // Create a Bootstrap toast with a custom color
+  const toastElement = document.createElement("div");
+  toastElement.className = `toast align-items-center text-white bg-${color}`;
+  toastElement.setAttribute("role", "alert");
+  toastElement.setAttribute("aria-live", "assertive");
+  toastElement.setAttribute("aria-atomic", "true");
 
-      toastWrapper.appendChild(toastElement);
-      document.body.appendChild(toastWrapper);
+  // Create the toast body with the message
+  const toastBody = document.createElement("div");
+  toastBody.className = "toast-body";
+  toastBody.innerHTML = message;
 
-      currentToast = toastWrapper; 
+  toastElement.appendChild(toastBody);
+  toastWrapper.appendChild(toastElement);
+  document.body.appendChild(toastWrapper);
 
-      setTimeout(() => {
-        toastWrapper.style.opacity = 0;
-      }, 1500); // Start fading out after 1.5 seconds
+  const toastOptions = { autohide: true, delay: 1500 };
 
-      setTimeout(() => {
-        toastWrapper.remove();
-        if (currentToast === toastWrapper) {
-          currentToast = null; // Clear the reference to the current toast if it's the one being removed
-        }
-      }, 2000);  // Remove the element after 2 seconds
-    }
-  window.showToastMessage = showToastMessage;
-})();
+  currentToast = new bootstrap.Toast(toastElement, toastOptions);
+  currentToast.show();
+
+  toastElement.addEventListener("hidden.bs.toast", () => {
+    toastWrapper.remove();
+  });
+
+}
+
+
 
 
 
@@ -425,31 +497,42 @@ pullS3ConfigButton.onclick = async function() {
   elById("profileList").onchange = () => loadProfile(elById("profileList").value);
   elById("setDefaultProfileButton").onclick = setDefaultProfile;
   elById("cognitoSignInButton").onclick = handleCognitoSignIn;
+  elById("exportProfileButton").onclick = exportProfile;
+  elById("importProfileButton").onclick = importProfile;
   loadProfiles(); // Load the saved profiles initially
   loadDefaultProfile(); // Load the default profile initially
 
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
+  // const importProfileButton = document.getElementById("importProfileButton");
+
+  // if (importProfileButton) {
+  //   importProfileButton.addEventListener("click", importProfile);
+  //   console.log("EventListener added for importProfileButton");
+  // } else {
+  //   console.error("Import profile button not found.");
+  // }
+
   // Creates a MutationObserver to hide a .hiddendiv.common on the page when a childList mutation occurs.
   const bodyObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
-      if (mutation.type === 'childList') {
-        const hiddenDiv = document.querySelector('.hiddendiv.common');
+      if (mutation.type === "childList") {
+        const hiddenDiv = document.querySelector(".hiddendiv.common");
         if (hiddenDiv) {
-          hiddenDiv.style.position = 'absolute';
-          hiddenDiv.style.left = '-9999px';
+          hiddenDiv.style.position = "absolute";
+          hiddenDiv.style.left = "-9999px";
         }
       }
     }
   });
 
   bodyObserver.observe(document.body, {
-    childList: true
+    childList: true,
   });
 
   // Retrieves an HTML element with the ID "extensionId" and appends the extension's runtime ID to the text content of the element.
-  const extensionIdElement = document.getElementById('extensionId');
+  const extensionIdElement = document.getElementById("extensionId");
   extensionIdElement.textContent += chrome.runtime.id;
 
   updateLastSentTimestamp();
