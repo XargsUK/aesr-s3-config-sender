@@ -3,3 +3,12 @@
 body {
     min-width: 800px; 
   }
+
+  .navbar-nav {
+    flex-direction: row;
+  }
+  
+  .nav-item.dropdown {
+    margin-left: 10px;
+  }
+  

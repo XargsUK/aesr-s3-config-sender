@@ -7,19 +7,16 @@
     <link href="css/options.css" rel="stylesheet">
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
       <div class="container">
         <a class="navbar-brand" href="#">AESR Config Sender</a>
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Profiles
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#" id="importProfileButton">Import Profile</a></li>
-                <li><a class="dropdown-item" href="#" id="exportProfileButton">Export Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
                 <li>
                   <div class="dropdown-item">
                     <label for="profileList" class="form-label">Choose a Profile:</label>
@@ -27,20 +24,15 @@
                     </select>
                   </div>
                 </li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="saveProfileButton">Save Profile</a></li>
+                <li><a class="dropdown-item" href="#" id="deleteProfileButton">Delete Profile</a></li>
+                <li><a class="dropdown-item" href="#" id="setDefaultProfileButton">Set Default Profile</a></li>
+                <li><a class="dropdown-item" href="#" id="importProfileButton">Import Profile</a></li>
+                <li><a class="dropdown-item" href="#" id="exportProfileButton">Export Profile</a></li>
               </ul>
             </li>
           </ul>
-          <div class="d-flex">
-            <button id="saveProfileButton" class="btn btn-primary me-2">
-              <i class="fa-solid fa-floppy-disk" style="color: #ffffff;"></i> Save Profile
-            </button>
-            <button id="deleteProfileButton" class="btn btn-danger me-2">
-              <i class="fa-solid fa-trash" style="color: #ffffff;"></i> Delete Profile
-            </button>
-            <button id="setDefaultProfileButton" class="btn btn-secondary">
-              <i class="fa-solid fa-house" style="color: #ffffff;"></i> Set Default
-            </button>
-          </div>
         </div>
       </div>
     </nav>
