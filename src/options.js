@@ -1,10 +1,9 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import * as bootstrap from 'bootstrap';
 import './options.css';
-import { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand } from "@aws-sdk/client-cognito-identity";
-import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile  } from './library/profile.js';
 import { showToastMessage } from './library/toast.js';
+import { signInWithCognito } from "./library/cognito.js";
 
 
 
@@ -214,7 +213,6 @@ async function exportProfileAndUpdateUI() {
 
 // Handles user sign-in using Cognito authentication service
 async function handleCognitoSignIn(event) {
-
   logDebugMessage("Cognito sign in button clicked.");
   event.preventDefault();
   logDebugMessage("Processing Cognito sign in...");
@@ -232,47 +230,9 @@ async function handleCognitoSignIn(event) {
   }
 
   try {
-    const cognitoProvider = new CognitoIdentityProviderClient({ region });
-    const authResult = await cognitoProvider.send(
-      new InitiateAuthCommand({
-        ClientId: clientAppId,
-        AuthFlow: "USER_PASSWORD_AUTH",
-        AuthParameters: {
-          USERNAME: username,
-          PASSWORD: password,
-        },
-      })
+    const { accessKeyId, secretAccessKey, sessionToken } = await signInWithCognito(
+      username, password, userPoolId, identityPoolId, clientAppId, region
     );
-
-    logDebugMessage("Auth result:", authResult);
-    const idToken = authResult.AuthenticationResult.IdToken;
-
-    const cognitoIdentityClient = new CognitoIdentityClient({ region });
-
-    const identityResult = await cognitoIdentityClient.send(
-      new GetIdCommand({
-        IdentityPoolId: identityPoolId,
-        Logins: {
-          [`cognito-idp.${region}.amazonaws.com/${userPoolId}`]: idToken,
-        },
-      })
-    );
-    logDebugMessage("Identity result:", identityResult);
-
-    const credentialsResult = await cognitoIdentityClient.send(
-      new GetCredentialsForIdentityCommand({
-        IdentityId: identityResult.IdentityId,
-        Logins: {
-          [`cognito-idp.${region}.amazonaws.com/${userPoolId}`]: idToken,
-        },
-      })
-    );
-
-    const {
-      AccessKeyId: accessKeyId,
-      SecretKey: secretAccessKey,
-      SessionToken: sessionToken,
-    } = credentialsResult.Credentials;
 
     logDebugMessage("Fetched credentials:", accessKeyId, secretAccessKey, sessionToken);
 
@@ -288,8 +248,8 @@ async function handleCognitoSignIn(event) {
           label.classList.add("active");
         }
       }
-    }
-  );
+    });
+
     logDebugMessage("Populated input fields with credentials:", accessKeyId, secretAccessKey, sessionToken);
     showToastMessage('green', 'Credentials stored from Cognito!')
   } catch (error) {
