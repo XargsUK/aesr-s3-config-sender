@@ -13,6 +13,9 @@ if [ -f dist/$zipfile ]; then
     rm dist/$zipfile
 fi
 
+echo "Updating credits..."
+node ./bin/update_credits.js
+
 # Create a zip file
 zip -r dist/$zipfile manifest.json *.html icons/ js/ css/
 echo "archived: dist/$zipfile"
@@ -26,8 +29,6 @@ cp -R js/ dist/extension/js/
 cp -R css/ dist/extension/css/
 
 # Copy .html files
-echo "Updating credits..."
-node ./bin/update_credits.js
 cp *.html dist/extension/
 
 # Copy manifest.json
