@@ -90,7 +90,7 @@ a:hover { background-color: #153247 }
   font-weight: bold;
 }
 .roleListTitle {
-  color: #2c2c2c; 
+  color: #eaeded; 
 }
 </style>
 </head>
@@ -106,16 +106,18 @@ a:hover { background-color: #153247 }
       <ul id="roleList">
       </ul>
     </div>
-    <div id="noMain" style="display: none;">
-      <p></p>
+    <div id="noMain">
+        <br>
+        <select id="profileList" class="form-select"></select><br>
+        <button id="performAllOperations">Sync</button><br>
+        <p id="lastSent" style="margin-top: 10px;">Last sent: Never</p>
     </div>
   </div>
   <div>
     <ul class="optionMenu">
       <li><a href="#" id="openOptionsLink">Configuration</a></li>
-      <li><a href="#" id="openUpdateNoticeLink">Update Notice</a></li>
       <li><a
-          href="https://github.com/XargsUK/aesr-s3-config-sender/blob/master/CHANGELOG.md#changelog" rel="noopener noreferrer" target="_blank">Release Notes</a></li>
+          href="https://github.com/XargsUK/aesr-s3-config-sender/blob/master/CHANGELOG.md#changelog" rel="noopener noreferrer" target="_blank">Change Log</a></li>
       <li><a href="#" id="openCreditsLink">Credits</a></li>
       <li><a href="https://github.com/XargsUK/aesr-s3-config-sender" rel="noopener noreferrer"
               target="_blank">Website</a></li>
@@ -129,7 +131,7 @@ a:hover { background-color: #153247 }
     </div>
   </div>
 </div>
-<script src="js/popup.js" charset="utf-8"></script>
+<script src="js/popup.bundle.js" charset="utf-8"></script>
 <div id="sandbox" style="display: none;"></div>
 </body>
 </head>

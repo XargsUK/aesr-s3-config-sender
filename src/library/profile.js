@@ -1,8 +1,11 @@
+import { logDebugMessage } from "./debug.js";
+import { getCurrentProfileData, setCurrentProfileData } from "./state.js";
+
 async function loadProfile(profileName) {
     const profileData = await new Promise((resolve) =>
       chrome.storage.sync.get(profileName, (result) => resolve(result[profileName]))
     );
-  
+    setCurrentProfileData(profileData);
     return profileData;
   }
   
@@ -87,4 +90,46 @@ async function setDefaultProfile(profileName) {
     );
   }
 
-export { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile };
+  async function loadProfilesIntoDropdown(selectedProfileName, dropdownId) {
+    const { profiles, defaultProfileName } = await loadProfiles();
+  
+    const profileList = document.getElementById(dropdownId);
+    profileList.innerHTML = '<option value="" disabled>Select a Profile</option>';
+  
+    for (const profileName in profiles) {
+      if (profileName === "defaultProfile") continue;
+  
+      const option = document.createElement("option");
+      option.value = profileName;
+      option.textContent = profileName === defaultProfileName ? `${profileName} (default)` : profileName;
+  
+      if (profileName === defaultProfileName) {
+        option.style.fontWeight = "bold";
+        option.selected = true;
+        // Load the default profile data
+        const profileData = await loadProfile(defaultProfileName);
+        setCurrentProfileData(profileData);
+      }
+  
+      profileList.appendChild(option);
+      if (profileName === selectedProfileName) {
+        option.selected = true;
+        // Update the currentProfileData if selectedProfileName is provided
+        currentProfileData = await loadProfile(selectedProfileName);
+      }
+      logDebugMessage("Current Profile Data:", getCurrentProfileData());
+    }
+  
+    if (defaultProfileName) {
+      profileList.value = defaultProfileName;
+    } else {
+      profileList.selectedIndex = 0;
+    }
+
+    // Log the currentProfileData
+    logDebugMessage("Current Profile Data:", getCurrentProfileData());
+}
+
+
+
+export { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile, loadProfilesIntoDropdown};
