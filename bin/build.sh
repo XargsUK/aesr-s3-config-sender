@@ -26,6 +26,8 @@ cp -R js/ dist/extension/js/
 cp -R css/ dist/extension/css/
 
 # Copy .html files
+echo "Updating credits..."
+node ./bin/update_credits.js
 cp *.html dist/extension/
 
 # Copy manifest.json

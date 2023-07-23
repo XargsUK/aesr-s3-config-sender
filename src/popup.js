@@ -31,7 +31,7 @@ window.onload = function() {
     logDebugMessage("Profile changed to: ", selectedProfile, " Current profile data is: ", getCurrentProfileData());
   });
 
-  document.getElementById("performAllOperations").addEventListener("click", async () => {
+  document.getElementById("syncButton").addEventListener("click", async () => {
     const profileData = getCurrentProfileData();
     if (profileData) {
       try {
