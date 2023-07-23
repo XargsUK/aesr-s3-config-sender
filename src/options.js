@@ -5,6 +5,7 @@ import { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, impor
 import { showToastMessage } from './library/toast.js';
 import { signInWithCognito } from "./library/cognito.js";
 import { getS3FileContent } from "./library/s3.js";
+import { setLastSentTimestamp, getLastSentTimestamp } from './library/timestamp.js';
 
 
 
@@ -335,8 +336,8 @@ window.onload = function() {
       data: textArea.value,
     }, function(response) {
       if (response) {
-        localStorage.setItem('lastSentTimestamp', new Date().toISOString());
-        updateLastSentTimestamp(Date.now());
+        setLastSentTimestamp(Date.now());
+        getLastSentTimestamp();
       } else {
         showErrorBanner('Failed to send data' + error.message);
       }
