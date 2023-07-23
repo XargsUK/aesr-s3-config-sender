@@ -5,6 +5,7 @@ module.exports = {
   mode: 'production',
   entry: {
     options: './src/options.js',
+    cognito: './src/library/cognito.js',
   },
   output: {
     filename: '[name].bundle.js',

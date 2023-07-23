@@ -20,7 +20,7 @@ tooltipTriggerList.forEach(tooltipTriggerEl => {
 
 
 const elById = (id) => document.getElementById(id);
-const debugMode = false;
+const debugMode = true;
 
 // PROFILE MANAGEMENT
 // Saves profile to Chrome storage and refreshes the profiles list on the page.
