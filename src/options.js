@@ -1,4 +1,3 @@
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import * as bootstrap from 'bootstrap';
 import './options.css';
 import { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile  } from './library/profile.js';
@@ -7,6 +6,7 @@ import { signInWithCognito } from "./library/cognito.js";
 import { getS3FileContent } from "./library/s3.js";
 import { setLastSentTimestamp, getLastSentTimestamp } from './library/timestamp.js';
 import { logDebugMessage } from './library/debug.js';
+import { elById } from './library/utils';
 
 
 
@@ -19,10 +19,6 @@ tooltipTriggerList.forEach(tooltipTriggerEl => {
     trigger: 'hover' // Show tooltip only on hover
   });
 });
-
-
-const elById = (id) => document.getElementById(id);
-const debugMode = true;
 
 // PROFILE MANAGEMENT
 // Saves profile to Chrome storage and refreshes the profiles list on the page.
@@ -312,7 +308,7 @@ window.onload = function() {
         setLastSentTimestamp(Date.now());
         getLastSentTimestamp();
       } else {
-        showErrorBanner('Failed to send data' + error.message);
+        logDebugMessage('Failed to send data' + error.message);
       }
     });
 };
@@ -327,7 +323,7 @@ pullS3ConfigButton.onclick = async function() {
   const key = elById('fileKey').value;
 
   if (!accessKeyId || !secretAccessKey || !region || !bucket || !key) {
-    showErrorBanner("Please fill in all required fields.");
+    logDebugMessage("Please fill in all required fields.");
     return;
   }
 
