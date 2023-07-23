@@ -6,6 +6,7 @@ import { getS3FileContent } from "./library/s3.js";
 import { logDebugMessage } from "./library/debug.js";
 import { showToastMessage } from "./library/toast.js";
 
+
 let awsCredentials = null;
 let configContent = null;
 
@@ -66,16 +67,20 @@ window.onload = function() {
           if (response) {
             setLastSentTimestamp(Date.now());
             getLastSentTimestamp();
+            showToastMessage("success", "Sync successful!");
           } else {
             logDebugMessage('Failed to send data');
+            showToastMessage("danger", "Failed to send data");
           }
         });
 
       } catch (error) {
         logDebugMessage("An error occurred", error);
+        showToastMessage("danger", "An error occurred: " + error);
       }
     } else {
         logDebugMessage("No profile selected");
+        showToastMessage("warning", "No profile selected");
     }
   });
 
