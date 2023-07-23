@@ -4,6 +4,7 @@ import './options.css';
 import { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand } from "@aws-sdk/client-cognito-identity";
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile  } from './library/profile.js';
+import { showToastMessage } from './library/toast.js';
 
 
 
@@ -354,49 +355,6 @@ function updateLastSentTimestamp(timestamp) {
 }
 
 // Shows toast notification with the specified color and message.
-function showToastMessage(color, message) {
-  // Remove toast if already exists
-  if (currentToast) {
-    currentToast.hide();
-  }
-
-  // Create a wrapper for the toast message
-  const toastWrapper = document.createElement("div");
-  toastWrapper.style.position = "fixed";
-  toastWrapper.style.top = "10px";
-  toastWrapper.style.left = "50%";
-  toastWrapper.style.transform = "translateX(-50%)";
-  toastWrapper.style.zIndex = 10000;
-
-  // Create a Bootstrap toast with a custom color
-  const toastElement = document.createElement("div");
-  toastElement.className = `toast align-items-center text-white bg-${color}`;
-  toastElement.setAttribute("role", "alert");
-  toastElement.setAttribute("aria-live", "assertive");
-  toastElement.setAttribute("aria-atomic", "true");
-
-  // Create the toast body with the message
-  const toastBody = document.createElement("div");
-  toastBody.className = "toast-body";
-  toastBody.innerHTML = message;
-
-  toastElement.appendChild(toastBody);
-  toastWrapper.appendChild(toastElement);
-  document.body.appendChild(toastWrapper);
-
-  const toastOptions = { autohide: true, delay: 1500 };
-
-  currentToast = new bootstrap.Toast(toastElement, toastOptions);
-  currentToast.show();
-
-  toastElement.addEventListener("hidden.bs.toast", () => {
-    toastWrapper.remove();
-  });
-
-}
-
-
-
 
 
 function activateLabel(inputId) {
@@ -477,8 +435,8 @@ pullS3ConfigButton.onclick = async function() {
   elById("cognitoSignInButton").onclick = handleCognitoSignIn;
   elById("exportProfileButton").onclick = exportProfileAndUpdateUI;
   elById("importProfileButton").onclick = importProfileAndUpdateUI;
-  loadProfiles(); // Load the saved profiles initially
-  loadDefaultProfile(); // Load the default profile initially
+  loadProfilesAndUpdateUI(); // Load the saved profiles initially
+  loadDefaultProfileAndUpdateUI(); // Load the default profile initially
 
 };
 
