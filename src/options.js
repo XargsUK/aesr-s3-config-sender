@@ -3,6 +3,9 @@ import * as bootstrap from 'bootstrap';
 import './options.css';
 import { CognitoIdentityClient, GetIdCommand, GetCredentialsForIdentityCommand } from "@aws-sdk/client-cognito-identity";
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile  } from './library/profile.js';
+
+
 
 window.bootstrap = bootstrap;
 
@@ -21,7 +24,7 @@ let currentToast;
 
 // PROFILE MANAGEMENT
 // Saves profile to Chrome storage and refreshes the profiles list on the page.
-async function saveProfile() {
+async function saveProfileAndUpdateUI() {
   const profileName = elById("profileName").value.trim();
   if (!profileName) {
     return;
@@ -51,27 +54,28 @@ async function saveProfile() {
     cognitoRegion: elById("cognitoRegion").value,
   };
 
-  await new Promise((resolve) =>
-    chrome.storage.sync.set({
-      [profileName]: profileData
-    }, resolve)
-  );
-
-  loadProfiles();
-  showToastMessage('green', 'Profile Saved')
+  try {
+    await saveProfile(profileName, profileData);
+    loadProfilesAndUpdateUI();
+    showToastMessage('green', 'Profile Saved');
+  } catch (error) {
+    showToastMessage('red', 'Failed to save profile');
+  }
 }
 
 // Deletes a profile from Chrome storage and refreshes the profiles list on the page.
-async function deleteProfile(profileName) {
-  await new Promise((resolve) => chrome.storage.sync.remove(profileName, resolve));
-  loadProfiles();
+async function deleteProfileAndUpdateUI(profileName) {
+  try {
+    await deleteProfile(profileName);
+    loadProfilesAndUpdateUI();
+  } catch (error) {
+    showToastMessage('red', 'Failed to delete profile');
+  }
 }
 
 // Loads a profile from Chrome storage and populates the form with the profile data.
-async function loadProfile(profileName) {
-  const profileData = await new Promise((resolve) =>
-    chrome.storage.sync.get(profileName, (result) => resolve(result[profileName]))
-  );
+async function loadProfileAndUpdateUI(profileName) {
+  const profileData = await loadProfile(profileName);
 
   if (profileData) {
     elById("profileName").value = profileName;
@@ -95,14 +99,8 @@ async function loadProfile(profileName) {
 }
 
 // Loads all profiles saved in Chrome storage and creates a dropdown list of profiles, setting the default profile if it exists.
-async function loadProfiles(selectedProfileName) {
-  const profiles = await new Promise((resolve) =>
-    chrome.storage.sync.get(null, (items) => resolve(items))
-  );
-
-  const defaultProfileName = await new Promise((resolve) =>
-    chrome.storage.sync.get('defaultProfile', (result) => resolve(result.defaultProfile))
-  );
+async function loadProfilesAndUpdateUI(selectedProfileName) {
+  const { profiles, defaultProfileName } = await loadProfiles();
 
   const profileList = document.getElementById("profileList");
   profileList.innerHTML = '<option value="" disabled>Select a Profile</option>';
@@ -126,44 +124,39 @@ async function loadProfiles(selectedProfileName) {
 
   if (defaultProfileName) {
     profileList.value = defaultProfileName;
-    loadProfile(defaultProfileName);
+    loadProfileAndUpdateUI(defaultProfileName);
   } else {
     profileList.selectedIndex = 0;
   }
 }
 
 // Sets the user's default profile to the currently selected profile in the dropdown list.
-async function setDefaultProfile() {
+async function setDefaultProfileAndUpdateUI() {
+  const profileList = elById("profileList");
   let selectedProfile = profileList.options[profileList.selectedIndex].text;
-  if (selectedProfile) {
-    chrome.storage.sync.set({
-      defaultProfile: selectedProfile
-    }, function() {
-      showToastMessage('green', 'Default profile set to: ' + selectedProfile)
-      loadProfiles();
-      selectDefaultProfile();
-    });
-  } else {
-      showToastMessage('yellow', 'Select a profile first!')
+  
+  try {
+    const profileName = await setDefaultProfile(selectedProfile);
+    showToastMessage('green', 'Default profile set to: ' + profileName);
+    loadProfilesAndUpdateUI();
+  }
+  catch (error) {
+    showToastMessage('yellow', error.message);
   }
 };
 
 // Loads the user's default profile from Chrome storage.
-async function loadDefaultProfile() {
-  const defaultProfile = await new Promise((resolve) =>
-    chrome.storage.sync.get("defaultProfile", (result) =>
-      resolve(result.defaultProfile)
-    )
-  );
+async function loadDefaultProfileAndUpdateUI() {
+  const defaultProfile = await loadDefaultProfile();
 
   if (defaultProfile) {
     elById("profileList").value = defaultProfile;
-    loadProfile(defaultProfile);
+    loadProfileAndUpdateUI(defaultProfile);
   }
 }
 
 // Allows users to import a profile from a JSON file.
-function importProfile() {
+function importProfileAndUpdateUI() {
   const fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.accept = ".json";
@@ -176,62 +169,47 @@ function importProfile() {
     }
 
     try {
-      const reader = new FileReader();
-
-      // Use a Promise to wait for the file to be read
-      const fileContent = await new Promise((resolve, reject) => {
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsText(file);
-      });
-
-      const importedProfile = JSON.parse(fileContent);
-      const profileName = Object.keys(importedProfile)[0];
-
-      if (typeof importedProfile[profileName] !== "object") {
-        throw new Error("Invalid profile data");
-      }
-
-      chrome.storage.sync.set(importedProfile, () => {
-        loadProfiles(); 
-        showToastMessage('green', 'Profile imported successfully');
-        });
-        setTimeout(() => {
-          loadProfile(profileName); 
-          elById("profileList").value = profileName;
-        }, 100);
-      }
+      const profileName = await importProfile(file);
+      showToastMessage('green', 'Profile imported successfully');
+      loadProfilesAndUpdateUI();
+      setTimeout(() => {
+        loadProfileAndUpdateUI(profileName); 
+        elById("profileList").value = profileName;
+      }, 100);
+    }
     catch (error) {
-        showToastMessage('red', 'Invalid profile JSON file');
+      showToastMessage('red', 'Invalid profile JSON file');
     } finally {
-        // Remove the file input element after it's been used
-        fileInput.remove();
+      // Remove the file input element after it's been used
+      fileInput.remove();
     }
   });
 
-  // Append the file input element to the document
+  // Append the file input element to the document and trigger the file selection dialog
   document.body.appendChild(fileInput);
   fileInput.click();
 }
 
 // Allows users to export a profile to a JSON file.
-function exportProfile() {
+async function exportProfileAndUpdateUI() {
   const profileName = elById("profileList").value;
   if (!profileName) {
     showToastMessage('yellow', 'Select a profile to export first!');
     return;
   }
 
-  chrome.storage.sync.get(profileName, (result) => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(result));
+  try {
+    const { dataStr, filename } = await exportProfile(profileName);
     const downloadAnchorNode = document.createElement("a");
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", profileName + ".json");
+    downloadAnchorNode.setAttribute("download", filename);
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
     showToastMessage('green', 'Profile exported successfully');
-  });
+  } catch (error) {
+    showToastMessage('red', 'Failed to export profile');
+  }
 }
 
 // Handles user sign-in using Cognito authentication service
@@ -492,13 +470,13 @@ pullS3ConfigButton.onclick = async function() {
   
 
 
-  elById("saveProfileButton").onclick = saveProfile;
-  elById("deleteProfileButton").onclick = () => deleteProfile(elById("profileList").value);
-  elById("profileList").onchange = () => loadProfile(elById("profileList").value);
-  elById("setDefaultProfileButton").onclick = setDefaultProfile;
+  elById("saveProfileButton").onclick = saveProfileAndUpdateUI;
+  elById("deleteProfileButton").onclick = () => deleteProfileAndUpdateUI(elById("profileList").value);
+  elById("profileList").onchange = () => loadProfileAndUpdateUI(elById("profileList").value);
+  elById("setDefaultProfileButton").onclick = setDefaultProfileAndUpdateUI;
   elById("cognitoSignInButton").onclick = handleCognitoSignIn;
-  elById("exportProfileButton").onclick = exportProfile;
-  elById("importProfileButton").onclick = importProfile;
+  elById("exportProfileButton").onclick = exportProfileAndUpdateUI;
+  elById("importProfileButton").onclick = importProfileAndUpdateUI;
   loadProfiles(); // Load the saved profiles initially
   loadDefaultProfile(); // Load the default profile initially
 
