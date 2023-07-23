@@ -1,3 +1,5 @@
+let currentToast;
+
 function showToastMessage(color, message) {
     // Remove toast if already exists
     if (currentToast) {
