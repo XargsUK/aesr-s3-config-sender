@@ -4,6 +4,7 @@ import './options.css';
 import { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile  } from './library/profile.js';
 import { showToastMessage } from './library/toast.js';
 import { signInWithCognito } from "./library/cognito.js";
+import { getS3FileContent } from "./library/s3.js";
 
 
 
@@ -264,27 +265,8 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, re
     // Log the credentials being used
     logDebugMessage('Using credentials for S3 fetch:', accessKeyId, secretAccessKey, sessionToken);
 
-    // Create a new S3 client
-    const s3Client = new S3Client({
-      region,
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-        sessionToken,
-      },
-    });
-
-    logDebugMessage('S3 Client:', s3Client);
-
-    // Create the GetObjectCommand with the required parameters
-    const getObjectCommand = new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    });
-
-    // Send the command and get the response
-    const response = await s3Client.send(getObjectCommand);
-    const content = new TextDecoder("utf-8").decode(await new Response(response.Body).arrayBuffer());
+    const content = await getS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key);
+    
     return content;
   } catch (error) {
     logDebugMessage('Error fetching file from S3:', error);
