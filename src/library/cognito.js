@@ -1,9 +1,12 @@
 import {
-    CognitoIdentityClient,
     CognitoIdentityProviderClient,
-    GetCredentialsForIdentityCommand,
-    GetIdCommand,
     InitiateAuthCommand
+  } from "@aws-sdk/client-cognito-identity-provider";
+  
+  import {
+    CognitoIdentityClient,
+    GetIdCommand,
+    GetCredentialsForIdentityCommand
   } from "@aws-sdk/client-cognito-identity";
   
   async function signInWithCognito(
@@ -57,4 +60,3 @@ import {
   }
   
 export { signInWithCognito };
-  
