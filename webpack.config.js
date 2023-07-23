@@ -9,7 +9,7 @@ module.exports = {
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'js'),
-    assetModuleFilename: 'fonts/[name][ext][query]', 
+    assetModuleFilename: 'fonts/[name][ext][query]',
   },
   module: {
     rules: [
