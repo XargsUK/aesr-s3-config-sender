@@ -19,12 +19,11 @@
     "jquery": "^3.6.4"
   },
   "devDependencies": {
-    "@aws-sdk/client-cognito-identity": "^3.326.0",
-    "@aws-sdk/client-cognito-identity-provider": "^3.326.0",
     "@babel/core": "^7.21.8",
     "@babel/preset-env": "^7.21.5",
     "css-loader": "^6.7.3",
     "install": "^0.13.0",
+    "license-checker": "^25.0.1",
     "mini-css-extract-plugin": "^2.7.5",
     "npm": "^9.6.6",
     "style-loader": "^3.3.2",
