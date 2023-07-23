@@ -1,3 +1,4 @@
+import * as bootstrap from 'bootstrap';
 let currentToast;
 
 function showToastMessage(color, message) {
