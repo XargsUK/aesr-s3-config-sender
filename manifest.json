@@ -15,7 +15,7 @@
     "open_in_tab": true
   },
   "action": {
-    "default_popup": "options.html",
+    "default_popup": "popup.html",
     "default_icon": {
       "48": "icons/Icon_48x48.png",
       "128": "icons/Icon_128x128.png"
