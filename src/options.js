@@ -6,6 +6,7 @@ import { showToastMessage } from './library/toast.js';
 import { signInWithCognito } from "./library/cognito.js";
 import { getS3FileContent } from "./library/s3.js";
 import { setLastSentTimestamp, getLastSentTimestamp } from './library/timestamp.js';
+import { logDebugMessage } from './library/debug.js';
 
 
 
@@ -93,9 +94,6 @@ async function loadProfileAndUpdateUI(profileName) {
     elById("cognitoClientAppId").value = profileData.cognitoClientAppId;
     elById("cognitoIdentityPoolId").value = profileData.cognitoIdentityPoolId;
     elById("cognitoRegion").value = profileData.cognitoRegion;
-
-    const inputIds = ["profileName", "awsAccessKey", "awsSecretKey", "awsRegion", "bucketName", "fileKey", "aesrIdText", "cognitoUsername", "cognitoPassword", "cognitoUserPoolId", "cognitoClientAppId", "cognitoIdentityPoolId", "cognitoRegion"];
-    activateLabels(inputIds);
   }
 }
 
@@ -296,31 +294,6 @@ function updateLastSentTimestamp(timestamp) {
   });
 }
 
-// Shows toast notification with the specified color and message.
-
-
-function activateLabel(inputId) {
-  const input = elById(inputId);
-  if (input && input.value) {
-    const label = document.querySelector(`label[for="${inputId}"]`);
-    if (label) {
-      label.classList.add("active");
-    }
-  }
-}
-
-function activateLabels(inputIds) {
-  inputIds.forEach((id) => {
-    activateLabel(id);
-  });
-}
-
-function logDebugMessage(...messages) {
-  if (debugMode) {
-    console.log(...messages);
-  }
-}
-
 
 window.onload = function() {
   const textArea = elById('awsConfigTextArea');
@@ -361,7 +334,6 @@ pullS3ConfigButton.onclick = async function() {
   try {
     const content = await fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key);
     textArea.value = content;
-    activateLabel('awsConfigTextArea')
     showToastMessage('green', 'Config downloaded')
   } catch (error) {
     showToastMessage('red', 'Error fetching S3 file content: ' + error.message)
