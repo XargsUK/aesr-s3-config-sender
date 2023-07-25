@@ -47,7 +47,7 @@ window.onload = function() {
         
         const bucket = profileData.bucket;
         const key = profileData.key;
-        const region = profileData.cognitoRegion;
+        const region = profileData.region;
         configContent = await getS3FileContent(
           awsCredentials.accessKeyId,
           awsCredentials.secretAccessKey,
