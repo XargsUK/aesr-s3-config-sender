@@ -54,7 +54,7 @@ async function saveProfileAndUpdateUI() {
 
   try {
     await saveProfile(profileName, profileData);
-    loadProfilesAndUpdateUI();
+    loadProfilesAndUpdateUI(profileName);
     showToastMessage('green', 'Profile Saved');
   } catch (error) {
     showToastMessage('red', 'Failed to save profile');
@@ -117,9 +117,10 @@ async function loadProfilesAndUpdateUI(selectedProfileName) {
     }
   }
 
-  if (defaultProfileName) {
+  if (selectedProfileName) {
+    profileList.value = selectedProfileName;
+  } else if (defaultProfileName) {
     profileList.value = defaultProfileName;
-    loadProfileAndUpdateUI(defaultProfileName);
   } else {
     profileList.selectedIndex = 0;
   }
