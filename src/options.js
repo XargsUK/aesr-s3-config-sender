@@ -54,6 +54,9 @@ async function saveProfileAndUpdateUI() {
 
   try {
     await saveProfile(profileName, profileData);
+    if (Object.keys(profiles).length === 1) {
+      await setDefaultProfile(profileName);
+    }
     loadProfilesAndUpdateUI(profileName);
     showToastMessage('green', 'Profile Saved');
   } catch (error) {
