@@ -53,24 +53,46 @@ async function saveProfileAndUpdateUI() {
   };
 
   try {
+    const { profiles } = await loadProfiles();
+
     await saveProfile(profileName, profileData);
-    if (Object.keys(profiles).length === 1) {
+
+    if (!profiles.defaultProfile) {
       await setDefaultProfile(profileName);
     }
+
     loadProfilesAndUpdateUI(profileName);
     showToastMessage('green', 'Profile Saved');
   } catch (error) {
     showToastMessage('red', 'Failed to save profile');
+    logDebugMessage('Failed to save profile:', error);
   }
 }
 
 // Deletes a profile from Chrome storage and refreshes the profiles list on the page.
 async function deleteProfileAndUpdateUI(profileName) {
   try {
+    const { profiles, defaultProfileName } = await loadProfiles();
+
+    const isDefaultProfile = profileName === defaultProfileName;
+
     await deleteProfile(profileName);
-    loadProfilesAndUpdateUI();
+
+    if (isDefaultProfile) {
+      const newDefaultProfile = Object.keys(profiles).find(p => p !== profileName && p !== 'defaultProfile');
+
+      if (newDefaultProfile) {
+        await setDefaultProfile(newDefaultProfile);
+        loadProfilesAndUpdateUI(newDefaultProfile);
+      } else {
+        loadProfilesAndUpdateUI();
+      }
+    } else {
+      loadProfilesAndUpdateUI();
+    }
   } catch (error) {
     showToastMessage('red', 'Failed to delete profile');
+    logDebugMessage('Failed to delete profile:', error);
   }
 }
 
