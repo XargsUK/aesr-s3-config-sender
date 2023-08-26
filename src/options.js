@@ -275,23 +275,8 @@ async function fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, re
 
 // Saves a timestamp to local storage as the last time data was sent.
 function updateLastSentTimestamp(timestamp) {
-  if (timestamp) {
-    chrome.storage.local.set({
-      lastSentTimestamp: timestamp
-    }, () => {
-      logDebugMessage('Last sent timestamp saved:', timestamp);
-    });
-  }
-
-  // Retrieves a timestamp from local storage and displays it on the page as "Last sent: [date and time]" or "Last sent: Never".
-  chrome.storage.local.get(['lastSentTimestamp'], (result) => {
-    const lastSentElement = document.getElementById('lastSent');
-    if (result.lastSentTimestamp) {
-      lastSentElement.textContent = 'Last sent: ' + new Date(Number(result.lastSentTimestamp)).toLocaleString();
-    } else {
-      lastSentElement.textContent = 'Last sent: Never';
-    }
-  });
+  setLastSentTimestamp(timestamp);
+  getLastSentTimestamp();
 }
 
 
