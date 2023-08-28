@@ -1,5 +1,10 @@
 Changelog
 =========
+# v0.1.1 - v0.1.2  (26/08/2023)
+
+- Bug fixes for profile management
+- Code refactoring
+- Dependancy updates 
 
 # v0.1.0 (23/07/2023)
 
