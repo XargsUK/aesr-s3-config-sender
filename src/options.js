@@ -365,15 +365,6 @@ pullS3ConfigButton.onclick = async function() {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  // const importProfileButton = document.getElementById("importProfileButton");
-
-  // if (importProfileButton) {
-  //   importProfileButton.addEventListener("click", importProfile);
-  //   console.log("EventListener added for importProfileButton");
-  // } else {
-  //   console.error("Import profile button not found.");
-  // }
-
   // Creates a MutationObserver to hide a .hiddendiv.common on the page when a childList mutation occurs.
   const bodyObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
