@@ -24,18 +24,25 @@ window.onload = function() {
 
   const profileListElement = document.getElementById("profileList");
 
-  profileListElement.addEventListener("change", async function() {
-    const selectedProfile = this.value;
+  profileListElement.addEventListener("change", function() {
+    handleProfileChange(this.value);
+  });
+
+  async function handleProfileChange(selectedProfile) {
     const profileData = await loadProfile(selectedProfile);
     setCurrentProfileData(profileData);
     logDebugMessage("Profile changed to: ", selectedProfile, " Current profile data is: ", getCurrentProfileData());
+  }
+
+  document.getElementById("syncButton").addEventListener("click", function() {
+    handleSyncButtonClick();
   });
 
-  document.getElementById("syncButton").addEventListener("click", async () => {
+  async function handleSyncButtonClick() {
     const profileData = getCurrentProfileData();
     if (profileData) {
       try {
-        awsCredentials = await signInWithCognito(
+        const awsCredentials = await signInWithCognito(
           profileData.cognitoUsername,
           profileData.cognitoPassword,
           profileData.cognitoUserPoolId,
@@ -48,7 +55,7 @@ window.onload = function() {
         const bucket = profileData.bucket;
         const key = profileData.key;
         const region = profileData.region;
-        configContent = await getS3FileContent(
+        const configContent = await getS3FileContent(
           awsCredentials.accessKeyId,
           awsCredentials.secretAccessKey,
           awsCredentials.sessionToken,
@@ -82,11 +89,12 @@ window.onload = function() {
         logDebugMessage("No profile selected");
         showToastMessage("warning", "No profile selected");
     }
-  });
+  }
 
   getLastSentTimestamp();
   loadProfilesIntoDropdown(null, "profileList");
 }
+
 
 function openOptions() {
   if (window.chrome) {
