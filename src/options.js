@@ -184,33 +184,32 @@ function importProfileAndUpdateUI() {
   fileInput.accept = ".json";
   fileInput.style.display = "none"; 
 
-  fileInput.addEventListener("change", async (event) => {
+  fileInput.addEventListener("change", (event) => {
     const file = event.target.files[0];
     if (!file) {
       return;
     }
 
-    try {
-      const profileName = await importProfile(file);
+    importProfile(file).then(profileName => {
       showToastMessage('green', 'Profile imported successfully');
       loadProfilesAndUpdateUI();
       setTimeout(() => {
         loadProfileAndUpdateUI(profileName); 
         elById("profileList").value = profileName;
       }, 100);
-    }
-    catch (error) {
+    }).catch(error => {
       showToastMessage('red', 'Invalid profile JSON file');
-    } finally {
+    }).finally(() => {
       // Remove the file input element after it's been used
       fileInput.remove();
-    }
+    });
   });
 
   // Append the file input element to the document and trigger the file selection dialog
   document.body.appendChild(fileInput);
   fileInput.click();
 }
+
 
 // Allows users to export a profile to a JSON file.
 async function exportProfileAndUpdateUI() {
