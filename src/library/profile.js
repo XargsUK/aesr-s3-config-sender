@@ -114,8 +114,6 @@ async function setDefaultProfile(profileName) {
       profileList.appendChild(option);
       if (profileName === selectedProfileName) {
         option.selected = true;
-        // Update the currentProfileData if selectedProfileName is provided
-        let currentProfileData = await loadProfile(selectedProfileName);
       }
       logDebugMessage("Current Profile Data:", getCurrentProfileData());
     }

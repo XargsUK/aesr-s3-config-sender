@@ -14,14 +14,13 @@ window.bootstrap = bootstrap;
 
 // Tooltips for buttons, only show on hover
 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-const tooltips = []; 
 
 tooltipTriggerList.forEach(tooltipTriggerEl => {
-  const tooltip = new bootstrap.Tooltip(tooltipTriggerEl, {
+  new bootstrap.Tooltip(tooltipTriggerEl, {
     trigger: 'hover' // Show tooltip only on hover
   });
-  tooltips.push(tooltip);
 });
+
 
 
 // PROFILE MANAGEMENT
