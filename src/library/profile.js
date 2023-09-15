@@ -115,7 +115,7 @@ async function setDefaultProfile(profileName) {
       if (profileName === selectedProfileName) {
         option.selected = true;
         // Update the currentProfileData if selectedProfileName is provided
-        currentProfileData = await loadProfile(selectedProfileName);
+        let currentProfileData = await loadProfile(selectedProfileName);
       }
       logDebugMessage("Current Profile Data:", getCurrentProfileData());
     }
