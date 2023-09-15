@@ -13,13 +13,16 @@ import { elById } from './library/utils';
 window.bootstrap = bootstrap;
 
 // Tooltips for buttons, only show on hover
-const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+const tooltips = []; 
+
 tooltipTriggerList.forEach(tooltipTriggerEl => {
-  new bootstrap.Tooltip(tooltipTriggerEl, {
+  const tooltip = new bootstrap.Tooltip(tooltipTriggerEl, {
     trigger: 'hover' // Show tooltip only on hover
   });
   tooltips.push(tooltip);
 });
+
 
 // PROFILE MANAGEMENT
 // Saves profile to Chrome storage and refreshes the profiles list on the page.
