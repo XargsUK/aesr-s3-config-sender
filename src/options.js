@@ -18,6 +18,7 @@ tooltipTriggerList.forEach(tooltipTriggerEl => {
   new bootstrap.Tooltip(tooltipTriggerEl, {
     trigger: 'hover' // Show tooltip only on hover
   });
+  tooltips.push(tooltip);
 });
 
 // PROFILE MANAGEMENT
