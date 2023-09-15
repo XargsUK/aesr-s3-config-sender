@@ -16,6 +16,7 @@ window.bootstrap = bootstrap;
 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
 
 tooltipTriggerList.forEach(tooltipTriggerEl => {
+  // Attaching the tooltip behavior to the element
   new bootstrap.Tooltip(tooltipTriggerEl, {
     trigger: 'hover' // Show tooltip only on hover
   });
