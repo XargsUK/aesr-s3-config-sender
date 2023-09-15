@@ -1,5 +1,26 @@
 Changelog
 =========
+
+# v0.1.3  (15/09/2023)
+
+### Features:
+- Improved code comments for better maintainability.
+- Added document titles for better accessibility.
+
+### Chores:
+- Improved accessibility with updates to HTML attributes.
+- Font updates for better readability.
+- Dependency and version updates.
+- Cleanup: Removed unused code and files.
+
+### Fixes:
+- Enhanced error handling in code.
+- Refactored event listeners for improved readability.
+- Fixed variable declaration issues.
+
+### Refactors:
+- Code cleanup and added clarifying comments.
+
 # v0.1.1 - v0.1.2  (26/08/2023)
 
 - Bug fixes for profile management
