@@ -5,7 +5,8 @@
   "short_name": "AESR Sender",
   "permissions": [
     "webRequest",
-    "tabs"
+    "tabs",
+    "storage" 
   ],
   "host_permissions": [
     "<all_urls>"

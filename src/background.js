@@ -70,9 +70,12 @@ async function onBeforeRequestEvent(details) {
   // Use the STS assumeRoleWithSAML function to get the temporary credentials
   let keys;
   try {
-    keys = await assumeRoleWithSAML(roleClaimValue, details.requestBody.formData.SAMLResponse[0]);
+    const keys = await assumeRoleWithSAML(roleClaimValue, details.requestBody.formData.SAMLResponse[0]);
     console.log('DEBUG: AssumeRoleWithSAML response:');
     console.log(keys);
+    chrome.storage.local.set({ awsCredentials: keys }, function() {
+      console.log('Credentials are saved to chrome.storage.local');
+    });
   } catch(err) {
     console.log("ERROR: Error when trying to assume the IAM Role with the SAML Assertion.");
     console.log(err, err.stack);
@@ -136,3 +139,7 @@ async function assumeRoleWithSAML(roleClaimValue, SAMLAssertion, SessionDuration
     throw error;
   }
 }
+
+chrome.storage.local.set({ awsCredentials: keys }, function() {
+  console.log('Credentials are saved to chrome.storage.local');
+});
