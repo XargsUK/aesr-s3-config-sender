@@ -1,7 +1,8 @@
-import './library/fxparser.min.js';
-import './library/aws-sdk/lib/aws-js-sdk-bundle.js';
+import { XMLParser } from 'fast-xml-parser';
+import { STSClient, AssumeRoleWithSAMLCommand } from "@aws-sdk/client-sts";
 
 let DebugLogs = true;
+addOnBeforeRequestEventListener();
 
 function addOnBeforeRequestEventListener() {
   if (DebugLogs) console.log('DEBUG: Extension is activated');
@@ -40,6 +41,98 @@ async function onBeforeRequestEvent(details) {
     console.log('DEBUG: samlXmlDoc:');
     console.log(samlXmlDoc);
   }
+
+  // Parse the SAML XML document
+  let options = {
+    ignoreAttributes: false,
+    attributeNamePrefix : "__",
+    removeNSPrefix: true,
+    alwaysCreateTextNode: true
+  };
+  let parser = new XMLParser(options);
+  let jsObj = parser.parse(samlXmlDoc);
+
+  // Extract the roles
+  let attributes = jsObj["Response"].Assertion.AttributeStatement.Attribute;
+  let roleClaimValue;
+  for (let i in attributes) {
+    if (attributes[i].__Name == "https://aws.amazon.com/SAML/Attributes/Role") {
+      // Assuming the first role (if multiple roles are returned, you may need to handle selection)
+      roleClaimValue = attributes[i].AttributeValue['#text'] || attributes[i].AttributeValue;
+      if (DebugLogs) {
+        console.log('DEBUG: roleClaimValue:');
+        console.log(roleClaimValue);
+      }
+      break; // assuming you want the first role
+    }
+  }
+
+  // Use the STS assumeRoleWithSAML function to get the temporary credentials
+  let keys;
+  try {
+    keys = await assumeRoleWithSAML(roleClaimValue, details.requestBody.formData.SAMLResponse[0]);
+    console.log('DEBUG: AssumeRoleWithSAML response:');
+    console.log(keys);
+  } catch(err) {
+    console.log("ERROR: Error when trying to assume the IAM Role with the SAML Assertion.");
+    console.log(err, err.stack);
+  }
 }
 
-addOnBeforeRequestEventListener();
+async function assumeRoleWithSAML(roleClaimValue, SAMLAssertion, SessionDuration) {
+  // First, ensure that roleClaimValue is a string
+  if (typeof roleClaimValue !== 'string') {
+    console.error('roleClaimValue is not a string:', roleClaimValue);
+    throw new TypeError('roleClaimValue must be a string');
+  }
+
+  // Pattern for Role
+  let reRole = /arn:aws:iam:[^:]*:[0-9]+:role\/[^,]+/i;
+  // Pattern for Principal (SAML Provider)
+  let rePrincipal = /arn:aws:iam:[^:]*:[0-9]+:saml-provider\/[^,]+/i;
+  // Extract both regex patterns from the roleClaimValue (which is a SAMLAssertion attribute)
+  let RoleArn = roleClaimValue.match(reRole)[0];
+  let PrincipalArn = roleClaimValue.match(rePrincipal)[0];
+
+  // Set parameters needed for AWS STS assumeRoleWithSAML API method
+  let params = {
+    PrincipalArn: PrincipalArn,
+    RoleArn: RoleArn,
+    SAMLAssertion: SAMLAssertion,
+    // Include DurationSeconds only if SessionDuration is provided
+    ...(SessionDuration && { DurationSeconds: SessionDuration }),
+  };
+
+  // Create a new STS client
+  const client = new STSClient({
+    region: 'us-east-1', // Specify the region
+  });
+
+  // Create a new command with the parameters
+  const command = new AssumeRoleWithSAMLCommand(params);
+
+  console.log("INFO: AWSAssumeRoleWithSAMLCommand client.send will now be executed")
+  try {
+    // Send the command to the STS client
+    const response = await client.send(command);
+    console.log("INFO: AWSAssumeRoleWithSAMLCommand client.send is done!");
+
+    // Extract credentials from the response
+    let keys = {
+      accessKeyId: response.Credentials.AccessKeyId,
+      secretAccessKey: response.Credentials.SecretAccessKey,
+      sessionToken: response.Credentials.SessionToken,
+      expiration: response.Credentials.Expiration // Added to retrieve the expiration of the session token
+    };
+
+    if (DebugLogs) {
+      console.log('DEBUG: AssumeRoleWithSAML response:');
+      console.log(keys);
+    }
+    return keys;
+  }
+  catch (error) {
+    console.error("Error assuming role with SAML", error);
+    throw error;
+  }
+}
