@@ -2,7 +2,7 @@ import * as bootstrap from 'bootstrap';
 import './options.css';
 import { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile  } from './library/profile.js';
 import { showToastMessage } from './library/toast.js';
-import { signInWithCognito } from "./library/cognito.js";
+// import { signInWithCognito } from "./library/cognito.js";
 import { getS3FileContent } from "./library/s3.js";
 import { setLastSentTimestamp, getLastSentTimestamp } from './library/timestamp.js';
 import { logDebugMessage } from './library/debug.js';
@@ -29,31 +29,18 @@ tooltipTriggerList.forEach(tooltipTriggerEl => {
 async function saveProfileAndUpdateUI() {
   const profileName = elById("profileName").value.trim();
   if (!profileName) {
+    showToastMessage('red', 'Profile name is required');
     return;
   }
 
-  const cognitoFilled =
-    elById("cognitoUsername").value &&
-    elById("cognitoPassword").value &&
-    elById("cognitoUserPoolId").value &&
-    elById("cognitoClientAppId").value &&
-    elById("cognitoIdentityPoolId").value &&
-    elById("cognitoRegion").value;
-
   const profileData = {
-    accessKeyId: cognitoFilled ? "" : elById("awsAccessKey").value,
-    secretAccessKey: cognitoFilled ? "" : elById("awsSecretKey").value,
-    sessionToken: cognitoFilled ? "" : elById("awsSessionToken").value,
+    // accessKeyId: elById("awsAccessKey").value,
+    // secretAccessKey: elById("awsSecretKey").value,
+    // sessionToken: elById("awsSessionToken").value,
     region: elById("awsRegion").value,
     bucket: elById("bucketName").value,
     key: elById("fileKey").value,
-    aesrId: elById("aesrIdText").value,
-    cognitoUsername: elById("cognitoUsername").value,
-    cognitoPassword: elById("cognitoPassword").value,
-    cognitoUserPoolId: elById("cognitoUserPoolId").value,
-    cognitoClientAppId: elById("cognitoClientAppId").value,
-    cognitoIdentityPoolId: elById("cognitoIdentityPoolId").value,
-    cognitoRegion: elById("cognitoRegion").value,
+    aesrId: elById("aesrIdText").value
   };
 
   try {
@@ -65,13 +52,14 @@ async function saveProfileAndUpdateUI() {
       await setDefaultProfile(profileName);
     }
 
-    loadProfilesAndUpdateUI(profileName);
+    await loadProfilesAndUpdateUI(profileName);
     showToastMessage('green', 'Profile Saved');
   } catch (error) {
     showToastMessage('red', 'Failed to save profile');
     logDebugMessage('Failed to save profile:', error);
   }
 }
+
 
 // Deletes a profile from Chrome storage and refreshes the profiles list on the page.
 async function deleteProfileAndUpdateUI(profileName) {
@@ -102,23 +90,18 @@ async function deleteProfileAndUpdateUI(profileName) {
 
 // Loads a profile from Chrome storage and populates the form with the profile data.
 async function loadProfileAndUpdateUI(profileName) {
+  console.log('Loading profile:', profileName); // Debug
   const profileData = await loadProfile(profileName);
+  console.log('Profile data:', profileData); // Debugging line
 
   if (profileData) {
     elById("profileName").value = profileName;
-    elById("awsAccessKey").value = profileData.accessKeyId;
-    elById("awsSecretKey").value = profileData.secretAccessKey;
-    elById("awsSessionToken").value = profileData.sessionToken;
     elById("awsRegion").value = profileData.region;
     elById("bucketName").value = profileData.bucket;
     elById("fileKey").value = profileData.key;
     elById("aesrIdText").value = profileData.aesrId;
-    elById("cognitoUsername").value = profileData.cognitoUsername;
-    elById("cognitoPassword").value = profileData.cognitoPassword;
-    elById("cognitoUserPoolId").value = profileData.cognitoUserPoolId;
-    elById("cognitoClientAppId").value = profileData.cognitoClientAppId;
-    elById("cognitoIdentityPoolId").value = profileData.cognitoIdentityPoolId;
-    elById("cognitoRegion").value = profileData.cognitoRegion;
+  } else {
+    console.log('No data found for profile:', profileName); // Debugging line
   }
 }
 
@@ -329,26 +312,37 @@ window.onload = function() {
 
 // Pulls AWS config data from S3 and updates the AWS config text area on the page.
 pullS3ConfigButton.onclick = async function() {
-  const accessKeyId = elById('awsAccessKey').value;
-  const secretAccessKey = elById('awsSecretKey').value;
-  const sessionToken = elById('awsSessionToken').value;
-  const region = elById('awsRegion').value;
-  const bucket = elById('bucketName').value;
-  const key = elById('fileKey').value;
+  // Retrieve credentials from chrome.storage.local 
+  chrome.storage.local.get('awsCredentials', async (data) => {
+    if (chrome.runtime.lastError || !data.awsCredentials) {
+      logDebugMessage("Error retrieving credentials: " + chrome.runtime.lastError);
+      return;
+    }
 
-  if (!accessKeyId || !secretAccessKey || !region || !bucket || !key) {
-    logDebugMessage("Please fill in all required fields.");
-    return;
-  }
+    const credentials = data.awsCredentials;
+    const accessKeyId = credentials.accessKeyId;
+    const secretAccessKey = credentials.secretAccessKey;
+    const sessionToken = credentials.sessionToken;
+    const region = elById('awsRegion').value;
+    const bucket = elById('bucketName').value;
+    const key = elById('fileKey').value;
 
-  try {
-    const content = await fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key);
-    textArea.value = content;
-    showToastMessage('green', 'Config downloaded')
-  } catch (error) {
-    showToastMessage('red', 'Error fetching S3 file content: ' + error.message)
-  }
+    if (!accessKeyId || !secretAccessKey || !region || !bucket || !key) {
+      logDebugMessage("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      const content = await fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key);
+      textArea.value = content;
+      showToastMessage('green', 'Config downloaded');
+    } catch (error) {
+      showToastMessage('red', 'Error fetching S3 file content: ' + error.message);
+    }
+  });
 };
+
+
   
 
 
@@ -356,7 +350,7 @@ pullS3ConfigButton.onclick = async function() {
   elById("deleteProfileButton").onclick = () => deleteProfileAndUpdateUI(elById("profileList").value);
   elById("profileList").onchange = () => loadProfileAndUpdateUI(elById("profileList").value);
   elById("setDefaultProfileButton").onclick = setDefaultProfileAndUpdateUI;
-  elById("cognitoSignInButton").onclick = handleCognitoSignIn;
+  // elById("cognitoSignInButton").onclick = handleCognitoSignIn;
   elById("exportProfileButton").onclick = exportProfileAndUpdateUI;
   elById("importProfileButton").onclick = importProfileAndUpdateUI;
   loadProfilesAndUpdateUI(); // Load the saved profiles initially

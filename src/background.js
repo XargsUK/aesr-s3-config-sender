@@ -56,14 +56,21 @@ async function onBeforeRequestEvent(details) {
   let attributes = jsObj["Response"].Assertion.AttributeStatement.Attribute;
   let roleClaimValue;
   for (let i in attributes) {
-    if (attributes[i].__Name == "https://aws.amazon.com/SAML/Attributes/Role") {
-      // Assuming the first role (if multiple roles are returned, you may need to handle selection)
-      roleClaimValue = attributes[i].AttributeValue['#text'] || attributes[i].AttributeValue;
+    if (attributes[i].__Name === "https://aws.amazon.com/SAML/Attributes/Role") {
+      // Check if AttributeValue is an array and if so, take the first element
+      let attributeValue = attributes[i].AttributeValue;
+      if (Array.isArray(attributeValue)) {
+        // If it's an array, assume each entry is a role and we take the first one
+        roleClaimValue = attributeValue[0]['#text'];
+      } else {
+        // If it's not an array, just take the value as it is
+        roleClaimValue = attributeValue['#text'] || attributeValue;
+      }
       if (DebugLogs) {
         console.log('DEBUG: roleClaimValue:');
         console.log(roleClaimValue);
       }
-      break; // assuming you want the first role
+      break; // stop after the first role
     }
   }
 
@@ -140,6 +147,6 @@ async function assumeRoleWithSAML(roleClaimValue, SAMLAssertion, SessionDuration
   }
 }
 
-chrome.storage.local.set({ awsCredentials: keys }, function() {
-  console.log('Credentials are saved to chrome.storage.local');
-});
+// chrome.storage.local.set({ awsCredentials: keys }, function() {
+//   console.log('Credentials are saved to chrome.storage.local');
+// });
