@@ -7,6 +7,8 @@ module.exports = {
     options: './src/options.js',
     cognito: './src/library/cognito.js',
     popup: './src/popup.js',
+    background: './src/background.js',
+    content: './src/content.js'
   },
   output: {
     filename: '[name].bundle.js',
