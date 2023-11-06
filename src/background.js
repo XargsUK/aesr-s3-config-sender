@@ -1,7 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
 import { STSClient, AssumeRoleWithSAMLCommand } from "@aws-sdk/client-sts";
 
-let DebugLogs = true;
+let DebugLogs = false;
 addOnBeforeRequestEventListener();
 
 function addOnBeforeRequestEventListener() {
