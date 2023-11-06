@@ -128,6 +128,16 @@ async function setDefaultProfile(profileName) {
     logDebugMessage("Current Profile Data:", getCurrentProfileData());
 }
 
+async function saveAWSCredentials(profileName, awsCredentials) {
+  await new Promise((resolve) =>
+    chrome.storage.sync.set({
+      [profileName]: {
+        ...getCurrentProfileData(), // Merge existing profile data
+        awsCredentials // Add new AWS credentials
+      }
+    }, resolve)
+  );
+}
 
 
-export { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile, loadProfilesIntoDropdown};
+export { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile, loadProfilesIntoDropdown, saveAWSCredentials};

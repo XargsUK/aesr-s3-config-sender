@@ -17,15 +17,13 @@ You can download the latest stable version from the [Chrome Web Store here](http
 3. Open Google Chrome and type `chrome://extensions` in the address bar.
 4. Turn on the "Developer mode" toggle switch (if it's not already on).
 5. Click the "Load unpacked" button and select the directory where you extracted the extension in step 2.
-6. The extension should now be loaded as an unpacked extension and ready to use.
+6. The extension should now be loaded as an u   npacked extension and ready to use.
 
 ## Authentication
 
-Currently, AESR Config Sender supports two authentication methods; IAM access keys and Cognito.
+The Security Token Service (STS) from AWS provides an API action assumeRoleWithSAML. Using the SAML Assertion given by your IDP, the Chrome Extension will call this API action to fetch temporary credentials. (AccessKeyId, SecretAccessKey and SessionToken). This way, there is no need to create some anonymous user in AWS IAM used for executing scripts. This Chrome Extension, however, will make it super easy for you to use your corporate identity for making requests to an S3 bucket for the AWS Extend Switch Roles extension. 
 
-Cognito uses the following flow to authenticate users: 
-
-![AESR Cognito Authentication Diagram](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/aesr-diagram.png)
+![AESR SSO Authentication Diagram](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/aesr-diagram.png)
 
 ## How to Use
 
@@ -38,30 +36,18 @@ Cognito uses the following flow to authenticate users:
 | Bucket Name       | The name of the S3 bucket where the AWS configuration file is stored.   | `my-s3-bucket`                     |
 | File Key          | The object key for the AESR configuration file stored in the S3 bucket. | `configs/my-aws-config.ini`        |
 
-### Credentials
+### Sign-In
+Sign into AWS using SSO, and the extension will capture the SAML response automatically. Ensure that the user you are signing into has the access required to the bucket where your configuration is stored. 
 
-| Field Name            | Description                                           | Example                                                                            |
-|-----------------------|-------------------------------------------------------|------------------------------------------------------------------------------------|
-| AWS Access Key*       | The access key ID for the AWS account being used.     | `AKIAYourAccessKey`                                                                |
-| AWS Secret Key*       | The secret access key for the AWS account being used. | `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`                                         |
-| Cognito Session Token | This field is populated after Cognito Sign-In.        | `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
 
 ### Cognito Sign In
 
-| Field Name                      | Description                                                                  | Example                                          |
-|---------------------------------|------------------------------------------------------------------------------|--------------------------------------------------|
-| Username                        | Cognito username                                                             | `john.smith`                                     |
-| Password                        | Cognito password                                                             | `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`       |
-| User Pool ID                    | User Pool ID the the user above                                              | `us-west-2_abcd1234`                             |
-| Cognito User Pool Client App ID | Client App ID to allow the app to use the User Pool                          | `5abcdefg6hijklmnop7`                            |
-| Cognito Identity Pool ID        | The Identity Pool ID which the User Pool trades its tokens for credentials.  | `us-west-2:1a2b3c4d-5e6f-7g8h-9i10-jk1lmnopqrs2` |
-| Cognito Region                  | Region                                                                       | `us-west-2`                                      |
+Originally, this project utilised Cognito for authentication. This methodology has since been deprecated, and has since been replaced by the use of AWS STS. 
 
-Note: The Cognito Identity Pool will have a role configured for Authenticated users. Ensure that this role has the correct permissions to access the S3 bucket. 
 
 ### Saving Profiles
 
-To save a new AWS configuration profile, click Save Profile. Note that it will only save the Access Key and Secret Key if the Cognito Sign In fields are empty. 
+To save a new AWS configuration profile, click Save Profile.
 
 ### Deleting Profiles
 To delete an existing AESR S3 Config Sender profile, select it from the dropdown list, and click the "Delete Profile" button.
@@ -82,7 +68,7 @@ To send the AWS configuration to AWS Extend Switch Roles, enter the chrome exten
 
 ## Appearance
 
-![Screen Shot 1](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/screenshot-2.png)
+![Screen Shot 1](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/screenshot-1.png)
 
 ## Contributing
 
