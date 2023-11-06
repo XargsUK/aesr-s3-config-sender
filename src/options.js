@@ -2,7 +2,6 @@ import * as bootstrap from 'bootstrap';
 import './options.css';
 import { loadProfile, loadProfiles, setDefaultProfile, loadDefaultProfile, importProfile, exportProfile, deleteProfile, saveProfile  } from './library/profile.js';
 import { showToastMessage } from './library/toast.js';
-// import { signInWithCognito } from "./library/cognito.js";
 import { getS3FileContent } from "./library/s3.js";
 import { setLastSentTimestamp, getLastSentTimestamp } from './library/timestamp.js';
 import { logDebugMessage } from './library/debug.js';
@@ -350,7 +349,6 @@ pullS3ConfigButton.onclick = async function() {
   elById("deleteProfileButton").onclick = () => deleteProfileAndUpdateUI(elById("profileList").value);
   elById("profileList").onchange = () => loadProfileAndUpdateUI(elById("profileList").value);
   elById("setDefaultProfileButton").onclick = setDefaultProfileAndUpdateUI;
-  // elById("cognitoSignInButton").onclick = handleCognitoSignIn;
   elById("exportProfileButton").onclick = exportProfileAndUpdateUI;
   elById("importProfileButton").onclick = importProfileAndUpdateUI;
   loadProfilesAndUpdateUI(); // Load the saved profiles initially
