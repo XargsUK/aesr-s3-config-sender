@@ -5,11 +5,10 @@
   "short_name": "AESR Sender",
   "permissions": [
     "webRequest",
-    "tabs",
     "storage" 
   ],
   "host_permissions": [
-    "<all_urls>"
+    "https://signin.aws.amazon.com/saml"
   ],
   "icons": {
     "48": "icons/Icon_48x48.png",

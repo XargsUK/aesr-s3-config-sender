@@ -146,7 +146,3 @@ async function assumeRoleWithSAML(roleClaimValue, SAMLAssertion, SessionDuration
     throw error;
   }
 }
-
-// chrome.storage.local.set({ awsCredentials: keys }, function() {
-//   console.log('Credentials are saved to chrome.storage.local');
-// });
