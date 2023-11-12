@@ -1,6 +1,22 @@
 Changelog
 =========
 
+# v0.2.1  (12/11/2023)
+
+### Features:
+- Firefox support added
+
+# v0.2.0  (06/11/2023)
+
+### Features:
+- Changed S3 authentication method to utilise SSO SAML response
+- Removed Cognito support
+
+### Chores:
+- Remove UI elements for Cognito
+- Dependency and version updates.
+- Cleanup: Removed unused code and files.
+
 # v0.1.3  (15/09/2023)
 
 ### Features:
