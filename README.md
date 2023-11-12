@@ -70,36 +70,6 @@ To send the AWS configuration to AWS Extend Switch Roles, enter the chrome exten
 
 ![Screen Shot 1](https://github.com/XargsUK/aesr-s3-config-sender/blob/main/images/screenshot-1.png)
 
-## Build
-This section guides you through the process of building the project from the source code. Please follow these steps carefully to ensure a successful build.
-
-### Prerequisites
-Before you begin, ensure that you have Node.js version 20.x installed on your Linux system. This is a necessary prerequisite for the build process. You can download and install Node.js from [here](https://nodejs.org/en).
-
-### Cloning the Repository
-
-1. Open your terminal. 
-2. Clone the repository by running the following command:
-   `git clone git@github.com:XargsUK/aesr-s3-config-sender.git`
-
-### Navigating to the Project Directory
-After cloning the repository, navigate to the project directory:
-`cd aesr-s3-config-sender`
-
-This step is crucial as the build script must be run from the root of the project directory.
-
-### Building the Project
-
-1. In the project directory, you will find a build script named build.sh. This script is used to build the project for different environments.
-2. While in the project root, execute the following command: `./bin/build.sh <chrome|firefox>`
-
-Replace <chrome|firefox> with the target platform for which you are building. For example, use chrome to build for Google Chrome or firefox for Mozilla Firefox.
-
-This command builds the project and places the output in the `dist/` directory.
-
-### Post-Build Steps
-After the build process completes, you will find the built project in the `dist/` directory. This directory contains the compiled code ready for deployment or further testing.
-
 ## Contributing
 
 Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request on [GitHub](https://github.com/XargsUK/aesr-s3-config-sender/).
