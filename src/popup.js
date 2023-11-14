@@ -6,6 +6,10 @@ import { logDebugMessage } from "./library/debug.js";
 import { showToastMessage } from "./library/toast.js";
 
 window.onload = function() {
+
+
+
+
   document.getElementById('openOptionsLink').onclick = function(e) {
     openOptions();
     return false;
@@ -28,8 +32,25 @@ window.onload = function() {
   }
 
   document.getElementById("syncButton").addEventListener("click", function() {
-    handleSyncButtonClick();
+    // Check if the browser is Firefox using the user agent string
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+      // For Firefox, check host permissions
+      checkHostPermission().then(hasPermission => {
+        if (hasPermission) {
+          // If permission is granted, proceed with the sync operation
+          handleSyncButtonClick();
+        } else {
+          // If permission is not granted, inform the user and show a button to request permission
+          showRequestPermissionButton();
+        }
+      });
+    } else {
+      // For other browsers, directly handle the sync button click
+      handleSyncButtonClick();
+    }
   });
+  
+
   async function handleSyncButtonClick() {
     const profileData = getCurrentProfileData();
     if (profileData) {
@@ -96,4 +117,60 @@ function openOptions() {
     });
   }
 }
+
+function checkHostPermission() {
+  return new Promise((resolve, reject) => {
+    const permissionsToCheck = {
+      origins: ["https://signin.aws.amazon.com/saml"]
+    };
+    browser.permissions.contains(permissionsToCheck).then(hasPermission => {
+      resolve(hasPermission);
+    }).catch(error => {
+      console.error("Error checking permissions:", error);
+      reject(error);
+    });
+  });
 }
+
+function requestPermissions() {
+  const permissionsToRequest = {
+    origins: ["https://signin.aws.amazon.com/saml"]
+  };
+  browser.permissions.request(permissionsToRequest).then(granted => {
+    if (granted) {
+      console.log("Permission was granted");
+    } else {
+      console.log("Permission was refused");
+    }
+  }).catch(error => {
+    console.error("Error requesting permissions:", error);
+  });
+}
+
+function showRequestPermissionButton() {
+  // Show a button to request permissions
+  const requestButton = document.createElement('button');
+  requestButton.textContent = 'Give Permissions to Sync';
+  requestButton.addEventListener('click', function() {
+    requestPermissions();
+    window.close(); // Close the popup after requesting permissions
+  });
+  document.body.appendChild(requestButton);}
+
+function requestPermissions() {
+  const permissionsToRequest = {
+    origins: ["https://signin.aws.amazon.com/saml"]
+  };
+  browser.permissions.request(permissionsToRequest).then(granted => {
+    if (granted) {
+      console.log("Permission was granted");
+    } else {
+      console.log("Permission was refused");
+    }
+  }).catch(error => {
+    console.error("Error requesting permissions:", error);
+  });
+}
+
+}
+

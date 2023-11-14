@@ -1,15 +1,23 @@
 import { XMLParser } from 'fast-xml-parser';
 import { STSClient, AssumeRoleWithSAMLCommand } from "@aws-sdk/client-sts";
 
-let DebugLogs = false;
+let DebugLogs = true;
+
+chrome.runtime.onInstalled.addListener(function(details) {
+  if (details.reason === "install") {
+    console.log("Extension installed. Permissions for capturing SAML are granted.");
+  }
+});
+
 addOnBeforeRequestEventListener();
 
 function addOnBeforeRequestEventListener() {
+  const webRequest = (typeof browser !== 'undefined') ? browser.webRequest : chrome.webRequest;
   if (DebugLogs) console.log('DEBUG: Extension is activated');
-  if (chrome.webRequest.onBeforeRequest.hasListener(onBeforeRequestEvent)) {
+  if (webRequest.onBeforeRequest.hasListener(onBeforeRequestEvent)) {
     console.log("ERROR: onBeforeRequest EventListener could not be added, because onBeforeRequest already has an EventListener.");
   } else {
-    chrome.webRequest.onBeforeRequest.addListener(
+    webRequest.onBeforeRequest.addListener(
       onBeforeRequestEvent,
       { urls: ["https://signin.aws.amazon.com/saml"] },
       ["requestBody"]
@@ -77,15 +85,20 @@ async function onBeforeRequestEvent(details) {
   // Use the STS assumeRoleWithSAML function to get the temporary credentials
   let keys;
   try {
-    const keys = await assumeRoleWithSAML(roleClaimValue, details.requestBody.formData.SAMLResponse[0]);
+    keys = await assumeRoleWithSAML(roleClaimValue, details.requestBody.formData.SAMLResponse[0]);
     console.log('DEBUG: AssumeRoleWithSAML response:');
     console.log(keys);
-    chrome.storage.local.set({ awsCredentials: keys }, function() {
-      console.log('Credentials are saved to chrome.storage.local');
+    const storage = (typeof browser !== 'undefined') ? browser.storage : chrome.storage;
+    storage.local.set({ awsCredentials: keys }, function() {
+      if (typeof chrome !== 'undefined' && chrome.runtime.lastError) {
+        console.error('Error saving credentials:', chrome.runtime.lastError);
+      } else {
+        console.log('Credentials are saved to storage');
+      }
     });
   } catch(err) {
-    console.log("ERROR: Error when trying to assume the IAM Role with the SAML Assertion.");
-    console.log(err, err.stack);
+    console.error("ERROR: Error when trying to assume the IAM Role with the SAML Assertion.");
+    console.error(err);
   }
 }
 

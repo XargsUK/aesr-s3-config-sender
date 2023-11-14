@@ -33,9 +33,6 @@ async function saveProfileAndUpdateUI() {
   }
 
   const profileData = {
-    // accessKeyId: elById("awsAccessKey").value,
-    // secretAccessKey: elById("awsSecretKey").value,
-    // sessionToken: elById("awsSessionToken").value,
     region: elById("awsRegion").value,
     bucket: elById("bucketName").value,
     key: elById("fileKey").value,
@@ -44,13 +41,10 @@ async function saveProfileAndUpdateUI() {
 
   try {
     const { profiles } = await loadProfiles();
-
     await saveProfile(profileName, profileData);
-
     if (!profiles.defaultProfile) {
       await setDefaultProfile(profileName);
     }
-
     await loadProfilesAndUpdateUI(profileName);
     showToastMessage('green', 'Profile Saved');
   } catch (error) {
@@ -64,14 +58,10 @@ async function saveProfileAndUpdateUI() {
 async function deleteProfileAndUpdateUI(profileName) {
   try {
     const { profiles, defaultProfileName } = await loadProfiles();
-
     const isDefaultProfile = profileName === defaultProfileName;
-
     await deleteProfile(profileName);
-
     if (isDefaultProfile) {
       const newDefaultProfile = Object.keys(profiles).find(p => p !== profileName && p !== 'defaultProfile');
-
       if (newDefaultProfile) {
         await setDefaultProfile(newDefaultProfile);
         loadProfilesAndUpdateUI(newDefaultProfile);
@@ -218,53 +208,6 @@ async function exportProfileAndUpdateUI() {
   }
 }
 
-// Handles user sign-in using Cognito authentication service
-async function handleCognitoSignIn(event) {
-  logDebugMessage("Cognito sign in button clicked.");
-  event.preventDefault();
-  logDebugMessage("Processing Cognito sign in...");
-
-  const username = elById("cognitoUsername").value.trim();
-  const password = elById("cognitoPassword").value.trim();
-  const userPoolId = elById("cognitoUserPoolId").value.trim();
-  const identityPoolId = elById("cognitoIdentityPoolId").value.trim();
-  const clientAppId = elById("cognitoClientAppId").value.trim();
-  const region = elById("cognitoRegion").value.trim();
-
-  if (!username || !password || !userPoolId || !identityPoolId || !clientAppId || !region) {
-    showToastMessage('red', 'Please fill in all required fields.')
-    return;
-  }
-
-  try {
-    const { accessKeyId, secretAccessKey, sessionToken } = await signInWithCognito(
-      username, password, userPoolId, identityPoolId, clientAppId, region
-    );
-
-    logDebugMessage("Fetched credentials:", accessKeyId, secretAccessKey, sessionToken);
-
-    elById("awsAccessKey").value = accessKeyId;
-    elById("awsSecretKey").value = secretAccessKey;
-    elById("awsSessionToken").value = sessionToken; 
-    const inputIds = ["awsAccessKey", "awsSecretKey", "awsSessionToken"];
-    inputIds.forEach((id) => {
-      const input = elById(id);
-      if (input.value) {
-        const label = document.querySelector(`label[for="${id}"]`);
-        if (label) {
-          label.classList.add("active");
-        }
-      }
-    });
-
-    logDebugMessage("Populated input fields with credentials:", accessKeyId, secretAccessKey, sessionToken);
-    showToastMessage('green', 'Credentials stored from Cognito!')
-  } catch (error) {
-    showToastMessage('red', 'Error during Cognito sign in: ' + error.message)
-  }
-  logDebugMessage("handleCognitoSignIn function finished.");
-}
-
 // Fetches the content of an S3 file using AWS credentials and returns it as a string.
 async function fetchS3FileContent(accessKeyId, secretAccessKey, sessionToken, region, bucket, key) {
   try {
@@ -355,10 +298,6 @@ pullS3ConfigButton.onclick = async function() {
     }
   });
 };
-
-
-  
-
 
   elById("saveProfileButton").onclick = saveProfileAndUpdateUI;
   elById("deleteProfileButton").onclick = () => deleteProfileAndUpdateUI(elById("profileList").value);
