@@ -30,61 +30,60 @@ window.onload = function() {
   document.getElementById("syncButton").addEventListener("click", function() {
     handleSyncButtonClick();
   });
-
   async function handleSyncButtonClick() {
     const profileData = getCurrentProfileData();
     if (profileData) {
-      chrome.storage.local.get(['awsCredentials'], async function(data) {
+      try {
+        const data = await (chrome.storage.local.get ? chrome.storage.local.get(['awsCredentials']) : browser.storage.local.get(['awsCredentials']));
         const awsCredentials = data.awsCredentials;
         if (awsCredentials) {
-          try {
-            const bucket = profileData.bucket;
-            const key = profileData.key;
-            const region = profileData.region;
-            const configContent = await getS3FileContent(
-              awsCredentials.accessKeyId,
-              awsCredentials.secretAccessKey,
-              awsCredentials.sessionToken,
-              region,
-              bucket,
-              key
-            );
-
-            logDebugMessage("S3 file content: ", configContent); 
-
-            const aesrSenderId = profileData.aesrId;
-            chrome.runtime.sendMessage(aesrSenderId, {
-              action: 'updateConfig',
-              dataType: 'ini',
-              data: configContent,
-            }, function(response) {
-              if (response) {
-                setLastSentTimestamp(Date.now());
-                getLastSentTimestamp();
-                showToastMessage("success", "Sync successful!");
-              } else {
-                logDebugMessage('Failed to send data');
-                showToastMessage("danger", "Failed to send data");
-              }
-            });
-          } catch (error) {
-            logDebugMessage("An error occurred", error);
-            showToastMessage("danger", "An error occurred: " + error);
-          }
+          const bucket = profileData.bucket;
+          const key = profileData.key;
+          const region = profileData.region;
+          const configContent = await getS3FileContent(
+            awsCredentials.accessKeyId,
+            awsCredentials.secretAccessKey,
+            awsCredentials.sessionToken,
+            region,
+            bucket,
+            key
+          );
+  
+          logDebugMessage("S3 file content: ", configContent);
+  
+          const aesrSenderId = profileData.aesrId;
+          const sendMessage = chrome.runtime.sendMessage ? chrome.runtime.sendMessage : browser.runtime.sendMessage;
+          sendMessage(aesrSenderId, {
+            action: 'updateConfig',
+            dataType: 'ini',
+            data: configContent,
+          }, function(response) {
+            if (response) {
+              setLastSentTimestamp(Date.now());
+              getLastSentTimestamp();
+              showToastMessage("success", "Sync successful!");
+            } else {
+              logDebugMessage('Failed to send data');
+              showToastMessage("danger", "Failed to send data");
+            }
+          });
         } else {
           logDebugMessage("No AWS credentials found");
           showToastMessage("warning", "No AWS credentials found");
         }
-      });
+      } catch (error) {
+        logDebugMessage("An error occurred", error);
+        showToastMessage("danger", "An error occurred: " + error);
+      }
     } else {
       logDebugMessage("No profile selected");
       showToastMessage("warning", "No profile selected");
     }
   }
-
+  
   getLastSentTimestamp();
   loadProfilesIntoDropdown(null, "profileList");
-}
+  
 
 function openOptions() {
   if (window.chrome) {
@@ -96,4 +95,5 @@ function openOptions() {
       if (err) console.error(`Error: ${err}`);
     });
   }
+}
 }

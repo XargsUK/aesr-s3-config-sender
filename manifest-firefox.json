@@ -1,5 +1,5 @@
 {
-  "version": "0.2.1",
+  "version": "0.2.3",
   "name": "AESR S3 Config Sender",
   "description": "Downloads Extend Switch Role configurations from S3 and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
@@ -17,7 +17,7 @@
   },
   "action": {
     "default_title": "AESR S3 Config Sender",
-    "default_icon": "icons/Icon_128x128.png",
+    "default_icon": "icons/Icon_38x38.png",
     "default_popup": "popup.html"
   },
   "commands": {

@@ -286,6 +286,10 @@ function updateLastSentTimestamp(timestamp) {
   getLastSentTimestamp();
 }
 
+function isFirefox() {
+  return typeof InstallTrigger !== 'undefined';
+}
+
 
 window.onload = function() {
   const textArea = elById('awsConfigTextArea');
@@ -293,21 +297,32 @@ window.onload = function() {
   const pullS3ConfigButton = elById('pullS3ConfigButton');
 
   saveButton.onclick = function() {
-    const aesrSenderId = elById('aesrIdText').value;
+      const aesrSenderId = elById('aesrIdText').value;
 
-    chrome.runtime.sendMessage(aesrSenderId, {
-      action: 'updateConfig',
-      dataType: 'ini',
-      data: textArea.value,
-    }, function(response) {
-      if (response) {
-        setLastSentTimestamp(Date.now());
-        getLastSentTimestamp();
+      const messageData = {
+          action: 'updateConfig',
+          dataType: 'ini',
+          data: textArea.value,
+      };
+
+      if (isFirefox()) {
+          browser.runtime.sendMessage(aesrSenderId, messageData).then(response => {
+              setLastSentTimestamp(Date.now());
+              getLastSentTimestamp();
+          }).catch(error => {
+              logDebugMessage('Failed to send data: ' + error.message);
+          });
       } else {
-        logDebugMessage('Failed to send data' + error.message);
+          chrome.runtime.sendMessage(aesrSenderId, messageData, function(response) {
+              if (response) {
+                  setLastSentTimestamp(Date.now());
+                  getLastSentTimestamp();
+              } else if (chrome.runtime.lastError) {
+                  logDebugMessage('Failed to send data: ' + chrome.runtime.lastError.message);
+              }
+          });
       }
-    });
-};
+  };
 
 // Pulls AWS config data from S3 and updates the AWS config text area on the page.
 pullS3ConfigButton.onclick = async function() {
