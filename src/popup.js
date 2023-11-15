@@ -1,41 +1,51 @@
-import { getLastSentTimestamp, setLastSentTimestamp } from "./library/timestamp";
+import {
+  getLastSentTimestamp,
+  setLastSentTimestamp,
+} from "./library/timestamp";
 import { loadProfilesIntoDropdown, loadProfile } from "./library/profile.js";
-import { getCurrentProfileData, setCurrentProfileData } from "./library/state.js";
+import {
+  getCurrentProfileData,
+  setCurrentProfileData,
+} from "./library/state.js";
 import { getS3FileContent } from "./library/s3.js";
 import { logDebugMessage } from "./library/debug.js";
 import { showToastMessage } from "./library/toast.js";
 
-window.onload = function() {
-
-
-
-
-  document.getElementById('openOptionsLink').onclick = function(e) {
+window.onload = function () {
+  document.getElementById("openOptionsLink").onclick = function (e) {
     openOptions();
     return false;
-  }
-  
-  document.getElementById('openCreditsLink').onclick = function(e) {
-    chrome.tabs.create({ url: chrome.runtime.getURL('credits.html') }, function(tab){});
+  };
+
+  document.getElementById("openCreditsLink").onclick = function (e) {
+    chrome.tabs.create(
+      { url: chrome.runtime.getURL("credits.html") },
+      function (tab) {}
+    );
     return false;
-  }
+  };
 
   const profileListElement = document.getElementById("profileList");
-  profileListElement.addEventListener("change", function() {
+  profileListElement.addEventListener("change", function () {
     handleProfileChange(this.value);
   });
 
   async function handleProfileChange(selectedProfile) {
     const profileData = await loadProfile(selectedProfile);
     setCurrentProfileData(profileData);
-    logDebugMessage("Profile changed to: ", selectedProfile, " Current profile data is: ", getCurrentProfileData());
+    logDebugMessage(
+      "Profile changed to: ",
+      selectedProfile,
+      " Current profile data is: ",
+      getCurrentProfileData()
+    );
   }
 
-  document.getElementById("syncButton").addEventListener("click", function() {
+  document.getElementById("syncButton").addEventListener("click", function () {
     // Check if the browser is Firefox using the user agent string
-    if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+    if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1) {
       // For Firefox, check host permissions
-      checkHostPermission().then(hasPermission => {
+      checkHostPermission().then((hasPermission) => {
         if (hasPermission) {
           // If permission is granted, proceed with the sync operation
           handleSyncButtonClick();
@@ -49,13 +59,12 @@ window.onload = function() {
       handleSyncButtonClick();
     }
   });
-  
 
   async function handleSyncButtonClick() {
     const profileData = getCurrentProfileData();
     if (profileData) {
       try {
-        const data = await (chrome.storage.local.get ? chrome.storage.local.get(['awsCredentials']) : browser.storage.local.get(['awsCredentials']));
+        const data = await (isFirefox() ? browser.storage.local.get(["awsCredentials"]) : chrome.storage.local.get(["awsCredentials"]));
         const awsCredentials = data.awsCredentials;
         if (awsCredentials) {
           const bucket = profileData.bucket;
@@ -73,28 +82,40 @@ window.onload = function() {
           logDebugMessage("S3 file content: ", configContent);
   
           const aesrSenderId = profileData.aesrId;
-          const sendMessage = chrome.runtime.sendMessage ? chrome.runtime.sendMessage : browser.runtime.sendMessage;
-          sendMessage(aesrSenderId, {
-            action: 'updateConfig',
-            dataType: 'ini',
+          const messageData = {
+            action: "updateConfig",
+            dataType: "ini",
             data: configContent,
-          }, function(response) {
-            if (response) {
+          };
+  
+          if (isFirefox()) {
+            browser.runtime.sendMessage(aesrSenderId, messageData).then((response) => {
               setLastSentTimestamp(Date.now());
               getLastSentTimestamp();
               showToastMessage("success", "Sync successful!");
-            } else {
-              logDebugMessage('Failed to send data');
+            }).catch((error) => {
+              logDebugMessage("Failed to send data: " + error.message);
               showToastMessage("danger", "Failed to send data");
-            }
-          });
+            });
+          } else {
+            chrome.runtime.sendMessage(aesrSenderId, messageData, function(response) {
+              if (chrome.runtime.lastError) {
+                logDebugMessage("Failed to send data: " + chrome.runtime.lastError.message);
+                showToastMessage("danger", "Failed to send data");
+                return;
+              }
+              setLastSentTimestamp(Date.now());
+              getLastSentTimestamp();
+              showToastMessage("success", "Sync successful!");
+            });
+          }
         } else {
           logDebugMessage("No AWS credentials found");
           showToastMessage("warning", "No AWS credentials found");
         }
       } catch (error) {
         logDebugMessage("An error occurred", error);
-        showToastMessage("danger", "An error occurred: " + error);
+        showToastMessage("danger", "An error occurred: " + error.message);
       }
     } else {
       logDebugMessage("No profile selected");
@@ -102,75 +123,87 @@ window.onload = function() {
     }
   }
   
-  getLastSentTimestamp();
-  loadProfilesIntoDropdown(null, "profileList");
+  function isFirefox() {
+    return typeof InstallTrigger !== 'undefined';
+  }
   
 
-function openOptions() {
-  if (window.chrome) {
-    chrome.runtime.openOptionsPage(err => {
-      if (err) console.error(`Error: ${err}`);
-    });
-  } else if (window.browser) {
-    window.browser.runtime.openOptionsPage().catch(err => {
-      if (err) console.error(`Error: ${err}`);
+  getLastSentTimestamp();
+  loadProfilesIntoDropdown(null, "profileList");
+
+  function openOptions() {
+    if (window.chrome) {
+      chrome.runtime.openOptionsPage((err) => {
+        if (err) console.error(`Error: ${err}`);
+      });
+    } else if (window.browser) {
+      window.browser.runtime.openOptionsPage().catch((err) => {
+        if (err) console.error(`Error: ${err}`);
+      });
+    }
+  }
+
+  function checkHostPermission() {
+    return new Promise((resolve, reject) => {
+      const permissionsToCheck = {
+        origins: ["https://signin.aws.amazon.com/saml"],
+      };
+      browser.permissions
+        .contains(permissionsToCheck)
+        .then((hasPermission) => {
+          resolve(hasPermission);
+        })
+        .catch((error) => {
+          console.error("Error checking permissions:", error);
+          reject(error);
+        });
     });
   }
-}
 
-function checkHostPermission() {
-  return new Promise((resolve, reject) => {
-    const permissionsToCheck = {
-      origins: ["https://signin.aws.amazon.com/saml"]
+  function requestPermissions() {
+    const permissionsToRequest = {
+      origins: ["https://signin.aws.amazon.com/saml"],
     };
-    browser.permissions.contains(permissionsToCheck).then(hasPermission => {
-      resolve(hasPermission);
-    }).catch(error => {
-      console.error("Error checking permissions:", error);
-      reject(error);
+    browser.permissions
+      .request(permissionsToRequest)
+      .then((granted) => {
+        if (granted) {
+          console.log("Permission was granted");
+        } else {
+          console.log("Permission was refused");
+        }
+      })
+      .catch((error) => {
+        console.error("Error requesting permissions:", error);
+      });
+  }
+
+  function showRequestPermissionButton() {
+    // Show a button to request permissions
+    const requestButton = document.createElement("button");
+    requestButton.textContent = "Give Permissions to Sync";
+    requestButton.addEventListener("click", function () {
+      requestPermissions();
+      window.close(); // Close the popup after requesting permissions
     });
-  });
-}
+    document.body.appendChild(requestButton);
+  }
 
-function requestPermissions() {
-  const permissionsToRequest = {
-    origins: ["https://signin.aws.amazon.com/saml"]
-  };
-  browser.permissions.request(permissionsToRequest).then(granted => {
-    if (granted) {
-      console.log("Permission was granted");
-    } else {
-      console.log("Permission was refused");
-    }
-  }).catch(error => {
-    console.error("Error requesting permissions:", error);
-  });
-}
-
-function showRequestPermissionButton() {
-  // Show a button to request permissions
-  const requestButton = document.createElement('button');
-  requestButton.textContent = 'Give Permissions to Sync';
-  requestButton.addEventListener('click', function() {
-    requestPermissions();
-    window.close(); // Close the popup after requesting permissions
-  });
-  document.body.appendChild(requestButton);}
-
-function requestPermissions() {
-  const permissionsToRequest = {
-    origins: ["https://signin.aws.amazon.com/saml"]
-  };
-  browser.permissions.request(permissionsToRequest).then(granted => {
-    if (granted) {
-      console.log("Permission was granted");
-    } else {
-      console.log("Permission was refused");
-    }
-  }).catch(error => {
-    console.error("Error requesting permissions:", error);
-  });
-}
-
-}
-
+  function requestPermissions() {
+    const permissionsToRequest = {
+      origins: ["https://signin.aws.amazon.com/saml"],
+    };
+    browser.permissions
+      .request(permissionsToRequest)
+      .then((granted) => {
+        if (granted) {
+          console.log("Permission was granted");
+        } else {
+          console.log("Permission was refused");
+        }
+      })
+      .catch((error) => {
+        console.error("Error requesting permissions:", error);
+      });
+  }
+};

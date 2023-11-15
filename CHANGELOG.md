@@ -1,5 +1,8 @@
 Changelog
 =========
+# v0.2.2 - v0.2.5  (15/11/2023)
+- Bug fixes for Firefox support
+- Permissions prompt in Firefox for AWS
 
 # v0.2.1  (12/11/2023)
 
