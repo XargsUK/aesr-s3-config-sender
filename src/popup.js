@@ -1,14 +1,14 @@
 import {
   getLastSentTimestamp,
   setLastSentTimestamp,
-} from "./library/timestamp";
+} from "./library/timestamp.js";
 import { loadProfilesIntoDropdown, loadProfile } from "./library/profile.js";
 import {
   getCurrentProfileData,
   setCurrentProfileData,
 } from "./library/state.js";
 import { getS3FileContent } from "./library/s3.js";
-import { logDebugMessage } from "./library/debug.js";
+import { logDebugMessage, logErrorMessage } from "./library/debug.js";
 import { showToastMessage } from "./library/toast.js";
 
 window.onload = function () {
@@ -99,7 +99,7 @@ window.onload = function () {
                 showToastMessage("success", "Sync successful!");
               })
               .catch((error) => {
-                logDebugMessage("Failed to send data: " + error.message);
+                logErrorMessage("Failed to send data: " + error.message);
                 showToastMessage("danger", "Failed to send data");
               });
           } else {
@@ -108,7 +108,7 @@ window.onload = function () {
               messageData,
               function (response) {
                 if (chrome.runtime.lastError) {
-                  logDebugMessage(
+                  logErrorMessage(
                     "Failed to send data: " + chrome.runtime.lastError.message
                   );
                   showToastMessage("danger", "Failed to send data");
@@ -125,7 +125,7 @@ window.onload = function () {
           showToastMessage("warning", "No AWS credentials found");
         }
       } catch (error) {
-        logDebugMessage("An error occurred", error);
+        logErrorMessage("An error occurred", error);
         showToastMessage("danger", "An error occurred: " + error.message);
       }
     } else {
@@ -144,11 +144,11 @@ window.onload = function () {
   function openOptions() {
     if (window.chrome) {
       chrome.runtime.openOptionsPage((err) => {
-        if (err) console.error(`Error: ${err}`);
+        if (err) logErrorMessage(`Error: ${err}`);
       });
     } else if (window.browser) {
       window.browser.runtime.openOptionsPage().catch((err) => {
-        if (err) console.error(`Error: ${err}`);
+        if (err) logErrorMessage(`Error: ${err}`);
       });
     }
   }
@@ -164,7 +164,7 @@ window.onload = function () {
           resolve(hasPermission);
         })
         .catch((error) => {
-          console.error("Error checking permissions:", error);
+          logErrorMessage("Error checking permissions:", error);
           reject(error);
         });
     });
@@ -184,7 +184,7 @@ window.onload = function () {
         }
       })
       .catch((error) => {
-        console.error("Error requesting permissions:", error);
+        logErrorMessage("Error requesting permissions:", error);
       });
   }
 
@@ -213,7 +213,7 @@ window.onload = function () {
         }
       })
       .catch((error) => {
-        console.error("Error requesting permissions:", error);
+        logErrorMessage("Error requesting permissions:", error);
       });
   }
 };

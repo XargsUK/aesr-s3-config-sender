@@ -16,7 +16,7 @@ import {
   setLastSentTimestamp,
   getLastSentTimestamp,
 } from "./library/timestamp.js";
-import { logDebugMessage, saveDebugModeSetting, restoreDebugModeSetting } from "./library/debug.js";
+import { logDebugMessage, logErrorMessage, saveDebugModeSetting, restoreDebugModeSetting } from "./library/debug.js";
 
 window.bootstrap = bootstrap;
 
@@ -58,7 +58,7 @@ async function saveProfileAndUpdateUI() {
     showToastMessage("green", "Profile Saved");
   } catch (error) {
     showToastMessage("red", "Failed to save profile");
-    logDebugMessage("Failed to save profile:", error);
+    logErrorMessage("Failed to save profile:", error);
   }
 }
 
@@ -83,7 +83,7 @@ async function deleteProfileAndUpdateUI(profileName) {
     }
   } catch (error) {
     showToastMessage("red", "Failed to delete profile");
-    logDebugMessage("Failed to delete profile:", error);
+    logErrorMessage("Failed to delete profile:", error);
   }
 }
 
@@ -151,6 +151,7 @@ async function setDefaultProfileAndUpdateUI() {
     loadProfilesAndUpdateUI();
   } catch (error) {
     showToastMessage("yellow", error.message);
+    logErrorMessage("Failed to set default profile:", error);
   }
 }
 
@@ -188,6 +189,7 @@ function importProfileAndUpdateUI() {
       })
       .catch((error) => {
         showToastMessage("red", "Invalid profile JSON file");
+        logErrorMessage("Failed to import profile:", error);
       })
       .finally(() => {
         // Remove the file input element after it's been used
@@ -219,6 +221,7 @@ async function exportProfileAndUpdateUI() {
     showToastMessage("green", "Profile exported successfully");
   } catch (error) {
     showToastMessage("red", "Failed to export profile");
+    logErrorMessage("Failed to export profile:", error);
   }
 }
 
@@ -251,7 +254,7 @@ async function fetchS3FileContent(
 
     return content;
   } catch (error) {
-    logDebugMessage("Error fetching file from S3:", error);
+    logErrorMessage("Error fetching file from S3:", error);
     showToastMessage("red", "Error fetching file from S3: " + error.message);
   }
 }
@@ -288,7 +291,7 @@ window.onload = function () {
           getLastSentTimestamp();
         })
         .catch((error) => {
-          logDebugMessage("Failed to send data: " + error.message);
+          logErrorMessage("Failed to send data: " + error.message);
         });
     } else {
       chrome.runtime.sendMessage(
@@ -299,7 +302,7 @@ window.onload = function () {
             setLastSentTimestamp(Date.now());
             getLastSentTimestamp();
           } else if (chrome.runtime.lastError) {
-            logDebugMessage(
+            logErrorMessage(
               "Failed to send data: " + chrome.runtime.lastError.message
             );
           }
@@ -313,7 +316,7 @@ window.onload = function () {
     // Retrieve credentials from chrome.storage.local
     chrome.storage.local.get("awsCredentials", async (data) => {
       if (chrome.runtime.lastError || !data.awsCredentials) {
-        logDebugMessage(
+        logErrorMessage(
           "Error retrieving credentials: " + chrome.runtime.lastError
         );
         return;
@@ -348,6 +351,7 @@ window.onload = function () {
           "red",
           "Error fetching S3 file content: " + error.message
         );
+        logErrorMessage("Error fetching S3 file content:", error);
       }
     });
   };

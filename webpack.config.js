@@ -6,8 +6,7 @@ module.exports = {
   entry: {
     options: './src/options.js',
     popup: './src/popup.js',
-    background: './src/background.js',
-    content: './src/content.js'
+    background: './src/background.js'
   },
   output: {
     filename: '[name].bundle.js',
