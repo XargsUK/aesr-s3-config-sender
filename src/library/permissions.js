@@ -1,4 +1,5 @@
 // Functions to check/request permissions
+import { logDebugMessage, logErrorMessage } from "./debug.js";
 
 function checkPermissions() {
   const requiredPermissions = {
@@ -13,14 +14,12 @@ function checkPermissions() {
     .contains(requiredPermissions)
     .then((hasPermissions) => {
       if (hasPermissions) {
-        if (DebugLogs)
-          console.log("DEBUG: The extension has the required permissions.");
+        logDebugMessage("DEBUG: The extension has the required permissions.");
         addOnBeforeRequestEventListener();
       } else {
-        if (DebugLogs)
-          console.log(
-            "DEBUG: The extension does not have the required permissions."
-          );
+        logDebugMessage(
+          "DEBUG: The extension does not have the required permissions."
+        );
         requestPermissions(requiredPermissions);
       }
     })
@@ -37,12 +36,12 @@ function requestPermissions(requiredPermissions) {
     .request(requiredPermissions)
     .then((granted) => {
       if (granted) {
-        if (DebugLogs)
-          console.log("DEBUG: The required permissions have been granted.");
+        logDebugMessage("DEBUG: The required permissions have been granted.");
         addOnBeforeRequestEventListener();
       } else {
-        if (DebugLogs)
-          console.log("DEBUG: The required permissions have not been granted.");
+        logDebugMessage(
+          "DEBUG: The required permissions have not been granted."
+        );
       }
     })
     .catch((error) => {

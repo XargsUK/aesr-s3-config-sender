@@ -64,7 +64,9 @@ window.onload = function () {
     const profileData = getCurrentProfileData();
     if (profileData) {
       try {
-        const data = await (isFirefox() ? browser.storage.local.get(["awsCredentials"]) : chrome.storage.local.get(["awsCredentials"]));
+        const data = await (isFirefox()
+          ? browser.storage.local.get(["awsCredentials"])
+          : chrome.storage.local.get(["awsCredentials"]));
         const awsCredentials = data.awsCredentials;
         if (awsCredentials) {
           const bucket = profileData.bucket;
@@ -78,36 +80,45 @@ window.onload = function () {
             bucket,
             key
           );
-  
+
           logDebugMessage("S3 file content: ", configContent);
-  
+
           const aesrSenderId = profileData.aesrId;
           const messageData = {
             action: "updateConfig",
             dataType: "ini",
             data: configContent,
           };
-  
+
           if (isFirefox()) {
-            browser.runtime.sendMessage(aesrSenderId, messageData).then((response) => {
-              setLastSentTimestamp(Date.now());
-              getLastSentTimestamp();
-              showToastMessage("success", "Sync successful!");
-            }).catch((error) => {
-              logDebugMessage("Failed to send data: " + error.message);
-              showToastMessage("danger", "Failed to send data");
-            });
-          } else {
-            chrome.runtime.sendMessage(aesrSenderId, messageData, function(response) {
-              if (chrome.runtime.lastError) {
-                logDebugMessage("Failed to send data: " + chrome.runtime.lastError.message);
+            browser.runtime
+              .sendMessage(aesrSenderId, messageData)
+              .then((response) => {
+                setLastSentTimestamp(Date.now());
+                getLastSentTimestamp();
+                showToastMessage("success", "Sync successful!");
+              })
+              .catch((error) => {
+                logDebugMessage("Failed to send data: " + error.message);
                 showToastMessage("danger", "Failed to send data");
-                return;
+              });
+          } else {
+            chrome.runtime.sendMessage(
+              aesrSenderId,
+              messageData,
+              function (response) {
+                if (chrome.runtime.lastError) {
+                  logDebugMessage(
+                    "Failed to send data: " + chrome.runtime.lastError.message
+                  );
+                  showToastMessage("danger", "Failed to send data");
+                  return;
+                }
+                setLastSentTimestamp(Date.now());
+                getLastSentTimestamp();
+                showToastMessage("success", "Sync successful!");
               }
-              setLastSentTimestamp(Date.now());
-              getLastSentTimestamp();
-              showToastMessage("success", "Sync successful!");
-            });
+            );
           }
         } else {
           logDebugMessage("No AWS credentials found");
@@ -122,11 +133,10 @@ window.onload = function () {
       showToastMessage("warning", "No profile selected");
     }
   }
-  
+
   function isFirefox() {
-    return typeof InstallTrigger !== 'undefined';
+    return typeof InstallTrigger !== "undefined";
   }
-  
 
   getLastSentTimestamp();
   loadProfilesIntoDropdown(null, "profileList");
@@ -168,9 +178,9 @@ window.onload = function () {
       .request(permissionsToRequest)
       .then((granted) => {
         if (granted) {
-          console.log("Permission was granted");
+          logDebugMessage("Permission was granted");
         } else {
-          console.log("Permission was refused");
+          logDebugMessage("Permission was refused");
         }
       })
       .catch((error) => {
@@ -197,9 +207,9 @@ window.onload = function () {
       .request(permissionsToRequest)
       .then((granted) => {
         if (granted) {
-          console.log("Permission was granted");
+          logDebugMessage("Permission was granted");
         } else {
-          console.log("Permission was refused");
+          logDebugMessage("Permission was refused");
         }
       })
       .catch((error) => {

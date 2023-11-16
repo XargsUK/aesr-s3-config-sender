@@ -1,11 +1,11 @@
 let currentProfileData = null;
 
 function getCurrentProfileData() {
-    return currentProfileData;
+  return currentProfileData;
 }
 
 function setCurrentProfileData(data) {
-    currentProfileData = data;
+  currentProfileData = data;
 }
 
 export { getCurrentProfileData, setCurrentProfileData };

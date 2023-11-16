@@ -16,8 +16,7 @@ import {
   setLastSentTimestamp,
   getLastSentTimestamp,
 } from "./library/timestamp.js";
-import { logDebugMessage } from "./library/debug.js";
-import { elById } from "./library/utils";
+import { logDebugMessage, saveDebugModeSetting, restoreDebugModeSetting } from "./library/debug.js";
 
 window.bootstrap = bootstrap;
 
@@ -36,17 +35,17 @@ tooltipTriggerList.forEach((tooltipTriggerEl) => {
 // PROFILE MANAGEMENT
 // Saves profile to Chrome storage and refreshes the profiles list on the page.
 async function saveProfileAndUpdateUI() {
-  const profileName = elById("profileName").value.trim();
+  const profileName = document.getElementById("profileName").value.trim();
   if (!profileName) {
     showToastMessage("red", "Profile name is required");
     return;
   }
 
   const profileData = {
-    region: elById("awsRegion").value,
-    bucket: elById("bucketName").value,
-    key: elById("fileKey").value,
-    aesrId: elById("aesrIdText").value,
+    region: document.getElementById("awsRegion").value,
+    bucket: document.getElementById("bucketName").value,
+    key: document.getElementById("fileKey").value,
+    aesrId: document.getElementById("aesrIdText").value,
   };
 
   try {
@@ -90,18 +89,18 @@ async function deleteProfileAndUpdateUI(profileName) {
 
 // Loads a profile from Chrome storage and populates the form with the profile data.
 async function loadProfileAndUpdateUI(profileName) {
-  console.log("Loading profile:", profileName); // Debug
+  logDebugMessage("Loading profile:", profileName); // Debug
   const profileData = await loadProfile(profileName);
-  console.log("Profile data:", profileData); // Debugging line
+  logDebugMessage("Profile data:", profileData); // Debugging line
 
   if (profileData) {
-    elById("profileName").value = profileName;
-    elById("awsRegion").value = profileData.region;
-    elById("bucketName").value = profileData.bucket;
-    elById("fileKey").value = profileData.key;
-    elById("aesrIdText").value = profileData.aesrId;
+    document.getElementById("profileName").value = profileName;
+    document.getElementById("awsRegion").value = profileData.region;
+    document.getElementById("bucketName").value = profileData.bucket;
+    document.getElementById("fileKey").value = profileData.key;
+    document.getElementById("aesrIdText").value = profileData.aesrId;
   } else {
-    console.log("No data found for profile:", profileName); // Debugging line
+    logDebugMessage("No data found for profile:", profileName); // Debugging line
   }
 }
 
@@ -143,7 +142,7 @@ async function loadProfilesAndUpdateUI(selectedProfileName) {
 
 // Sets the user's default profile to the currently selected profile in the dropdown list.
 async function setDefaultProfileAndUpdateUI() {
-  const profileList = elById("profileList");
+  const profileList = document.getElementById("profileList");
   let selectedProfile = profileList.options[profileList.selectedIndex].text;
 
   try {
@@ -160,7 +159,7 @@ async function loadDefaultProfileAndUpdateUI() {
   const defaultProfile = await loadDefaultProfile();
 
   if (defaultProfile) {
-    elById("profileList").value = defaultProfile;
+    document.getElementById("profileList").value = defaultProfile;
     loadProfileAndUpdateUI(defaultProfile);
   }
 }
@@ -184,7 +183,7 @@ function importProfileAndUpdateUI() {
         loadProfilesAndUpdateUI();
         setTimeout(() => {
           loadProfileAndUpdateUI(profileName);
-          elById("profileList").value = profileName;
+          document.getElementById("profileList").value = profileName;
         }, 100);
       })
       .catch((error) => {
@@ -203,7 +202,7 @@ function importProfileAndUpdateUI() {
 
 // Allows users to export a profile to a JSON file.
 async function exportProfileAndUpdateUI() {
-  const profileName = elById("profileList").value;
+  const profileName = document.getElementById("profileList").value;
   if (!profileName) {
     showToastMessage("yellow", "Select a profile to export first!");
     return;
@@ -268,12 +267,12 @@ function isFirefox() {
 }
 
 window.onload = function () {
-  const textArea = elById("awsConfigTextArea");
-  const saveButton = elById("saveButton");
-  const pullS3ConfigButton = elById("pullS3ConfigButton");
+  const textArea = document.getElementById("awsConfigTextArea");
+  const saveButton = document.getElementById("saveButton");
+  const pullS3ConfigButton = document.getElementById("pullS3ConfigButton");
 
   saveButton.onclick = function () {
-    const aesrSenderId = elById("aesrIdText").value;
+    const aesrSenderId = document.getElementById("aesrIdText").value;
 
     const messageData = {
       action: "updateConfig",
@@ -324,9 +323,9 @@ window.onload = function () {
       const accessKeyId = credentials.accessKeyId;
       const secretAccessKey = credentials.secretAccessKey;
       const sessionToken = credentials.sessionToken;
-      const region = elById("awsRegion").value;
-      const bucket = elById("bucketName").value;
-      const key = elById("fileKey").value;
+      const region = document.getElementById("awsRegion").value;
+      const bucket = document.getElementById("bucketName").value;
+      const key = document.getElementById("fileKey").value;
 
       if (!accessKeyId || !secretAccessKey || !region || !bucket || !key) {
         logDebugMessage("Please fill in all required fields.");
@@ -353,19 +352,21 @@ window.onload = function () {
     });
   };
 
-  elById("saveProfileButton").onclick = saveProfileAndUpdateUI;
-  elById("deleteProfileButton").onclick = () =>
-    deleteProfileAndUpdateUI(elById("profileList").value);
-  elById("profileList").onchange = () =>
-    loadProfileAndUpdateUI(elById("profileList").value);
-  elById("setDefaultProfileButton").onclick = setDefaultProfileAndUpdateUI;
-  elById("exportProfileButton").onclick = exportProfileAndUpdateUI;
-  elById("importProfileButton").onclick = importProfileAndUpdateUI;
+  document.getElementById("saveProfileButton").onclick = saveProfileAndUpdateUI;
+  document.getElementById("deleteProfileButton").onclick = () =>
+    deleteProfileAndUpdateUI(document.getElementById("profileList").value);
+  document.getElementById("profileList").onchange = () =>
+    loadProfileAndUpdateUI(document.getElementById("profileList").value);
+  document.getElementById("setDefaultProfileButton").onclick = setDefaultProfileAndUpdateUI;
+  document.getElementById("exportProfileButton").onclick = exportProfileAndUpdateUI;
+  document.getElementById("importProfileButton").onclick = importProfileAndUpdateUI;
   loadProfilesAndUpdateUI(); // Load the saved profiles initially
   loadDefaultProfileAndUpdateUI(); // Load the default profile initially
 };
 
 document.addEventListener("DOMContentLoaded", function () {
+  restoreDebugModeSetting();
+  document.getElementById("debugModeCheckbox").addEventListener('change', saveDebugModeSetting);
   // Creates a MutationObserver to hide a .hiddendiv.common on the page when a childList mutation occurs.
   const bodyObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {

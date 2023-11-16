@@ -5,7 +5,6 @@ module.exports = {
   mode: 'production',
   entry: {
     options: './src/options.js',
-    cognito: './src/library/cognito.js',
     popup: './src/popup.js',
     background: './src/background.js',
     content: './src/content.js'
