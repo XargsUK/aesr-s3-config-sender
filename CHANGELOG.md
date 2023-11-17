@@ -1,5 +1,11 @@
 Changelog
 =========
+# v0.2.6 - v0.2.7  (17/11/2023)
+- Bug fixes for Firefox support
+- Add debug mode for console logging
+- Resolve issue with background.js which was preventing SAML capture
+
+
 # v0.2.2 - v0.2.5  (15/11/2023)
 - Bug fixes for Firefox support
 - Permissions prompt in Firefox for AWS
