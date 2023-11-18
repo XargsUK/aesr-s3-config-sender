@@ -1,5 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { PurgeCSSPlugin } = require("purgecss-webpack-plugin");
+const glob = require('glob');
 
 module.exports = {
   mode: 'production',
@@ -20,7 +22,7 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       {
-        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
         type: 'asset/resource',
       },
     ],
@@ -28,6 +30,12 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       filename: '../css/[name].css',
+    }),
+    new PurgeCSSPlugin({
+      paths: glob.sync(`${path.join(__dirname, 'src')}/**/*`, { nodir: true }).concat(
+        glob.sync(`${path.join(__dirname, '*.html')}`, { nodir: true })
+      ),
+      only: ['options', 'popup', 'background'], // Specify the keys from the entry object you want to purge
     }),
   ],
 };
