@@ -1,0 +1,30 @@
+:root {
+  /* Primary color */
+  --md-sys-color-primary: var(--md-ref-palette-primary80);
+  --md-sys-color-on-primary: var(--md-ref-palette-primary20);
+
+  /* Secondary color */
+  --md-sys-color-secondary: var(--md-ref-palette-secondary80);
+  --md-sys-color-on-secondary: var(--md-ref-palette-secondary20);
+
+  /* Tertiary color */
+  --md-sys-color-tertiary: var(--md-ref-palette-tertiary80);
+  --md-sys-color-on-tertiary: var(--md-ref-palette-tertiary20);
+
+  /* Background */
+  --md-sys-color-background: var(--md-ref-palette-neutral10);
+  --md-sys-color-on-background: var(--md-ref-palette-neutral90);
+
+  /* Surface */
+  --md-sys-color-surface: var(--md-ref-palette-neutral30);
+  --md-sys-color-on-surface: var(--md-ref-palette-neutral80);
+
+  /* Error */
+  --md-sys-color-error: var(--md-ref-palette-error70);
+  --md-sys-color-on-error: var(--md-ref-palette-error30);
+
+  /* Adjusting typescale for dark mode */
+  --md-sys-typescale-display-large-color: var(--md-sys-color-on-background);
+  --md-sys-typescale-headline-large-color: var(--md-sys-color-on-background);
+  --md-sys-typescale-title-large-color: var(--md-sys-color-on-background);
+}

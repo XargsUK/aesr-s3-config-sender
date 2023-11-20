@@ -1,4 +1,4 @@
-import { logDebugMessage, logErrorMessage } from "./debug.js";
+import { logDebugMessage } from "./debug.js";
 import { getCurrentProfileData, setCurrentProfileData } from "./state.js";
 
 async function loadProfile(profileName) {
@@ -108,42 +108,34 @@ async function loadProfilesIntoDropdown(selectedProfileName, dropdownId) {
   const { profiles, defaultProfileName } = await loadProfiles();
 
   const profileList = document.getElementById(dropdownId);
-  profileList.innerHTML = '<option value="" disabled>Select a Profile</option>';
+  profileList.innerHTML = '';
 
   for (const profileName in profiles) {
     if (profileName === "defaultProfile") continue;
 
-    const option = document.createElement("option");
+    const option = document.createElement("md-select-option");
     option.value = profileName;
-    option.textContent =
-      profileName === defaultProfileName
-        ? `${profileName} (default)`
-        : profileName;
+    
+    const headline = document.createElement("div");
+    headline.slot = "headline";
+    headline.textContent = profileName;
+    option.appendChild(headline);
 
-    if (profileName === defaultProfileName) {
-      option.style.fontWeight = "bold";
-      option.selected = true;
-      // Load the default profile data
-      const profileData = await loadProfile(defaultProfileName);
+    // Set the selected attribute if this is the selected profile
+    if (profileName === selectedProfileName || profileName === defaultProfileName) {
+      option.setAttribute('selected', '');
+      const profileData = await loadProfile(profileName);
       setCurrentProfileData(profileData);
     }
 
     profileList.appendChild(option);
-    if (profileName === selectedProfileName) {
-      option.selected = true;
-    }
-    logDebugMessage("Current Profile Data:", getCurrentProfileData());
+    logDebugMessage("Profile Loaded:", profileName);
   }
 
-  if (defaultProfileName) {
-    profileList.value = defaultProfileName;
-  } else {
-    profileList.selectedIndex = 0;
-  }
-
-  // Log the currentProfileData
   logDebugMessage("Current Profile Data:", getCurrentProfileData());
 }
+
+
 
 async function saveAWSCredentials(profileName, awsCredentials) {
   await new Promise((resolve) =>

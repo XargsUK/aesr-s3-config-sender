@@ -1,5 +1,7 @@
 import * as bootstrap from "bootstrap";
+import '@material/web/all.js';
 import "./options.css";
+import './css/theme.css';
 import {
   loadProfile,
   loadProfiles,
@@ -109,41 +111,46 @@ async function loadProfilesAndUpdateUI(selectedProfileName) {
   const { profiles, defaultProfileName } = await loadProfiles();
 
   const profileList = document.getElementById("profileList");
-  profileList.innerHTML = '<option value="" disabled>Select a Profile</option>';
+  profileList.innerHTML = ''; // Clear existing options
 
+  // Dynamically create and append md-select-option elements
   for (const profileName in profiles) {
-    if (profileName === "defaultProfile") continue;
+    if (profileName === "defaultProfile") continue; // Skip defaultProfile key
 
-    const option = document.createElement("option");
+    const option = document.createElement("md-select-option");
     option.value = profileName;
-    option.textContent =
+    
+    const headline = document.createElement("div");
+    headline.slot = "headline";
+    headline.textContent = 
       profileName === defaultProfileName
         ? `${profileName} (default)`
         : profileName;
+    option.appendChild(headline);
 
-    if (profileName === defaultProfileName) {
-      option.style.fontWeight = "bold";
+    // Set selected attribute based on the current or default profile
+    if (profileName === selectedProfileName || profileName === defaultProfileName) {
+      option.setAttribute('selected', '');
     }
 
     profileList.appendChild(option);
-    if (profileName === selectedProfileName) {
-      option.selected = true;
-    }
   }
 
-  if (selectedProfileName) {
-    profileList.value = selectedProfileName;
-  } else if (defaultProfileName) {
-    profileList.value = defaultProfileName;
-  } else {
-    profileList.selectedIndex = 0;
-  }
+  // Additional logic to set the value of the md-filled-select if needed
+  // This depends on how md-filled-select manages its displayed value
 }
+
 
 // Sets the user's default profile to the currently selected profile in the dropdown list.
 async function setDefaultProfileAndUpdateUI() {
   const profileList = document.getElementById("profileList");
-  let selectedProfile = profileList.options[profileList.selectedIndex].text;
+  const selectedOption = profileList.querySelector('md-select-option[aria-selected="true"]');
+  let selectedProfile = selectedOption ? selectedOption.textContent.trim() : null;
+
+  if (!selectedProfile) {
+    showToastMessage("yellow", "No profile selected");
+    return;
+  }
 
   try {
     const profileName = await setDefaultProfile(selectedProfile);
@@ -154,6 +161,7 @@ async function setDefaultProfileAndUpdateUI() {
     logErrorMessage("Failed to set default profile:", error);
   }
 }
+
 
 // Loads the user's default profile from Chrome storage.
 async function loadDefaultProfileAndUpdateUI() {
@@ -270,6 +278,32 @@ function isFirefox() {
 }
 
 window.onload = function () {
+
+const tabs = document.getElementById('myTabs');
+const syncContent = document.getElementById('syncContent');
+const profilesContent = document.getElementById('profilesContent');
+const helpContent = document.getElementById('helpContent');
+
+tabs.addEventListener('change', (event) => {
+  // Hide all content
+  syncContent.hidden = true;
+  profilesContent.hidden = true;
+  helpContent.hidden = true;
+
+  // Show the selected tab's content
+  switch(event.target.activeTabIndex) {
+    case 0:
+      syncContent.hidden = false;
+      break;
+    case 1:
+      profilesContent.hidden = false;
+      break;
+    case 2:
+      helpContent.hidden = false;
+      break;
+  }
+});
+
   const textArea = document.getElementById("awsConfigTextArea");
   const saveButton = document.getElementById("saveButton");
   const pullS3ConfigButton = document.getElementById("pullS3ConfigButton");
