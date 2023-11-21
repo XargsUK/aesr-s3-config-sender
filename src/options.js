@@ -281,13 +281,13 @@ window.onload = function () {
 
 const tabs = document.getElementById('myTabs');
 const syncContent = document.getElementById('syncContent');
-const profilesContent = document.getElementById('profilesContent');
+const settingsContent = document.getElementById('settingsContent');
 const helpContent = document.getElementById('helpContent');
 
 tabs.addEventListener('change', (event) => {
   // Hide all content
   syncContent.hidden = true;
-  profilesContent.hidden = true;
+  settingsContent.hidden = true;
   helpContent.hidden = true;
 
   // Show the selected tab's content
@@ -296,7 +296,7 @@ tabs.addEventListener('change', (event) => {
       syncContent.hidden = false;
       break;
     case 1:
-      profilesContent.hidden = false;
+      settingsContent.hidden = false;
       break;
     case 2:
       helpContent.hidden = false;

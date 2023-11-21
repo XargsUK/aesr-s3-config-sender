@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title style="text-align: center;">AESR Config Sender</title>
     <link href="css/options.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet" />
 
     <style>
       md-filled-text-field {
@@ -21,298 +23,204 @@
       }
 
       md-filled-button md-icon {
-        font-size: 24px; /* Adjust size as needed */
-        vertical-align: middle; /* Align icon with the text */
+        font-size: 24px; 
+        vertical-align: middle; 
       }
       md-filled-tonal-button md-icon {
-        font-size: 24px; /* Adjust size as needed */
-        vertical-align: middle; /* Align icon with the text */
+        font-size: 24px; 
+        vertical-align: middle; 
       }
       #tabContent {
         background-color: var(--md-sys-color-surface-container);
         color: var(--md-sys-color-on-surface-container);
         font-family: var(--md-sys-typescale-body-medium-font-family-name), sans-serif;
+        padding: 20px;
       }
 
       #headingOne {
         text-align: center;
         color: var(--md-sys-color-on-surface);
         font-family: var(--md-sys-typescale-body-medium-font-family-name), sans-serif;
+        font-size: 2rem; /* Example size, adjust as needed */
+        font-weight: bold; /* Makes the text bold */
+        margin-bottom: 1rem; /* Adds space below the heading */
       }
+
+      #profileSelectorContainer {
+        margin-bottom: 16px; /* Adjust as needed for visual separation */
+      }
+
+      #tabsContainer {
+        /* Keeps the content inside the tabs aligned with the profile selector */
+        background-color: var(--md-sys-color-surface-container);
+        padding-top: 20px;
+      }
+
+      #profileList {
+        background-color: var(--md-sys-color-surface-variant);
+        color: var(--md-sys-color-on-surface-variant);
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: 4px; /* Rounds the corners */
+        padding: 8px; /* Adds some padding inside the dropdown */
+        width: auto; /* Sets the width to auto to fit the content */
+        display: block; /* Makes the dropdown a block element */
+        margin-bottom: 1rem; /* Adds space below the dropdown */
+      }
+
+      md-filled-tonal-button, md-filled-button {
+        display: flex; /* Use flexbox for alignment */
+        align-items: center; /* Centers items vertically */
+        justify-content: center; /* Centers items horizontally */
+      }
+
+      #buttonContainer {
+        display: flex;
+        justify-content: start; /* Aligns the buttons to the start of the container */
+        gap: 8px; /* Sets a gap between the buttons */
+        padding: 0; /* Adjust padding as needed */
+      }
+
+      .md-button {
+        /* Your existing button styles */
+        flex: 1 1 auto; /* Allows the buttons to grow and shrink as needed */
+        min-width: 120px; /* Minimum width for the buttons to maintain usability */
+        max-width: 200px; /* Maximum width for aesthetic consistency */
+      }
+
+      .profile-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Adjust the gap size as needed */
+        margin-bottom: 20px; /* Provides spacing from the next section */
+      }
+
+      /* Button container for Save/Delete/Default */
+      .profile-action-buttons {
+        display: flex;
+        justify-content: start;
+        gap: 8px; /* Adjust the gap size as needed */
+      }
+
+      .global-settings {
+        margin-top: 20px; /* Provides spacing from the profile sections */
+      }
+
+      .icon-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px; /* Adjust the gap size as needed */
+        padding-right: 20px; /* Aligns with the overall padding of the tab */
+      }
+
 
     </style>
   </head>
   <body>
-      <h1 id="headingOne">AESR Config Sender</h1>
-      <md-outlined-select id="profileList">
+    <h1 id="headingOne">AESR Config Sender</h1>
+
+    <!-- Profile Selector Placement -->
+    <div id="profileSelectorContainer" style="padding: 0 20px;">
+      <md-outlined-select id="profileList"
+        class="md-sys-color-surface-variant md-sys-color-on-surface-variant">
         <md-select-option aria-label="blank"></md-select-option>
       </md-outlined-select>
-      <div class="card mb-3">
-        <div class="card-body">
-          <md-tabs id="myTabs">
-            <md-primary-tab>Sync</md-primary-tab>
-            <md-primary-tab>Profiles</md-primary-tab>
-            <md-primary-tab>Help</md-primary-tab>
-          </md-tabs>
-          
-          <div id="tabContent">            
-            <div id="syncContent">
-                  <br />
-                  <br />
+    </div>
+    <md-tabs id="myTabs">
+      <md-primary-tab>Sync</md-primary-tab>
+      <md-primary-tab>Settings</md-primary-tab>
+      <md-primary-tab>Help</md-primary-tab>
+    </md-tabs>
 
-                  <md-filled-text-field
-                  id="awsConfigTextArea"
-                  type="textarea"
-                  label="Configuration from S3"
-                  rows="5">
-              </md-filled-text-field>
+    <!-- Tabs and Content -->
+    <div id="tabsContainer" style="padding: 0 20px;">
+      <div id="tabContent">
+        <div id="syncContent">
+          <br />
+          <br />
 
-              <!-- <label for="aesrIdText">AESR Extension ID:</label> -->
-              <!-- <input id="aesrIdText" class="form-control" type="text" /> -->
-              <md-filled-text-field label="AESR Extension ID" type="text" id="aesrIdText">
-              </md-filled-text-field>
-              <p id="extensionId">Sender Extension ID:</p>
+          <md-filled-text-field
+            id="awsConfigTextArea"
+            type="textarea"
+            label="Configuration from S3"
+            rows="5">
+          </md-filled-text-field>
 
-              <md-filled-tonal-button id="saveButton">
-                <md-icon>send</md-icon>
-                Send
-              </md-filled-tonal-button>
-    
-              <md-filled-button id="pullS3ConfigButton">
-                <md-icon>cloud_download</md-icon>
-                Download
-              </md-filled-button>
-              <br />
+          <md-filled-text-field label="AESR Extension ID" type="text"
+            id="aesrIdText">
+          </md-filled-text-field>
+          <p id="extensionId">Sender Extension ID:</p>
 
-              <p id="lastSent">Last sent: Never</p>
+          <div id="buttonContainer">
+            <md-filled-button class="md-button md-button-download"
+              id="pullS3ConfigButton">
+              <md-icon>cloud_download</md-icon>
+              Download Config
+            </md-filled-button>
+            <md-filled-tonal-button class="md-button md-button-send"
+              id="saveButton">
+              <md-icon>send</md-icon>
+              Send to AESR
+            </md-filled-tonal-button>
+          </div>
+          <br />
 
-            </div>
+          <p id="lastSent">Last sent: Never</p>
 
+        </div>
 
+        <div id="settingsContent" hidden>
 
+          <div class="profile-section">
+            <md-filled-text-field label="Profile Name" type="text"
+              id="profileName">
+            </md-filled-text-field>
+            <md-filled-text-field label="Region" type="text" id="awsRegion">
+            </md-filled-text-field>
+            <md-filled-text-field label="Bucket Name" type="text"
+              id="bucketName">
+            </md-filled-text-field>
+            <md-filled-text-field label="File Key" type="text" id="fileKey">
+            </md-filled-text-field>
+          </div>
 
-            <div id="profilesContent" hidden>
+          <div class="profile-action-buttons">
+            <md-filled-button id="saveProfileButton">
+              <md-icon>save</md-icon>
+              Save
+            </md-filled-button>
+            <md-filled-button id="deleteProfileButton">
+              <md-icon>delete</md-icon>
+              Delete
+            </md-filled-button>
+            <md-filled-button id="setDefaultProfileButton">
+              <md-icon>home</md-icon>
+              Default
+            </md-filled-button>
+          </div>
 
-              <md-icon-button id="importProfileButton" style="float: right;">
-                <md-icon>upload</md-icon>
-              </md-icon-button>
-              <md-icon-button id="exportProfileButton" style="float: right;">
-                <md-icon>download</md-icon>
-              </md-icon-button>
-
-              <form>
-                <md-filled-text-field label="Profile Name" type="text" id="profileName">
-                </md-filled-text-field>
-                <md-filled-text-field label="Region" type="text" id="awsRegion">
-                </md-filled-text-field>
-                <md-filled-text-field label="Bucket Name" type="text" id="bucketName">
-                </md-filled-text-field>
-                <md-filled-text-field label="File Key" type="text" id="fileKey">
-                </md-filled-text-field>
-              </form>
-
-              <md-filled-button id="saveProfileButton">
-                <md-icon>save</md-icon>
-                Save
-              </md-filled-button>
-              <md-filled-button id="deleteProfileButton">
-                <md-icon>delete</md-icon>
-                Delete
-              </md-filled-button>
-              <md-filled-button id="setDefaultProfileButton">
-                <md-icon>home</md-icon>
-                Default
-              </md-filled-button>
-
-            </div>
-
-
-
-
-
-
-            <div id="helpContent" hidden>
-              <div class="card mb-3">
-                <div class="card-header">Instructions</div>
-                <div class="card-body">
-                  <div class="accordion" id="instructionsAccordion">
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="headingOne">
-                        <button
-                          class="accordion-button"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#collapseOne"
-                          aria-expanded="true"
-                          aria-controls="collapseOne"
-                        >
-                          What is AESR Config Sender?
-                        </button>
-                      </h2>
-                      <div
-                        id="collapseOne"
-                        class="accordion-collapse collapse show"
-                        aria-labelledby="headingOne"
-                        data-bs-parent="#instructionsAccordion"
-                      >
-                        <div class="accordion-body">
-                          <p>
-                            AESR Config Sender is a Chrome extension that allows you to
-                            send your AWS Extend Switch Roles configuration to the AWS
-                            Extend Switch Roles Chrome extension, using S3 as a source.
-                          </p>
-                          <br />
-                          <p>
-                            It does this by using a user-specified IAM user Access Key,
-                            Secret Key, and the S3 bucket information to download the
-                            configuration, and then using the extension ID of AESR,
-                            pushes the configuration to AESR. The user-specified
-                            information can be saved to Chrome local storage as a
-                            profile.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="headingTwo">
-                        <button
-                          class="accordion-button collapsed"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#collapseTwo"
-                          aria-expanded="false"
-                          aria-controls="collapseTwo"
-                        >
-                          Initial Setup
-                        </button>
-                      </h2>
-                      <div
-                        id="collapseTwo"
-                        class="accordion-collapse collapse"
-                        aria-labelledby="headingTwo"
-                        data-bs-parent="#instructionsAccordion"
-                      >
-                        <div class="accordion-body">
-                          <ol>
-                            <li>
-                              Fill in the fields in the S3 Configuration section. See
-                              "What do I put into the fields?" for what to enter.
-                            </li>
-                            <li>
-                              Copy the extension ID at the bottom of the S3
-                              Configuration section. Open the AWS Extend Switch Roles
-                              configuration page and paste the ID into the
-                              <b>Extension API</b> field.
-                            </li>
-                            <li>
-                              Copy the extension ID of AWS Extend Switch Roles and paste
-                              into the <b>AESR extension ID</b> field. After this, click
-                              <b>Save Profile</b>.
-                            </li>
-                            <li>
-                              Click "Pull Config from S3" to download your switch role
-                              config from the specified S3 bucket.
-                            </li>
-                            <li>
-                              Click "Send to AESR" to send the configuration to AWS
-                              Extend Switch Roles. This will overwrite your current
-                              configuration in AESR.
-                            </li>
-                          </ol>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="headingThree">
-                        <button
-                          class="accordion-button collapsed"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#collapseThree"
-                          aria-expanded="false"
-                          aria-controls="collapseThree"
-                        >
-                          What do I put into the fields?
-                        </button>
-                      </h2>
-                      <div
-                        id="collapseThree"
-                        class="accordion-collapse collapse"
-                        aria-labelledby="headingThree"
-                        data-bs-parent="#instructionsAccordion"
-                      >
-                        <div class="accordion-body">
-                          <table class="table" style="caption-side: top">
-                            <caption>
-                              Overview of AWS Configuration Fields
-                            </caption>
-                            <thead>
-                              <tr>
-                                <th scope="col">Field</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Example</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td>Profile Name</td>
-                                <td>Name of the profile to be saved or loaded</td>
-                                <td>AdminProfile</td>
-                              </tr>
-                              <tr>
-                                <td>Access Key</td>
-                                <td>Your AWS access key ID</td>
-                                <td>AKIAIOSFODNN7EXAMPLE</td>
-                              </tr>
-                              <tr>
-                                <td>Secret Key</td>
-                                <td>Your AWS secret access key</td>
-                                <td>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</td>
-                              </tr>
-                              <tr>
-                                <td>Region</td>
-                                <td>AWS region where your S3 bucket is located</td>
-                                <td>eu-west-2</td>
-                              </tr>
-                              <tr>
-                                <td>Bucket Name</td>
-                                <td>
-                                  Name of your S3 bucket containing the configuration
-                                  file
-                                </td>
-                                <td>my-config-bucket</td>
-                              </tr>
-                              <tr>
-                                <td>File Key</td>
-                                <td>
-                                  The key (path) to the configuration file in your S3
-                                  bucket
-                                </td>
-                                <td>my-folder/browser-plugin-config.txt</td>
-                              </tr>
-                              <tr>
-                                <td>AESR extension ID</td>
-                                <td>
-                                  The ID of your AWS Extend Switch Roles extension. Open
-                                  AWS Extend Switch Roles, click options, and copy the
-                                  extension ID in the URL.
-                                </td>
-                                <td>eiephjnabgbnmffmlopgdnnfaimfllpk</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <label for="debugModeCheckbox">Debug Mode</label>
+          <div class="global-settings">
+            <label>
               <md-checkbox id="debugModeCheckbox" touch-target="wrapper"></md-checkbox>
-            </div>
+              Debug Mode
+            </label>            
+          </div>
+
+          <div class="icon-container">
+            <md-icon-button id="importProfileButton" style="float: right;">
+              <md-icon>upload</md-icon>
+            </md-icon-button>
+            <md-icon-button id="exportProfileButton" style="float: right;">
+              <md-icon>download</md-icon>
+            </md-icon-button>
+          </div>
+
+        </div>
+
+        <div id="helpContent" hidden>
+
         </div>
       </div>
-      
+    </div>
     <script src="js/options.bundle.js"></script>
   </body>
 </html>
