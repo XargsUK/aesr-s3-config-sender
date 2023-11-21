@@ -1,12 +1,7 @@
 @import './css/theme.css'; 
 /* @import '~bootstrap/dist/css/bootstrap.min.css'; */
 @import './fontawesome-custom.css';
-@font-face {
-  font-family: 'Roboto';
-  font-style: 'Normal';
-  font-weight: 400;
-  src: url('./fonts/roboto-regular.woff2') format('woff2');
-}
+
 
 
 

@@ -11,8 +11,8 @@
 
     <style>
       md-filled-text-field {
-        width: 100%; /* This makes the text field take the full width of its container */
-        resize: vertical; /* Allows vertical resizing */
+        width: 100%; 
+        resize: vertical; 
       }
       body {
         background-color: var(--md-sys-color-surface);
@@ -41,17 +41,17 @@
         text-align: center;
         color: var(--md-sys-color-on-surface);
         font-family: var(--md-sys-typescale-body-medium-font-family-name), sans-serif;
-        font-size: 2rem; /* Example size, adjust as needed */
-        font-weight: bold; /* Makes the text bold */
-        margin-bottom: 1rem; /* Adds space below the heading */
+        font-size: 2rem; 
+        font-weight: bold; 
+        margin-bottom: 1rem; 
       }
 
       #profileSelectorContainer {
-        margin-bottom: 16px; /* Adjust as needed for visual separation */
+        margin-bottom: 16px; 
       }
 
       #tabsContainer {
-        /* Keeps the content inside the tabs aligned with the profile selector */
+        
         background-color: var(--md-sys-color-surface-container);
         padding-top: 20px;
       }
@@ -60,59 +60,176 @@
         background-color: var(--md-sys-color-surface-variant);
         color: var(--md-sys-color-on-surface-variant);
         border: 1px solid var(--md-sys-color-outline);
-        border-radius: 4px; /* Rounds the corners */
-        padding: 8px; /* Adds some padding inside the dropdown */
-        width: auto; /* Sets the width to auto to fit the content */
-        display: block; /* Makes the dropdown a block element */
-        margin-bottom: 1rem; /* Adds space below the dropdown */
+        border-radius: 4px; 
+        padding: 8px; 
+        width: auto; 
+        display: block; 
+        margin-bottom: 1rem; 
       }
 
       md-filled-tonal-button, md-filled-button {
-        display: flex; /* Use flexbox for alignment */
-        align-items: center; /* Centers items vertically */
-        justify-content: center; /* Centers items horizontally */
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
       }
 
       #buttonContainer {
         display: flex;
-        justify-content: start; /* Aligns the buttons to the start of the container */
-        gap: 8px; /* Sets a gap between the buttons */
-        padding: 0; /* Adjust padding as needed */
+        justify-content: start; 
+        gap: 8px; 
+        padding: 0; 
       }
 
       .md-button {
-        /* Your existing button styles */
-        flex: 1 1 auto; /* Allows the buttons to grow and shrink as needed */
-        min-width: 120px; /* Minimum width for the buttons to maintain usability */
-        max-width: 200px; /* Maximum width for aesthetic consistency */
+        
+        flex: 1 1 auto; 
+        min-width: 120px; 
+        max-width: 200px; 
       }
 
       .profile-section {
         display: flex;
         flex-direction: column;
-        gap: 10px; /* Adjust the gap size as needed */
-        margin-bottom: 20px; /* Provides spacing from the next section */
+        gap: 10px; 
+        margin-bottom: 20px; 
       }
 
-      /* Button container for Save/Delete/Default */
+      
       .profile-action-buttons {
         display: flex;
         justify-content: start;
-        gap: 8px; /* Adjust the gap size as needed */
+        gap: 8px; 
       }
 
       .global-settings {
-        margin-top: 20px; /* Provides spacing from the profile sections */
+        margin-top: 20px; 
       }
 
       .icon-container {
         display: flex;
         justify-content: flex-end;
-        gap: 10px; /* Adjust the gap size as needed */
-        padding-right: 20px; /* Aligns with the overall padding of the tab */
+        gap: 10px; 
+        padding-right: 20px; 
+      }
+
+      .setting-item {
+        display: flex;
+        align-items: center;
+      }
+
+      .setting-label {
+        /* Font & Text */
+        margin-right: 32px;
+        font-family: "Google Sans", Roboto, system-ui;
+        font-size: 16px;
+        font-style: normal;
+        font-variant: normal;
+        font-weight: 400;
+        letter-spacing: normal;
+        line-height: normal;
+        text-decoration: none solid rgb(223, 226, 235);
+        text-align: start;
+        text-indent: 0px;
+        text-transform: none;
+
+        /* Color & Background */
+        background-attachment: scroll;
+        background-color: rgba(0, 0, 0, 0);
+        background-image: none;
+        background-position: 0% 0%;
+        background-repeat: repeat;
+        color: rgb(223, 226, 235);
+      }
+
+      .profile-import-export-buttons {
+        display: flex;
+        justify-content: flex-end; /* Align buttons to the right */
+        padding: 10px 20px; /* Same horizontal padding as your content for alignment */
+        background-color: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container); 
+      }
+
+      .action-and-settings-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .profile-action-buttons, .debug-settings {
+        display: flex;
+        align-items: center;
+      }
+
+      .debug-settings {
+        margin-left: auto;
+      }
+
+      .help-container {
+        margin: 20px;
+        padding: 20px;
+        background-color: #f7f7f7; /* or any other light neutral color */
+        border-radius: 6px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .help-header {
+        font-size: 24px;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .help-details {
+        border-bottom: 1px solid #e1e1e1; /* subtle separator */
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+      }
+
+      .help-details summary {
+        font-weight: bold;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 18px;
+        margin-bottom: 5px;
+        list-style: none;
+      }
+
+      .help-details summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .help-details[open] summary:before {
+        content: '▼ ';
+        margin-right: 5px;
+        font-size: 1em;
+      }
+
+      .help-details:not([open]) summary:before {
+        content: '► ';
+        margin-right: 5px;
+        font-size: 1em;
+      }
+      .help-details .accordion-body {
+        background-color: #444; /* Slightly lighter than summary for differentiation */
+        padding: 10px 15px;
+        border-radius: 0 0 4px 4px; /* Rounded corners at the bottom */
+        margin-bottom: 10px; /* Space after the content */
+      }
+
+      .help-details .accordion-body {
+        border-bottom: none;
+      }
+
+      .help-details p, .help-details ol {
+        font-size: 1em; /* smaller font size for body text */
+        line-height: 1.6; /* increased line height for readability */
+        padding-left: 20px; /* indent text for better structure */
       }
 
 
+
+      
     </style>
   </head>
   <body>
@@ -170,6 +287,17 @@
 
         <div id="settingsContent" hidden>
 
+          <div class="profile-import-export-buttons">
+            <md-filled-tonal-button id="importProfileButton">
+              <md-icon>attach_file</md-icon>
+              Import Profile
+            </md-filled-tonal-button>
+            <md-filled-tonal-button id="exportProfileButton">
+              <md-icon>file_download</md-icon>
+              Export Profile
+            </md-filled-tonal-button>
+          </div>
+
           <div class="profile-section">
             <md-filled-text-field label="Profile Name" type="text"
               id="profileName">
@@ -183,40 +311,112 @@
             </md-filled-text-field>
           </div>
 
-          <div class="profile-action-buttons">
-            <md-filled-button id="saveProfileButton">
-              <md-icon>save</md-icon>
-              Save
-            </md-filled-button>
-            <md-filled-button id="deleteProfileButton">
-              <md-icon>delete</md-icon>
-              Delete
-            </md-filled-button>
-            <md-filled-button id="setDefaultProfileButton">
-              <md-icon>home</md-icon>
-              Default
-            </md-filled-button>
-          </div>
+          <div class="action-and-settings-container">
+            <div class="profile-action-buttons">
+              <md-filled-button id="saveProfileButton">
+                <md-icon>save</md-icon>
+                Save
+              </md-filled-button>
+              <md-filled-button id="deleteProfileButton">
+                <md-icon>delete</md-icon>
+                Delete
+              </md-filled-button>
+              <md-filled-button id="setDefaultProfileButton">
+                <md-icon>home</md-icon>
+                Default
+              </md-filled-button>
+            </div>
 
-          <div class="global-settings">
-            <label>
-              <md-checkbox id="debugModeCheckbox" touch-target="wrapper"></md-checkbox>
-              Debug Mode
-            </label>            
-          </div>
-
-          <div class="icon-container">
-            <md-icon-button id="importProfileButton" style="float: right;">
-              <md-icon>upload</md-icon>
-            </md-icon-button>
-            <md-icon-button id="exportProfileButton" style="float: right;">
-              <md-icon>download</md-icon>
-            </md-icon-button>
+            <div class="debug-settings">
+              <span class="setting-label">Debug Mode</span>
+              <md-switch id="debugModeSwitch" touch-target="wrapper"></md-switch>
+            </div>
           </div>
 
         </div>
 
         <div id="helpContent" hidden>
+          <h2 class="help-header">Instructions</h2>
+          <details class="help-details">
+            <summary>What is AESR Config Sender?</summary>
+            <p>
+              AESR Config Sender is a web extension that enables seamless
+              integration between your AWS Extend Switch Roles configuration and
+              the corresponding extension. By capturing the SSO SAML response
+              from AWS, the extension exchanges it for tokens used to retrieve
+              your configuration from an S3 source.
+            </p>
+            <p>
+              Utilizing different S3 profiles, AESR Config Sender downloads the
+              necessary configuration and, with the AESR extension ID, pushes it
+              directly to the AWS Extend Switch Roles extension.
+            </p>
+          </details>
+
+          <details class="help-details">
+            <summary>Initial Setup</summary>
+            <p>
+              Begin by navigating to the Sync section and enter the extension ID
+              of the AWS Extend Switch Roles. This links AESR Config Sender with
+              AWS Extend Switch Roles, allowing configurations to be pushed
+              directly.
+            </p>
+            <p>
+              Use the 'Download Config' button to fetch the configuration file
+              from S3. This populates the 'Configuration from S3' field with the
+              configuration text.
+            </p>
+            <p>
+              Click 'Send to AESR' to transfer the configuration from the text
+              field to the AWS Extend Switch Roles extension.
+            </p>
+            <p>
+              In the Settings section, define your profiles and S3 details to
+              manage where and how configurations are sourced and sent.
+            </p>
+          </details>
+
+          <details class="help-details">
+            <summary>Settings Explained</summary>
+            <dl>
+              <dt>Profile Name:</dt>
+              <dd>The user-defined name for the profile being configured.</dd>
+
+              <dt>Region:</dt>
+              <dd>The AWS region where the S3 bucket is located.</dd>
+
+              <dt>Bucket Name:</dt>
+              <dd>The name of the S3 bucket that contains the AWS Extend Switch
+                Roles configuration.</dd>
+
+              <dt>File Key:</dt>
+              <dd>The specific file path (key) within the S3 bucket where the
+                configuration file resides.</dd>
+            </dl>
+            <p>
+              Enabling 'Debug Mode' will log extension activities to the
+              console, aiding in troubleshooting.
+            </p>
+          </details>
+
+          <details class="help-details">
+            <summary>Profile Management</summary>
+            <p>
+              Use 'Import Profile' to bring a JSON-formatted profile into the
+              extension's profile list, and 'Export Profile' to save the current
+              profile as a JSON file for backup or transfer purposes.
+            </p>
+          </details>
+
+          <details class="help-details">
+            <summary>Linking with AWS Extend Switch Roles</summary>
+            <p>
+              To complete the setup, open the AWS Extend Switch Roles extension
+              and navigate to the section labeled 'Config sender extension ID'.
+              Enter the ID of the AESR Config Sender extension there to
+              establish a connection.
+            </p>
+          </details>
 
         </div>
       </div>

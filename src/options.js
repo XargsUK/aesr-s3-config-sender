@@ -2,6 +2,8 @@ import * as bootstrap from "bootstrap";
 import '@material/web/all.js';
 import "./options.css";
 import './css/theme.css';
+import 'typeface-roboto'
+
 import {
   loadProfile,
   loadProfiles,
@@ -404,7 +406,7 @@ tabs.addEventListener('change', (event) => {
 
 document.addEventListener("DOMContentLoaded", function () {
   restoreDebugModeSetting();
-  document.getElementById("debugModeCheckbox").addEventListener('change', saveDebugModeSetting);
+  document.getElementById("debugModeSwitch").addEventListener('change', saveDebugModeSetting);
   // Creates a MutationObserver to hide a .hiddendiv.common on the page when a childList mutation occurs.
   const bodyObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {

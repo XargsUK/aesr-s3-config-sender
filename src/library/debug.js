@@ -15,7 +15,7 @@ function logErrorMessage(...messages) {
 }
 
 function saveDebugModeSetting() {
-  const debugMode = document.getElementById("debugModeCheckbox").checked;
+  const debugMode = document.getElementById("debugModeSwitch").selected ;
   chrome.storage.sync.set({ debugMode }, function() {
     console.log('Debug mode is ' + (debugMode ? 'on' : 'off') + '.');
   });
@@ -23,7 +23,7 @@ function saveDebugModeSetting() {
 
 function restoreDebugModeSetting() {
   chrome.storage.sync.get('debugMode', function(data) {
-    document.getElementById("debugModeCheckbox").checked = !!data.debugMode;
+    document.getElementById("debugModeSwitch").selected  = !!data.debugMode;
   });
 }
 
