@@ -11,6 +11,11 @@ import { getS3FileContent } from "./library/s3.js";
 import { logDebugMessage, logErrorMessage } from "./library/debug.js";
 import { showToastMessage } from "./library/toast.js";
 
+import '@material/web/all.js';
+import "./options.css";
+import './css/theme.css';
+import 'typeface-roboto'
+
 window.onload = function () {
   document.getElementById("openOptionsLink").onclick = function (e) {
     openOptions();

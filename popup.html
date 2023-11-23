@@ -3,28 +3,48 @@
 <head>
   <title>AESR S3 Config Sender</title>
 <link href="css/options.css" rel="stylesheet">
+<link
+href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+rel="stylesheet" />
 <style>
-* { box-sizing: border-box }
-html { padding: 0 }
-body {
-  background-color: #2a2e33;
-  color: #2a2e33;
-  margin: 0;
+
+* {
+  box-sizing: border-box;
+}
+html, body {
   padding: 0;
-  font-family: "Segoe UI", Arial, Meiryo, sans-serif;
+  margin: 0;
+}
+
+
+body {
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-sys-typescale-body-medium-font-family-name), sans-serif;
   max-width: 600px;
   max-height: 600px;
 }
+
+
 .optionMenu {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .optionMenu li {
   padding: 0;
   margin: 0;
   border-bottom: 1px solid #41474F;
 }
+
+.optionMenu li a {
+  color: var(--md-sys-color-on-surface);
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
 .optionMenu a {
   color: #d5dbdb;
   display: block;
@@ -35,8 +55,16 @@ body {
   text-decoration: none;
   width: 9em;
 }
-a:hover { background-color: #153247 }
-#openOptionsLink { font-weight: bold }
+
+.optionMenu a:active {
+  background-color: var(--md-sys-color-primary-container);
+}
+
+a:hover { 
+  background-color: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
 
 .mainPane {
   border-right: 1px solid #41474F;
@@ -44,10 +72,12 @@ a:hover { background-color: #153247 }
   margin-right: 4px;
   padding-right: 10px;
 }
+
 #main {
   font-size: 15px;
   padding-bottom: 5px;
 }
+
 #roleList {
   padding: 0;
   margin: 0;
@@ -55,6 +85,7 @@ a:hover { background-color: #153247 }
   max-height: 516px;
   scrollbar-width: thin;
 }
+
 #roleList li {
   padding: 0;
   margin: 4px 10px 4px 2px;
@@ -62,7 +93,11 @@ a:hover { background-color: #153247 }
   white-space: nowrap;
   vertical-align: middle;
 }
-#roleList li.selected { background-color: #143846 }
+
+#roleList li.selected { 
+  background-color: #143846;
+}
+
 #roleList li a {
   color: #fff;
   font-family: Arial, sans-serif;
@@ -71,9 +106,23 @@ a:hover { background-color: #153247 }
   line-height: 29px;
   text-decoration: none;
 }
+
 #roleList li a > * {
   vertical-align: top;
 }
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  vertical-align: middle
+}
+
+md-icon {
+  line-height: 24px;
+  vertical-align: middle;
+}
+
 .headSquare {
   background-size: contain;
   display: inline-block;
@@ -81,20 +130,31 @@ a:hover { background-color: #153247 }
   width: 20px;
   height: 20px;
 }
-#noMain p {
-  font-size: 12px;
+
+#noMain p, #supportComment p {
   margin: 12px 5px 5px 5px;
   line-height: 1.66;
   color: #eaeded;
 }
+
 #supportComment p {
   line-height: 1.25;
-  margin: .5em 0;
   font-weight: bold;
 }
+
 .roleListTitle {
-  color: #eaeded; 
+  color: #eaeded;
 }
+
+
+#openOptionsLink { 
+  font-weight: bold;
+}
+
+#syncButton {
+  display: flex;
+} 
+
 </style>
 </head>
 <body>
@@ -102,17 +162,19 @@ a:hover { background-color: #153247 }
   <div class="mainPane" style="min-width: 280px">
     <div id="noMain">
         <br>
-        <select id="profileList" class="form-select"></select><br>
-        <button id="syncButton" class="btn btn-secondary mt-2">
-            <i class="fa-solid fa-rotate" style="color: #ffffff;"></i> Sync
-        </button>
-
-        <!-- <div id="permissions-container" style="display: none;">
-          <button id="request-permissions-button" class="btn-secondary mt-2">
-            <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i> Permissions Required
-          </button>
-        </div> -->
-        <p id="lastSent" style="margin-top: 10px;">Last sent: Never</p>
+        <md-outlined-select id="profileList" class="md-sys-color-surface-variant md-sys-color-on-surface-variant">
+          <!-- Options will go here -->
+        </md-outlined-select>
+        <br>
+        <div class="buttonContainer">
+          <div class="buttons">
+            <md-filled-tonal-button id="syncButton">
+              <md-icon>sync</md-icon>
+              Sync
+            </md-filled-tonal-button>
+          </div>
+        </div>
+      <p id="lastSent" style="margin-top: 10px;">Last sent: Never</p>
     </div>
   </div>
   <div>
