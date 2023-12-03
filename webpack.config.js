@@ -36,6 +36,7 @@ module.exports = {
         glob.sync(`${path.join(__dirname, '*.html')}`, { nodir: true })
       ),
       only: ['options', 'popup', 'background'], // Specify the keys from the entry object you want to purge
+      safelist: ['bg-danger', 'text-bg-danger', 'bg-warning', 'text-bg-warning', 'bg-success', 'text-bg-success'],
     }),
   ],
 };
