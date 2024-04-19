@@ -1,6 +1,6 @@
 {
   "name": "aesr-s3-config-sender",
-  "version": "0.0.1",
+  "version": "0.2.13",
   "description": "AWS Extend Switch Roles config sender",
   "main": "index.js",
   "scripts": {
