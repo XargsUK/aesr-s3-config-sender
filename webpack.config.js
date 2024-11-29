@@ -18,9 +18,14 @@ export default {
     popup: "./src/popup.ts",
   },
   output: {
-    filename: "js/[name].ts.bundle.js",
+    filename: "[name].js",
     path: path.resolve(__dirname, "dist/extension"),
     clean: true,
+  },
+  optimization: {
+    splitChunks: false,
+    runtimeChunk: false,
+    minimize: false,
   },
   module: {
     rules: [
@@ -30,10 +35,11 @@ export default {
           {
             loader: "ts-loader",
             options: {
-              transpileOnly: true,
+              transpileOnly: false,
               compilerOptions: {
                 module: "ES2022",
-                moduleResolution: "Bundler",
+                moduleResolution: "Node",
+                target: "ES2022",
               },
             },
           },
@@ -48,9 +54,17 @@ export default {
             loader: "css-loader",
             options: {
               importLoaders: 1,
+              url: false,
             },
           },
         ],
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: "asset/resource",
+        generator: {
+          filename: "fonts/[name][ext]",
+        },
       },
     ],
   },
@@ -64,10 +78,23 @@ export default {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "css/[name].css",
+      filename: "[name].css",
     }),
     new PurgeCSSPlugin({
       paths: glob.sync(`src/**/*`, { nodir: true }),
+      safelist: {
+        standard: [
+          /^btn-/,
+          /^form-/,
+          /^modal-/,
+          /^fade/,
+          /^show/,
+          /^mt-/,
+          /^mb-/,
+          /^ms-/,
+          /^me-/,
+        ],
+      },
     }),
     new CopyPlugin({
       patterns: [
@@ -79,15 +106,39 @@ export default {
           from: "icons",
           to: "icons",
         },
-        ...(isDevelopment
-          ? [
-              {
-                from: "src/manifest/manifest-chrome.json",
-                to: "manifest.json",
-              },
-            ]
-          : []),
+        {
+          from: "src/styles/*.css",
+          to: "[name][ext]",
+        },
+        {
+          from: "node_modules/bootstrap/dist/css/bootstrap.min.css",
+          to: "bootstrap.min.css",
+        },
+        {
+          from: "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+          to: "bootstrap.bundle.min.js",
+        },
+        {
+          from: "node_modules/@fortawesome/fontawesome-free/webfonts",
+          to: "webfonts",
+        },
+        {
+          from: isDevelopment
+            ? "src/manifest/manifest-chrome.json"
+            : "src/manifest/manifest-chrome.json",
+          to: "manifest.json",
+          transform(content) {
+            const manifest = JSON.parse(content.toString());
+            manifest.content_security_policy = {
+              extension_pages: isDevelopment
+                ? "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+                : "script-src 'self'; object-src 'self'",
+            };
+            return JSON.stringify(manifest, null, 2);
+          },
+        },
       ],
     }),
   ],
+  devtool: isDevelopment ? "inline-source-map" : false,
 };

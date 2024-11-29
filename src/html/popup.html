@@ -2,8 +2,9 @@
 <html lang="en" xml:lang="en">
 <head>
   <title>AESR S3 Config Sender</title>
-  <link href="css/options.css" rel="stylesheet">
-  <link href="css/fontawesome-custom.css" rel="stylesheet">
+  <link href="bootstrap.min.css" rel="stylesheet">
+  <link href="options.css" rel="stylesheet">
+  <link href="fontawesome-custom.css" rel="stylesheet">
   <style>
   * { box-sizing: border-box }
   html { padding: 0 }
@@ -107,13 +108,7 @@
         <button id="syncButton" class="btn btn-secondary mt-2">
             <i class="fa-solid fa-rotate" style="color: #ffffff;"></i> Sync
         </button>
-
-        <!-- <div id="permissions-container" style="display: none;">
-          <button id="request-permissions-button" class="btn-secondary mt-2">
-            <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i> Permissions Required
-          </button>
-        </div> -->
-        <p id="lastSent" style="margin-top: 10px;">Last sent: Never</p>
+        <p id="lastSent" class="text-light mt-2">Last sent: Never</p>
     </div>
   </div>
   <div>
@@ -127,7 +122,8 @@
     </ul>
   </div>
 </div>
-<script src="js/popup.ts.bundle.js" charset="utf-8"></script>
+<script src="bootstrap.bundle.min.js"></script>
+<script src="popup.js"></script>
 <div id="sandbox" style="display: none;"></div>
 </body>
 </html>
