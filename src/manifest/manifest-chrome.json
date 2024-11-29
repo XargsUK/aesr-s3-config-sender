@@ -14,7 +14,7 @@
     "open_in_tab": true
   },
   "background": {
-    "service_worker": "js/background.bundle.js"
+    "service_worker": "js/background.ts.bundle.js"
   },
   "action": {
     "default_popup": "popup.html",

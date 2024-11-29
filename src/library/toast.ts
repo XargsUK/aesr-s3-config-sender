@@ -1,7 +1,15 @@
 import * as bootstrap from "bootstrap";
-let currentToast;
 
-function showToastMessage(color, message) {
+type ToastColor = 'success' | 'danger' | 'warning' | 'info';
+let currentToast: bootstrap.Toast | null = null;
+
+interface ToastOptions {
+  animation?: boolean;
+  autohide?: boolean;
+  delay?: number;
+}
+
+export function showToastMessage(color: ToastColor, message: string): void {
   // Remove toast if already exists
   if (currentToast) {
     currentToast.hide();
@@ -13,7 +21,7 @@ function showToastMessage(color, message) {
   toastWrapper.style.top = "10px";
   toastWrapper.style.left = "50%";
   toastWrapper.style.transform = "translateX(-50%)";
-  toastWrapper.style.zIndex = 10000;
+  toastWrapper.style.zIndex = "10000";
 
   // Create a Bootstrap toast with a custom color
   const toastElement = document.createElement("div");
@@ -31,7 +39,10 @@ function showToastMessage(color, message) {
   toastWrapper.appendChild(toastElement);
   document.body.appendChild(toastWrapper);
 
-  const toastOptions = { autohide: true, delay: 1500 };
+  const toastOptions: ToastOptions = {
+    autohide: true,
+    delay: 1500
+  };
 
   currentToast = new bootstrap.Toast(toastElement, toastOptions);
   currentToast.show();
@@ -39,6 +50,4 @@ function showToastMessage(color, message) {
   toastElement.addEventListener("hidden.bs.toast", () => {
     toastWrapper.remove();
   });
-}
-
-export { showToastMessage };
+} 
