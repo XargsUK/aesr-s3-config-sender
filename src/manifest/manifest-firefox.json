@@ -4,7 +4,11 @@
   "description": "Downloads Extend Switch Role configurations from S3 and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
   "permissions": ["webRequest", "webRequestBlocking", "storage"],
-  "host_permissions": ["https://signin.aws.amazon.com/saml"],
+  "host_permissions": [
+    "https://signin.aws.amazon.com/saml",
+    "https://*.awsapps.com/start/*",
+    "https://signin.aws.amazon.com/federation"
+  ],
   "icons": {
     "48": "icons/Icon_48x48.png",
     "128": "icons/Icon_128x128.png"
@@ -30,7 +34,11 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://signin.aws.amazon.com/saml"],
+      "matches": [
+        "https://signin.aws.amazon.com/saml",
+        "https://*.awsapps.com/start/*",
+        "https://signin.aws.amazon.com/federation"
+      ],
       "js": ["js/background.ts.bundle.js"]
     }
   ],
