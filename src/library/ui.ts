@@ -1,5 +1,4 @@
 import { logDebugMessage } from './debug';
-import { ProfileData } from './state';
 import { showToastMessage } from './toast';
 
 export function setButtonLoading(button: HTMLButtonElement, loading: boolean): void {

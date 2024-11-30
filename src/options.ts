@@ -251,7 +251,7 @@ async function exportProfileAndUpdateUI(): Promise<void> {
 // Event Listeners
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('DOMContentLoaded event fired');
-  
+
   // Load settings first
   const data = await chrome.storage.local.get(['globalSettings']);
   if (data.globalSettings) {
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Pull Config button
   const pullConfigButton = document.getElementById('pullConfigButton') as HTMLButtonElement;
   console.log('Pull config button found:', !!pullConfigButton);
-  
+
   pullConfigButton?.addEventListener('click', async () => {
     console.log('Pull config button clicked');
     setButtonLoading(pullConfigButton, true);
@@ -270,11 +270,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const configTextArea = document.getElementById('awsConfigTextArea') as HTMLTextAreaElement;
       const profileList = document.getElementById('profileList') as HTMLSelectElement;
       console.log('Selected profile:', profileList.value);
-      
+
       console.log('Loading profile data...');
       const profileData = await loadProfile(profileList.value);
       console.log('Profile data:', profileData);
-      
+
       if (!profileData) {
         console.log('No profile data found');
         showToastMessage('danger', 'No profile selected');
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.log('Getting AWS credentials...');
       const data = await chrome.storage.local.get(['awsCredentials']);
       console.log('AWS credentials found:', !!data.awsCredentials);
-      
+
       const awsCredentials = data.awsCredentials;
       if (!awsCredentials) {
         console.log('No AWS credentials found');
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         profileData.key,
       );
       console.log('S3 content fetched successfully');
-      
+
       configTextArea.value = content;
       showConfigSuccess();
       showToastMessage('success', 'Configuration pulled successfully');

@@ -11,7 +11,7 @@ import {
   deleteProfile,
   saveProfile,
 } from './profile';
-import { ProfileData, GlobalSettings, getGlobalSettings, setGlobalSettings } from './state';
+import { ProfileData, getGlobalSettings } from './state';
 import { showToastMessage } from './toast';
 import { showProfileSetup, clearProfileForm, showEmptyState, toggleSettings } from './ui';
 
@@ -83,7 +83,7 @@ export async function deleteProfileAndUpdateUI(profileName: string): Promise<voi
     if (remainingProfiles.length === 0) {
       const settings = getGlobalSettings();
       const emptyState = document.getElementById('emptyState');
-      
+
       if (settings?.aesrId && emptyState) {
         // If AESR ID is set, show the "create first profile" screen
         emptyState.innerHTML = `
