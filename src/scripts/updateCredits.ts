@@ -1,6 +1,7 @@
 import { exec as execCallback } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import util from 'util';
 
 const exec = util.promisify(execCallback);
@@ -14,6 +15,9 @@ interface LicenseData {
 interface LicenseCheckerOutput {
   [key: string]: LicenseData;
 }
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const packageJsonPath = path.join(__dirname, '../../package.json');
 const creditsHtmlPath = path.join(__dirname, '../../src/html/credits.html');
