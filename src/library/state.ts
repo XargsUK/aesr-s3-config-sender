@@ -13,4 +13,4 @@ export function getCurrentProfileData(): ProfileData | null {
 
 export function setCurrentProfileData(data: ProfileData | null): void {
   currentProfileData = data;
-} 
+}

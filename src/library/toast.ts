@@ -1,53 +1,51 @@
-import * as bootstrap from "bootstrap";
-
 type ToastColor = 'success' | 'danger' | 'warning' | 'info';
-let currentToast: bootstrap.Toast | null = null;
-
-interface ToastOptions {
-  animation?: boolean;
-  autohide?: boolean;
-  delay?: number;
-}
+let currentToast: HTMLElement | null = null;
+let currentTimeout: NodeJS.Timeout | null = null;
 
 export function showToastMessage(color: ToastColor, message: string): void {
-  // Remove toast if already exists
+  // Remove existing toast if present
   if (currentToast) {
-    currentToast.hide();
+    currentToast.remove();
+    if (currentTimeout) {
+      clearTimeout(currentTimeout);
+    }
   }
 
-  // Create a wrapper for the toast message
-  const toastWrapper = document.createElement("div");
-  toastWrapper.style.position = "fixed";
-  toastWrapper.style.top = "10px";
-  toastWrapper.style.left = "50%";
-  toastWrapper.style.transform = "translateX(-50%)";
-  toastWrapper.style.zIndex = "10000";
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${color}`;
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'assertive');
+  toast.setAttribute('aria-atomic', 'true');
 
-  // Create a Bootstrap toast with a custom color
-  const toastElement = document.createElement("div");
-  toastElement.className = `toast align-items-center text-white bg-${color}`;
-  toastElement.setAttribute("role", "alert");
-  toastElement.setAttribute("aria-live", "assertive");
-  toastElement.setAttribute("aria-atomic", "true");
+  // Add message
+  toast.textContent = message;
 
-  // Create the toast body with the message
-  const toastBody = document.createElement("div");
-  toastBody.className = "toast-body";
-  toastBody.innerHTML = message;
+  // Add to document
+  document.body.appendChild(toast);
+  currentToast = toast;
 
-  toastElement.appendChild(toastBody);
-  toastWrapper.appendChild(toastElement);
-  document.body.appendChild(toastWrapper);
-
-  const toastOptions: ToastOptions = {
-    autohide: true,
-    delay: 1500
-  };
-
-  currentToast = new bootstrap.Toast(toastElement, toastOptions);
-  currentToast.show();
-
-  toastElement.addEventListener("hidden.bs.toast", () => {
-    toastWrapper.remove();
+  // Trigger show animation
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
   });
-} 
+
+  // Auto hide after 1.5s
+  currentTimeout = setTimeout(() => {
+    hideToast(toast);
+  }, 1500);
+}
+
+function hideToast(toast: HTMLElement): void {
+  toast.classList.remove('show');
+  toast.addEventListener(
+    'transitionend',
+    () => {
+      toast.remove();
+      if (currentToast === toast) {
+        currentToast = null;
+      }
+    },
+    { once: true },
+  );
+}

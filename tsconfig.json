@@ -15,8 +15,12 @@
     "lib": ["DOM", "ES2022"],
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "allowJs": true,
-    "checkJs": false
+    "checkJs": false,
+    "baseUrl": "./src",
+    "paths": {
+      "*": ["*", "types/*"]
+    }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 } 

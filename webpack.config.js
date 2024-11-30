@@ -23,9 +23,18 @@ export default {
     clean: true,
   },
   optimization: {
-    splitChunks: false,
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: "modern",
+          type: "css/mini-extract",
+          chunks: "all",
+          enforce: true,
+        },
+      },
+    },
     runtimeChunk: false,
-    minimize: false,
+    minimize: !isDevelopment,
   },
   module: {
     rules: [
@@ -59,13 +68,6 @@ export default {
           },
         ],
       },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        type: "asset/resource",
-        generator: {
-          filename: "fonts/[name][ext]",
-        },
-      },
     ],
   },
   resolve: {
@@ -78,21 +80,19 @@ export default {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "[name].css",
+      filename: "modern.css",
     }),
     new PurgeCSSPlugin({
       paths: glob.sync(`src/**/*`, { nodir: true }),
       safelist: {
         standard: [
-          /^btn-/,
-          /^form-/,
-          /^modal-/,
-          /^fade/,
+          /^toast-/,
           /^show/,
-          /^mt-/,
-          /^mb-/,
-          /^ms-/,
-          /^me-/,
+          /^icon/,
+          /^lucide/,
+          "icon",
+          "icon-wrapper",
+          /data-lucide/,
         ],
       },
     }),
@@ -105,22 +105,6 @@ export default {
         {
           from: "icons",
           to: "icons",
-        },
-        {
-          from: "src/styles/*.css",
-          to: "[name][ext]",
-        },
-        {
-          from: "node_modules/bootstrap/dist/css/bootstrap.min.css",
-          to: "bootstrap.min.css",
-        },
-        {
-          from: "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-          to: "bootstrap.bundle.min.js",
-        },
-        {
-          from: "node_modules/@fortawesome/fontawesome-free/webfonts",
-          to: "webfonts",
         },
         {
           from: isDevelopment
