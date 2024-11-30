@@ -3,186 +3,216 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AESR S3 Config Sender</title>
+    <title>AESR Config Sender</title>
     <link href="modern.css" rel="stylesheet" />
   </head>
   <body>
+    <div id="toastContainer" class="toast-container"></div>
+
     <div class="container">
       <h1>AESR Config Sender</h1>
-      <div class="card">
-        <div class="card-header">AESR Actions</div>
-        <div class="card-body">
-          <div class="button-group">
-            <button id="pullS3ConfigButton" class="primary" title="Downloads config from S3">
-              <i data-lucide="download"></i>
-              Pull Config from S3
-            </button>
-            <button id="saveButton" class="primary" title="Sends configuration to AWS Extend Switch Roles">
-              <i data-lucide="upload"></i>
-              Push to AESR
-            </button>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state">
+        <i data-lucide="settings-2" class="empty-state-icon"></i>
+        <h2>Welcome to AESR Config Sender</h2>
+        <p>Let's connect with AWS Extend Switch Roles</p>
+        <div class="setup-steps">
+          <div class="setup-step">
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <h3>Copy this extension's ID:</h3>
+              <div class="copy-id-container">
+                <input type="text" id="thisExtensionId" class="form-control" readonly />
+                <button id="copyThisId" class="btn secondary" title="Copy ID">
+                  <i data-lucide="copy"></i>
+                </button>
+              </div>
+            </div>
           </div>
-          <p id="lastSent">Last sent: Never</p>
-          <div class="form-group">
-            <label for="profileList">Choose a Profile:</label>
-            <select id="profileList"></select>
+          <div class="setup-step">
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <h3>Configure AWS Extend Switch Roles:</h3>
+              <ol class="substeps">
+                <li>Open AWS Extend Switch Roles extension options</li>
+                <li>Paste the copied ID into "Config sender extension ID"</li>
+                <li>Change "Storage" setting to "Local"</li>
+                <li>Click Save in AWS Extend Switch Roles</li>
+              </ol>
+            </div>
           </div>
-          <div class="button-group">
-            <button id="importProfileButton">
-              <i data-lucide="file-input"></i>
-              Import Profile
-            </button>
-            <button id="exportProfileButton">
-              <i data-lucide="file-output"></i>
-              Export Profile
-            </button>
+          <div class="setup-step">
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <h3>Get AESR extension ID:</h3>
+              <p>Copy the extension ID from AWS Extend Switch Roles' address bar (it looks like "chrome-extension://[ID]/options.html")</p>
+            </div>
+          </div>
+          <div class="setup-step">
+            <span class="step-number">4</span>
+            <div class="step-content">
+              <h3>Complete the setup:</h3>
+              <button id="emptyStateSettings" class="btn primary">
+                <i data-lucide="settings"></i>
+                Open Settings to Paste AESR ID
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">AESR Configuration</div>
-        <div class="card-body">
-          <form>
+      <!-- Main Content -->
+      <div id="mainContent">
+        <!-- Main Configuration Card -->
+        <div class="card">
+          <div class="card-header">AESR Configuration</div>
+          <div class="card-body">
+            <!-- Profile Selection -->
             <div class="form-group">
-              <label for="awsConfigTextArea">Configuration:</label>
-              <textarea id="awsConfigTextArea" rows="5"></textarea>
+              <label for="profileList">Active Profile:</label>
+              <div class="profile-controls">
+                <select id="profileList" class="form-control" data-tooltip="Select a profile to work with">
+                  <option value="" disabled selected>Select a profile...</option>
+                </select>
+                <button id="newProfileButton" class="btn secondary" title="Create New Profile">
+                  <i data-lucide="plus"></i>
+                  New
+                </button>
+                <button id="editProfileButton" class="btn secondary" title="Edit Profile">
+                  <i data-lucide="edit"></i>
+                  Edit
+                </button>
+                <button id="settingsButton" class="btn icon-button" title="Global Settings">
+                  <i data-lucide="settings"></i>
+                </button>
+              </div>
             </div>
+
+            <!-- Configuration Area -->
+            <div id="configSection" class="config-section">
+              <div class="config-header">
+                <div class="config-title">
+                  <label for="awsConfigTextArea">Configuration</label>
+                  <div class="last-sync" title="Last time config was pushed to AESR">
+                    <i data-lucide="clock"></i>
+                    <span id="lastSent">Last pushed: Never</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="config-container">
+                <textarea id="awsConfigTextArea" 
+                         class="form-control" 
+                         rows="8" 
+                         placeholder="Configuration will appear here after pulling from S3..."></textarea>
+                <div class="config-status">
+                  <i data-lucide="check-circle"></i>
+                  <span>Config pulled successfully</span>
+                </div>
+              </div>
+
+              <div class="action-buttons">
+                <button id="pullConfigButton" class="btn primary">
+                  <i data-lucide="download-cloud"></i>
+                  Pull from S3
+                  <div class="button-loader"></div>
+                </button>
+                <button id="saveButton" class="btn primary">
+                  <i data-lucide="upload-cloud"></i>
+                  Push to AESR
+                  <div class="button-loader"></div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Profile Setup (Initially Hidden) -->
+            <div id="profileSetup" class="profile-setup">
+              <div class="form-group">
+                <label for="profileName">Profile Name:</label>
+                <input type="text" id="profileName" class="form-control" placeholder="e.g. Production" />
+              </div>
+              <div class="form-group">
+                <label for="awsRegion">Region:</label>
+                <input type="text" id="awsRegion" class="form-control" placeholder="e.g. eu-west-2" />
+              </div>
+              <div class="form-group">
+                <label for="bucketName">Bucket Name:</label>
+                <input type="text" id="bucketName" class="form-control" placeholder="e.g. my-config-bucket" />
+              </div>
+              <div class="form-group">
+                <label for="fileKey">File Key:</label>
+                <input type="text" id="fileKey" class="form-control" placeholder="path/to/config.json" />
+              </div>
+              <div class="profile-actions">
+                <button id="saveProfileButton" class="btn primary">
+                  <i data-lucide="save"></i>
+                  Save
+                </button>
+                <button id="setDefaultProfileButton" class="btn accent">
+                  <i data-lucide="star"></i>
+                  Default
+                </button>
+                <button id="deleteProfileButton" class="btn danger">
+                  <i data-lucide="trash-2"></i>
+                  Delete
+                </button>
+                <button id="closeProfileButton" class="btn secondary">
+                  <i data-lucide="x"></i>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Modal -->
+      <div id="settingsModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Settings</h2>
+            <button class="close-button" id="closeSettingsModal">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+          <div class="modal-body">
             <div class="form-group">
               <label for="aesrIdText">AESR Extension ID:</label>
-              <input id="aesrIdText" type="text" />
-              <p id="extensionId">Sender Extension ID:</p>
-              <label class="debug-container">
-                <input type="checkbox" id="debugModeCheckbox">
+              <div class="input-with-help">
+                <input type="text" id="aesrIdText" class="form-control" placeholder="Paste the ID from AWS Extend Switch Roles address bar" />
+                <div class="help-text">This is the ID you copied from AWS Extend Switch Roles' address bar (after "chrome-extension://")</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="debugModeCheckbox" />
                 Enable Debug Mode
               </label>
             </div>
-          </form>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">S3 Configuration</div>
-        <div class="card-body">
-          <form>
-            <div class="form-group">
-              <label for="profileName">Profile Name:</label>
-              <input id="profileName" type="text" />
-            </div>
-            <div class="form-group">
-              <label for="awsRegion">Region:</label>
-              <input id="awsRegion" type="text" />
-            </div>
-            <div class="form-group">
-              <label for="bucketName">Bucket Name:</label>
-              <input id="bucketName" type="text" />
-            </div>
-            <div class="form-group">
-              <label for="fileKey">File Key:</label>
-              <input id="fileKey" type="text" />
-            </div>
-          </form>
-          <div class="button-group">
-            <button id="saveProfileButton" class="primary">
+          </div>
+          <div class="modal-actions">
+            <button id="saveSettingsButton" class="btn primary">
               <i data-lucide="save"></i>
-              Save Profile
+              Save Settings
             </button>
-            <button id="deleteProfileButton" class="danger">
-              <i data-lucide="trash"></i>
-              Delete Profile
-            </button>
-            <button id="setDefaultProfileButton">
-              <i data-lucide="home"></i>
-              Set Default
+            <button id="cancelSettingsButton" class="btn secondary">
+              <i data-lucide="x"></i>
+              Cancel
             </button>
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">Instructions</div>
-        <div class="card-body">
-          <details open>
-            <summary>What is AESR Config Sender?</summary>
-            <div class="details-content">
-              <p>
-                AESR Config Sender is a Chrome extension that allows you to
-                send your AWS Extend Switch Roles configuration to the AWS
-                Extend Switch Roles Chrome extension, using S3 as a source.
-              </p>
-              <p>
-                It does this by using a user-specified IAM user Access Key,
-                Secret Key, and the S3 bucket information to download the
-                configuration, and then using the extension ID of AESR,
-                pushes the configuration to AESR. The user-specified
-                information can be saved to Chrome local storage as a
-                profile.
-              </p>
-            </div>
-          </details>
-          <details>
-            <summary>Initial Setup</summary>
-            <div class="details-content">
-              <ol>
-                <li>
-                  Fill in the fields in the S3 Configuration section. See
-                  "What do I put into the fields?" for what to enter.
-                </li>
-                <li>
-                  Copy the extension ID at the bottom of the S3
-                  Configuration section. Open the AWS Extend Switch Roles
-                  configuration page and paste the ID into the
-                  <b>Extension API</b> field.
-                </li>
-                <li>
-                  Copy the extension ID of AWS Extend Switch Roles and paste
-                  into the <b>AESR extension ID</b> field. After this, click
-                  <b>Save Profile</b>.
-                </li>
-                <li>
-                  Click "Pull Config from S3" to download your switch role
-                  config from the specified S3 bucket.
-                </li>
-                <li>
-                  Click "Send to AESR" to send the configuration to AWS
-                  Extend Switch Roles. This will overwrite your current
-                  configuration in AESR.
-                </li>
-              </ol>
-            </div>
-          </details>
-          <details>
-            <summary>What do I put into the fields?</summary>
-            <div class="details-content">
-              <table>
-                <caption>Overview of AWS Configuration Fields</caption>
-                <thead>
-                  <tr>
-                    <th>Field</th>
-                    <th>Description</th>
-                    <th>Example</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Profile Name</td>
-                    <td>Name of the profile to be saved or loaded</td>
-                    <td>AdminProfile</td>
-                  </tr>
-                  <tr>
-                    <td>Access Key</td>
-                    <td>Your AWS access key ID</td>
-                    <td>AKIAIOSFODNN7EXAMPLE</td>
-                  </tr>
-                  <tr>
-                    <td>Secret Key</td>
-                    <td>Your AWS secret access key</td>
-                    <td>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </details>
+      <!-- Delete Confirmation Modal -->
+      <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content">
+          <h3>Delete Profile</h3>
+          <p>Are you sure you want to delete this profile? This action cannot be undone.</p>
+          <div class="modal-actions">
+            <button id="confirmDelete" class="btn danger">Delete</button>
+            <button id="cancelDelete" class="btn secondary">Cancel</button>
+          </div>
         </div>
       </div>
     </div>

@@ -11,6 +11,13 @@ export function showToastMessage(color: ToastColor, message: string): void {
     }
   }
 
+  // Get toast container
+  const toastContainer = document.getElementById('toastContainer');
+  if (!toastContainer) {
+    console.error('Toast container not found');
+    return;
+  }
+
   // Create toast element
   const toast = document.createElement('div');
   toast.className = `toast toast-${color}`;
@@ -21,8 +28,8 @@ export function showToastMessage(color: ToastColor, message: string): void {
   // Add message
   toast.textContent = message;
 
-  // Add to document
-  document.body.appendChild(toast);
+  // Add to container
+  toastContainer.appendChild(toast);
   currentToast = toast;
 
   // Trigger show animation
@@ -30,10 +37,10 @@ export function showToastMessage(color: ToastColor, message: string): void {
     toast.classList.add('show');
   });
 
-  // Auto hide after 1.5s
+  // Auto hide after 3s
   currentTimeout = setTimeout(() => {
     hideToast(toast);
-  }, 1500);
+  }, 3000);
 }
 
 function hideToast(toast: HTMLElement): void {

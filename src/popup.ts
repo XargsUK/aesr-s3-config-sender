@@ -4,7 +4,7 @@ import { createIcons, icons } from 'lucide';
 import { logDebugMessage, logErrorMessage } from './library/debug';
 import { loadProfilesIntoDropdown, loadProfile } from './library/profile';
 import { getS3FileContent } from './library/s3';
-import { getCurrentProfileData, setCurrentProfileData } from './library/state';
+import { getCurrentProfileData, setCurrentProfileData, getGlobalSettings } from './library/state';
 import { getLastSentTimestamp, setLastSentTimestamp } from './library/timestamp';
 import { showToastMessage } from './library/toast';
 
@@ -72,6 +72,41 @@ function setupEventListeners(): void {
       handleSyncButtonClick();
     }
   });
+
+  // Pull S3 Config button handler
+  document.getElementById('pullS3ConfigButton')?.addEventListener('click', async function () {
+    const profileData = getCurrentProfileData();
+    const settings = getGlobalSettings();
+    if (!profileData) {
+      showToastMessage('warning', 'Please select a profile first');
+      return;
+    }
+    if (!settings?.aesrId) {
+      showToastMessage('warning', 'Please set your AESR Extension ID in Settings');
+      chrome.runtime.openOptionsPage();
+      return;
+    }
+
+    const requiredFields = {
+      region: profileData.region,
+      bucket: profileData.bucket,
+      key: profileData.key,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value)
+      .map(([field]) => field);
+
+    if (missingFields.length > 0) {
+      showToastMessage(
+        'warning',
+        `Please fill in the following required fields: ${missingFields.join(', ')}`,
+      );
+      return;
+    }
+
+    handleSyncButtonClick();
+  });
 }
 
 function initialize(): void {
@@ -81,7 +116,8 @@ function initialize(): void {
 
 async function handleSyncButtonClick(): Promise<void> {
   const profileData = getCurrentProfileData();
-  if (profileData) {
+  const settings = getGlobalSettings();
+  if (profileData && settings?.aesrId) {
     try {
       const data = await (isFirefox()
         ? (browser.storage.local.get(['awsCredentials']) as Promise<{
@@ -108,7 +144,6 @@ async function handleSyncButtonClick(): Promise<void> {
 
         logDebugMessage('S3 file content: ', configContent);
 
-        const aesrSenderId = profileData.aesrId;
         const messageData = {
           action: 'updateConfig',
           dataType: 'ini',
@@ -117,7 +152,7 @@ async function handleSyncButtonClick(): Promise<void> {
 
         if (isFirefox()) {
           try {
-            await browser.runtime.sendMessage(aesrSenderId, messageData);
+            await browser.runtime.sendMessage(settings.aesrId, messageData);
             setLastSentTimestamp(Date.now());
             getLastSentTimestamp();
             showToastMessage('success', 'Sync successful!');
@@ -126,7 +161,7 @@ async function handleSyncButtonClick(): Promise<void> {
             showToastMessage('danger', 'Failed to send data');
           }
         } else {
-          chrome.runtime.sendMessage(aesrSenderId, messageData, function (_response) {
+          chrome.runtime.sendMessage(settings.aesrId, messageData, function (_response) {
             if (chrome.runtime.lastError) {
               logErrorMessage('Failed to send data: ' + chrome.runtime.lastError.message);
               showToastMessage('danger', 'Failed to send data');
@@ -146,8 +181,8 @@ async function handleSyncButtonClick(): Promise<void> {
       showToastMessage('danger', 'An error occurred: ' + (error as Error).message);
     }
   } else {
-    logDebugMessage('No profile selected');
-    showToastMessage('warning', 'No profile selected');
+    logDebugMessage('No profile selected or AESR ID not set');
+    showToastMessage('warning', 'Please select a profile and set your AESR Extension ID');
   }
 }
 

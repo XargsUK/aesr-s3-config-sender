@@ -1,12 +1,8 @@
 import './styles/modern.css';
 import { createIcons, icons } from 'lucide';
 
-import {
-  logDebugMessage,
-  logErrorMessage,
-  saveDebugModeSetting,
-  restoreDebugModeSetting,
-} from './library/debug';
+import { logDebugMessage, logErrorMessage, restoreDebugModeSetting } from './library/debug';
+import { showDeleteConfirmation } from './library/modal';
 import {
   loadProfile,
   loadProfiles,
@@ -14,27 +10,31 @@ import {
   loadDefaultProfile,
   importProfile,
   exportProfile,
-  deleteProfile,
   saveProfile,
 } from './library/profile';
-import { ProfileData } from './library/state';
+import { getS3FileContent } from './library/s3';
+import { saveSettings, loadSettings } from './library/settings';
+import { ProfileData, getGlobalSettings, setGlobalSettings } from './library/state';
+import { getLastSentTimestamp, setLastSentTimestamp } from './library/timestamp';
 import { showToastMessage } from './library/toast';
+import {
+  setButtonLoading,
+  showConfigSuccess,
+  showProfileSetup,
+  clearProfileForm,
+  showEmptyState,
+  toggleSettings,
+  getThisExtensionId,
+  copyToClipboard,
+} from './library/ui';
 
 // Initialize Lucide icons
-createIcons({
-  icons: {
-    Download: icons.Download,
-    Upload: icons.Upload,
-    Save: icons.Save,
-    Trash: icons.Trash,
-    Home: icons.Home,
-    FileInput: icons.FileInput,
-    FileOutput: icons.FileOutput,
-  },
-});
+createIcons({ icons });
 
-// PROFILE MANAGEMENT
-// Saves profile to Chrome storage and refreshes the profiles list on the page.
+// Basic console log to verify script loading
+console.log('Script loaded successfully');
+
+// Profile Management Functions
 async function saveProfileAndUpdateUI(): Promise<void> {
   const profileNameInput = document.getElementById('profileName') as HTMLInputElement;
   const profileName = profileNameInput.value.trim();
@@ -43,12 +43,37 @@ async function saveProfileAndUpdateUI(): Promise<void> {
     return;
   }
 
+  // Check for global AESR ID
+  const settings = getGlobalSettings();
+  if (!settings?.aesrId) {
+    showToastMessage('warning', 'Please set your AESR Extension ID in Settings');
+    toggleSettings();
+    return;
+  }
+
   const profileData: ProfileData = {
-    region: (document.getElementById('awsRegion') as HTMLInputElement).value,
-    bucket: (document.getElementById('bucketName') as HTMLInputElement).value,
-    key: (document.getElementById('fileKey') as HTMLInputElement).value,
-    aesrId: (document.getElementById('aesrIdText') as HTMLInputElement).value,
+    region: (document.getElementById('awsRegion') as HTMLInputElement).value.trim(),
+    bucket: (document.getElementById('bucketName') as HTMLInputElement).value.trim(),
+    key: (document.getElementById('fileKey') as HTMLInputElement).value.trim(),
   };
+
+  const requiredFields = {
+    region: profileData.region,
+    bucket: profileData.bucket,
+    key: profileData.key,
+  };
+
+  const missingFields = Object.entries(requiredFields)
+    .filter(([_, value]) => !value)
+    .map(([field]) => field);
+
+  if (missingFields.length > 0) {
+    showToastMessage(
+      'danger',
+      `Please fill in the following required fields: ${missingFields.join(', ')}`,
+    );
+    return;
+  }
 
   try {
     const { profiles } = await loadProfiles();
@@ -64,32 +89,6 @@ async function saveProfileAndUpdateUI(): Promise<void> {
   }
 }
 
-// Deletes a profile from Chrome storage and refreshes the profiles list on the page.
-async function deleteProfileAndUpdateUI(profileName: string): Promise<void> {
-  try {
-    const { profiles, defaultProfileName } = await loadProfiles();
-    const isDefaultProfile = profileName === defaultProfileName;
-    await deleteProfile(profileName);
-    if (isDefaultProfile) {
-      const newDefaultProfile = Object.keys(profiles).find(
-        (p) => p !== profileName && p !== 'defaultProfile',
-      );
-      if (newDefaultProfile) {
-        await setDefaultProfile(newDefaultProfile);
-        loadProfilesAndUpdateUI(newDefaultProfile);
-      } else {
-        loadProfilesAndUpdateUI(null);
-      }
-    } else {
-      loadProfilesAndUpdateUI(null);
-    }
-  } catch (error) {
-    showToastMessage('danger', 'Failed to delete profile');
-    logErrorMessage('Failed to delete profile:', error);
-  }
-}
-
-// Loads a profile from Chrome storage and populates the form with the profile data.
 async function loadProfileAndUpdateUI(profileName: string): Promise<void> {
   logDebugMessage('Loading profile:', profileName);
   const profileData = await loadProfile(profileName);
@@ -100,26 +99,31 @@ async function loadProfileAndUpdateUI(profileName: string): Promise<void> {
     (document.getElementById('awsRegion') as HTMLInputElement).value = profileData.region;
     (document.getElementById('bucketName') as HTMLInputElement).value = profileData.bucket;
     (document.getElementById('fileKey') as HTMLInputElement).value = profileData.key;
-    (document.getElementById('aesrIdText') as HTMLInputElement).value = profileData.aesrId;
   } else {
     logDebugMessage('No data found for profile:', profileName);
   }
 }
 
-// Loads all profiles saved in Chrome storage and creates a dropdown list of profiles, setting the default profile if it exists.
 async function loadProfilesAndUpdateUI(selectedProfileName: string | null): Promise<void> {
   const { profiles, defaultProfileName } = await loadProfiles();
-
   const profileList = document.getElementById('profileList') as HTMLSelectElement;
+
   if (!profileList) {
     throw new Error('Profile list element not found');
   }
 
+  // Get profile names excluding the 'defaultProfile' key
+  const profileNames = Object.keys(profiles).filter((p) => p !== 'defaultProfile');
+
+  if (profileNames.length === 0) {
+    showEmptyState(true);
+    return;
+  }
+
+  showEmptyState(false);
   profileList.innerHTML = '<option value="" disabled>Select a Profile</option>';
 
-  for (const profileName in profiles) {
-    if (profileName === 'defaultProfile') continue;
-
+  for (const profileName of profileNames) {
     const option = document.createElement('option');
     option.value = profileName;
     option.textContent =
@@ -144,7 +148,6 @@ async function loadProfilesAndUpdateUI(selectedProfileName: string | null): Prom
   }
 }
 
-// Sets the user's default profile to the currently selected profile in the dropdown list.
 async function setDefaultProfileAndUpdateUI(): Promise<void> {
   const profileList = document.getElementById('profileList') as HTMLSelectElement;
   if (!profileList) {
@@ -170,7 +173,6 @@ async function setDefaultProfileAndUpdateUI(): Promise<void> {
   }
 }
 
-// Loads the user's default profile from Chrome storage.
 async function loadDefaultProfileAndUpdateUI(): Promise<void> {
   const defaultProfile = await loadDefaultProfile();
 
@@ -183,7 +185,6 @@ async function loadDefaultProfileAndUpdateUI(): Promise<void> {
   }
 }
 
-// Allows users to import a profile from a JSON file.
 function importProfileAndUpdateUI(): void {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
@@ -220,7 +221,6 @@ function importProfileAndUpdateUI(): void {
   fileInput.click();
 }
 
-// Allows users to export a profile to a JSON file.
 async function exportProfileAndUpdateUI(): Promise<void> {
   const profileList = document.getElementById('profileList') as HTMLSelectElement;
   if (!profileList) {
@@ -249,47 +249,259 @@ async function exportProfileAndUpdateUI(): Promise<void> {
 }
 
 // Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-  // Load profiles and default profile
-  loadProfilesAndUpdateUI(null);
-  loadDefaultProfileAndUpdateUI();
-  restoreDebugModeSetting();
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('DOMContentLoaded event fired');
+  
+  // Load settings first
+  const data = await chrome.storage.local.get(['globalSettings']);
+  if (data.globalSettings) {
+    setGlobalSettings(data.globalSettings);
+  }
 
-  // Profile list change event
-  const profileList = document.getElementById('profileList') as HTMLSelectElement;
-  profileList?.addEventListener('change', () => {
-    const selectedProfile = profileList.value;
-    if (selectedProfile) {
-      loadProfileAndUpdateUI(selectedProfile);
+  // Pull Config button
+  const pullConfigButton = document.getElementById('pullConfigButton') as HTMLButtonElement;
+  console.log('Pull config button found:', !!pullConfigButton);
+  
+  pullConfigButton?.addEventListener('click', async () => {
+    console.log('Pull config button clicked');
+    setButtonLoading(pullConfigButton, true);
+    try {
+      console.log('Getting config textarea and profile list...');
+      const configTextArea = document.getElementById('awsConfigTextArea') as HTMLTextAreaElement;
+      const profileList = document.getElementById('profileList') as HTMLSelectElement;
+      console.log('Selected profile:', profileList.value);
+      
+      console.log('Loading profile data...');
+      const profileData = await loadProfile(profileList.value);
+      console.log('Profile data:', profileData);
+      
+      if (!profileData) {
+        console.log('No profile data found');
+        showToastMessage('danger', 'No profile selected');
+        return;
+      }
+
+      console.log('Getting AWS credentials...');
+      const data = await chrome.storage.local.get(['awsCredentials']);
+      console.log('AWS credentials found:', !!data.awsCredentials);
+      
+      const awsCredentials = data.awsCredentials;
+      if (!awsCredentials) {
+        console.log('No AWS credentials found');
+        showToastMessage('warning', 'No AWS credentials found. Please sign in to AWS first.');
+        return;
+      }
+
+      console.log('Fetching S3 content...');
+      const content = await getS3FileContent(
+        awsCredentials.accessKeyId,
+        awsCredentials.secretAccessKey,
+        awsCredentials.sessionToken,
+        profileData.region,
+        profileData.bucket,
+        profileData.key,
+      );
+      console.log('S3 content fetched successfully');
+      
+      configTextArea.value = content;
+      showConfigSuccess();
+      showToastMessage('success', 'Configuration pulled successfully');
+    } catch (error) {
+      console.error('Error in pull config:', error);
+      showToastMessage('danger', 'Failed to pull configuration');
+      logErrorMessage('Failed to pull configuration:', error);
+    } finally {
+      setButtonLoading(pullConfigButton, false);
     }
   });
 
-  // Save profile button
-  const saveButton = document.getElementById('saveButton');
-  saveButton?.addEventListener('click', saveProfileAndUpdateUI);
+  // Load initial data
+  await loadProfilesAndUpdateUI(null);
+  await loadDefaultProfileAndUpdateUI();
+  restoreDebugModeSetting();
+  getLastSentTimestamp();
 
-  // Delete profile button
-  const deleteButton = document.getElementById('deleteButton');
-  deleteButton?.addEventListener('click', () => {
+  // If default profile is loaded, show config section
+  const profileList = document.getElementById('profileList') as HTMLSelectElement;
+  if (profileList?.value) {
+    showProfileSetup(false);
+    const configSection = document.getElementById('configSection');
+    configSection?.classList.add('show');
+  } else {
+    // No profiles exist, check if settings are configured
+    const settings = getGlobalSettings();
+    const emptyState = document.getElementById('emptyState');
+    if (settings?.aesrId && emptyState) {
+      // If AESR ID is set, show the "create first profile" screen
+      emptyState.innerHTML = `
+        <i data-lucide="user-plus" class="empty-state-icon"></i>
+        <h2>Settings Complete!</h2>
+        <p>Now let's create your first profile to manage your AWS configurations</p>
+        <button id="emptyStateNewProfile" class="btn primary">
+          <i data-lucide="plus"></i>
+          Create First Profile
+        </button>
+      `;
+      createIcons({ icons });
+
+      const newProfileButton = document.getElementById('emptyStateNewProfile');
+      newProfileButton?.addEventListener('click', () => {
+        clearProfileForm();
+        showProfileSetup(true);
+        showEmptyState(false);
+      });
+    }
+  }
+
+  // New Profile button
+  const newProfileButton = document.getElementById('newProfileButton');
+  newProfileButton?.addEventListener('click', () => {
+    clearProfileForm();
+    showProfileSetup(true);
+  });
+
+  // Edit Profile button
+  const editProfileButton = document.getElementById('editProfileButton');
+  editProfileButton?.addEventListener('click', async () => {
+    const profileList = document.getElementById('profileList') as HTMLSelectElement;
+    if (!profileList || !profileList.value) {
+      showToastMessage('warning', 'Please select a profile to edit');
+      return;
+    }
+
+    const profileSetup = document.getElementById('profileSetup');
+    if (profileSetup?.classList.contains('show')) {
+      showProfileSetup(false);
+    } else {
+      await loadProfileAndUpdateUI(profileList.value);
+      showProfileSetup(true);
+    }
+  });
+
+  // Save Profile button
+  const saveProfileButton = document.getElementById('saveProfileButton');
+  saveProfileButton?.addEventListener('click', saveProfileAndUpdateUI);
+
+  // Push to AESR button
+  const saveButton = document.getElementById('saveButton');
+  saveButton?.addEventListener('click', async () => {
+    const configTextArea = document.getElementById('awsConfigTextArea') as HTMLTextAreaElement;
+    const settings = getGlobalSettings();
+    if (!settings?.aesrId) {
+      showToastMessage('warning', 'Please set your AESR Extension ID in Settings');
+      toggleSettings();
+      return;
+    }
+
+    if (!configTextArea.value) {
+      showToastMessage('warning', 'Please pull configuration from S3 first');
+      return;
+    }
+
+    try {
+      const messageData = {
+        action: 'updateConfig',
+        dataType: 'ini',
+        data: configTextArea.value,
+      };
+
+      chrome.runtime.sendMessage(settings.aesrId, messageData, function (_response) {
+        if (chrome.runtime.lastError) {
+          logErrorMessage('Failed to send data: ' + chrome.runtime.lastError.message);
+          showToastMessage('danger', 'Failed to send data');
+          return;
+        }
+        setLastSentTimestamp(Date.now());
+        getLastSentTimestamp();
+        showToastMessage('success', 'Configuration pushed successfully');
+      });
+    } catch (error) {
+      logErrorMessage('Failed to push configuration:', error);
+      showToastMessage('danger', 'Failed to push configuration');
+    }
+  });
+
+  // Delete Profile button
+  const deleteProfileButton = document.getElementById('deleteProfileButton');
+  deleteProfileButton?.addEventListener('click', () => {
     const profileName = (document.getElementById('profileName') as HTMLInputElement).value;
     if (profileName) {
-      deleteProfileAndUpdateUI(profileName);
+      showDeleteConfirmation(profileName);
     }
   });
 
-  // Set default profile button
-  const setDefaultButton = document.getElementById('setDefaultButton');
-  setDefaultButton?.addEventListener('click', setDefaultProfileAndUpdateUI);
+  // Close Profile button
+  const closeProfileButton = document.getElementById('closeProfileButton');
+  closeProfileButton?.addEventListener('click', () => {
+    showProfileSetup(false);
+  });
 
-  // Import profile button
-  const importButton = document.getElementById('importButton');
-  importButton?.addEventListener('click', importProfileAndUpdateUI);
+  // Set Default Profile button
+  const setDefaultProfileButton = document.getElementById('setDefaultProfileButton');
+  setDefaultProfileButton?.addEventListener('click', setDefaultProfileAndUpdateUI);
 
-  // Export profile button
-  const exportButton = document.getElementById('exportButton');
-  exportButton?.addEventListener('click', exportProfileAndUpdateUI);
+  // Import Profile button
+  const importProfileButton = document.getElementById('importProfileButton');
+  importProfileButton?.addEventListener('click', importProfileAndUpdateUI);
 
-  // Debug mode checkbox
-  const debugModeCheckbox = document.getElementById('debugModeCheckbox') as HTMLInputElement;
-  debugModeCheckbox?.addEventListener('change', saveDebugModeSetting);
+  // Export Profile button
+  const exportProfileButton = document.getElementById('exportProfileButton');
+  exportProfileButton?.addEventListener('click', exportProfileAndUpdateUI);
+
+  // Settings button and modal
+  const settingsButton = document.getElementById('settingsButton');
+  const closeSettingsModal = document.getElementById('closeSettingsModal');
+  const cancelSettingsButton = document.getElementById('cancelSettingsButton');
+  const settingsModal = document.getElementById('settingsModal');
+
+  settingsButton?.addEventListener('click', toggleSettings);
+  closeSettingsModal?.addEventListener('click', toggleSettings);
+  cancelSettingsButton?.addEventListener('click', toggleSettings);
+
+  // Close settings modal when clicking outside
+  settingsModal?.addEventListener('click', (e) => {
+    if (e.target === settingsModal) {
+      toggleSettings();
+    }
+  });
+
+  // Close settings modal with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && settingsModal?.classList.contains('show')) {
+      toggleSettings();
+    }
+  });
+
+  // Empty state new profile button
+  const emptyStateNewProfile = document.getElementById('emptyStateNewProfile');
+  emptyStateNewProfile?.addEventListener('click', () => {
+    clearProfileForm();
+    showProfileSetup(true);
+    showEmptyState(false);
+  });
+
+  // Settings save button
+  const saveSettingsButton = document.getElementById('saveSettingsButton');
+  saveSettingsButton?.addEventListener('click', saveSettings);
+
+  // Display this extension's ID
+  const thisExtensionId = document.getElementById('thisExtensionId') as HTMLInputElement;
+  if (thisExtensionId) {
+    thisExtensionId.value = getThisExtensionId();
+  }
+
+  // Copy this extension's ID button
+  const copyThisId = document.getElementById('copyThisId');
+  copyThisId?.addEventListener('click', () => {
+    copyToClipboard(getThisExtensionId());
+  });
+
+  // Empty state settings button
+  const emptyStateSettings = document.getElementById('emptyStateSettings');
+  emptyStateSettings?.addEventListener('click', () => {
+    toggleSettings();
+  });
+
+  // Load settings on startup
+  await loadSettings();
 });
