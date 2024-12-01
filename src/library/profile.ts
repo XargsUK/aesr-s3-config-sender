@@ -21,6 +21,14 @@ interface ExportResult {
   filename: string;
 }
 
+interface OldProfileData extends ProfileData {
+  aesrId: string;
+}
+
+interface StorageItems {
+  [key: string]: ProfileData | OldProfileData | string | boolean;
+}
+
 export async function loadProfile(profileName: string): Promise<ProfileData> {
   const result = (await chrome.storage.sync.get(profileName)) as { [key: string]: ProfileData };
   const profileData = result[profileName];
@@ -98,9 +106,77 @@ export async function deleteProfile(profileName: string): Promise<void> {
 }
 
 export async function saveProfile(profileName: string, profileData: ProfileData): Promise<void> {
-  await chrome.storage.sync.set({
-    [profileName]: profileData,
+  await chrome.storage.sync.set({ [profileName]: profileData });
+}
+
+export async function migrateFromOldVersion(): Promise<{
+  migrated: boolean;
+  profileCount: number;
+}> {
+  const allItems = (await chrome.storage.sync.get(null)) as StorageItems;
+
+  // Check if migration is needed by looking for aesrId in any profile
+  const needsMigration = Object.entries(allItems).some(([key, value]) => {
+    return (
+      key !== 'debugMode' &&
+      key !== 'defaultProfile' &&
+      typeof value === 'object' &&
+      'aesrId' in value
+    );
   });
+
+  if (!needsMigration) {
+    return { migrated: false, profileCount: 0 };
+  }
+
+  // Extract AESR ID from the first profile that has it
+  let globalAesrId: string | undefined;
+  for (const [key, value] of Object.entries(allItems)) {
+    if (
+      key !== 'debugMode' &&
+      key !== 'defaultProfile' &&
+      typeof value === 'object' &&
+      'aesrId' in value
+    ) {
+      globalAesrId = (value as OldProfileData).aesrId;
+      break;
+    }
+  }
+
+  // Save global AESR ID if found
+  if (globalAesrId) {
+    await chrome.storage.local.set({
+      globalSettings: {
+        aesrId: globalAesrId,
+      },
+    });
+  }
+
+  // Migrate each profile to new format
+  let migratedCount = 0;
+  const migrations = Object.entries(allItems).map(async ([key, value]) => {
+    if (
+      key !== 'debugMode' &&
+      key !== 'defaultProfile' &&
+      typeof value === 'object' &&
+      'aesrId' in value
+    ) {
+      // Convert to new format by removing aesrId
+      const oldProfile = value as OldProfileData;
+      const newProfileData: ProfileData = {
+        region: oldProfile.region,
+        bucket: oldProfile.bucket,
+        key: oldProfile.key,
+      };
+      await chrome.storage.sync.set({ [key]: newProfileData });
+      migratedCount++;
+    }
+  });
+
+  // Wait for all migrations to complete
+  await Promise.all(migrations);
+
+  return { migrated: true, profileCount: migratedCount };
 }
 
 export async function loadProfilesIntoDropdown(

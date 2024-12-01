@@ -11,6 +11,7 @@ import {
   importProfile,
   exportProfile,
   saveProfile,
+  migrateFromOldVersion,
 } from './library/profile';
 import { getS3FileContent } from './library/s3';
 import { saveSettings, loadSettings } from './library/settings';
@@ -251,6 +252,20 @@ async function exportProfileAndUpdateUI(): Promise<void> {
 // Event Listeners
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('DOMContentLoaded event fired');
+
+  try {
+    // Attempt to migrate from old version if needed
+    const { migrated, profileCount } = await migrateFromOldVersion();
+    if (migrated) {
+      showToastMessage(
+        'success',
+        `Successfully migrated ${profileCount} profile${profileCount !== 1 ? 's' : ''} to the new version`,
+      );
+    }
+  } catch (error) {
+    logErrorMessage('Migration failed:', error);
+    showToastMessage('danger', 'Failed to migrate profiles from old version');
+  }
 
   // Load settings first
   const data = await chrome.storage.local.get(['globalSettings']);
