@@ -42,21 +42,23 @@ The Security Token Service (STS) from AWS provides an API action assumeRoleWithS
 
 Sign into AWS using SSO, and the extension will capture the SAML response automatically. Ensure that the user you are signing into has the access required to the bucket where your configuration is stored.
 
-### Cognito Sign In
+### Profile Management
 
-Originally, this project utilised Cognito for authentication. This methodology has since been deprecated, and has since been replaced by the use of AWS STS.
+Profiles can now be managed through the extension popup:
 
-### Saving Profiles
+- Create and save multiple profiles
+- Set a default profile
+- Import/Export profiles
+- Delete profiles
+- Quick sync with selected profile
 
-To save a new AWS configuration profile, click Save Profile.
+### Browser Permissions
 
-### Deleting Profiles
+The extension now requires the following permissions:
 
-To delete an existing AESR S3 Config Sender profile, select it from the dropdown list, and click the "Delete Profile" button.
-
-### Setting a Default Profile
-
-To set a default AESR S3 Config Sender profile, select it from the dropdown list, and click the "Set Default Profile" button. The default profile will be saved to your browser's local storage.
+- Tabs access
+- Storage access
+- Web request permissions for SAML processing
 
 ### Pulling Configurations from S3
 
@@ -78,37 +80,64 @@ This section guides you through the process of building the project from the sou
 
 ### Prerequisites
 
-Before you begin, ensure that you have Node.js version 20.x installed on your Linux system. This is a necessary prerequisite for the build process. You can download and install Node.js from [here](https://nodejs.org/en).
+Before you begin, ensure you have the following installed:
 
-### Cloning the Repository
+- Node.js version 22.x (as specified in mise.toml)
+- npm (latest version recommended)
 
-1. Open your terminal.
-2. Clone the repository by running the following command:
-   `git clone git@github.com:XargsUK/aesr-s3-config-sender.git`
+### Development Setup
 
-### Navigating to the Project Directory
+1. Clone the repository:
 
-After cloning the repository, navigate to the project directory:
-`cd aesr-s3-config-sender`
+   ```bash
+   git clone git@github.com:XargsUK/aesr-s3-config-sender.git
+   cd aesr-s3-config-sender
+   ```
 
-This step is crucial as the build script must be run from the root of the project directory.
+2. Install dependencies:
 
-### Building the Project
+   ```bash
+   npm install
+   ```
 
-1. In the project directory, you will find a build script named build.sh. This script is used to build the project for different environments.
-2. While in the project root, execute the following command: `./bin/build.sh <chrome|firefox>`
+3. Development Commands:
 
-Replace <chrome|firefox> with the target platform for which you are building. For example, use chrome to build for Google Chrome or firefox for Mozilla Firefox.
+   ```bash
+   npm run clean      # Clean build directories
+   npm run build     # Build both Chrome and Firefox extensions
+   npm run package   # Create distribution packages
+   npm run typecheck # Run TypeScript type checking
+   npm run lint      # Run ESLint checks
+   npm run start     # Start development server
+   ```
 
-This command builds the project and places the output in the `dist/` directory.
+### Development in Browser
 
-### Post-Build Steps
+You can launch browsers with the development extension using VS Code:
 
-After the build process completes, you will find the built project in the `dist/` directory. This directory contains the compiled code ready for deployment or further testing.
+1. Open the project in VS Code
+2. Go to the Run and Debug view
+3. Select either "Launch Chrome with Extension" or "Launch Firefox with Extension"
+4. Press F5 to start debugging
+
+## Project Structure
+
+The project was modernised in v1.0.0 with:
+
+- TypeScript support
+- ESLint configuration
+- Prettier code formatting
+- Modern build system using webpack
+- Browser-specific manifest files
+- Lucide icons replacing FontAwesome
 
 ## Contributing
 
-Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request on [GitHub](https://github.com/XargsUK/aesr-s3-config-sender/).
+Contributions are welcome! Please ensure you:
+
+1. Follow the TypeScript/ESLint/Prettier configurations
+2. Run type checking and linting before submitting PRs
+3. Test on both Chrome and Firefox browsers
 
 ## License
 
