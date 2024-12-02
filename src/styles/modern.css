@@ -623,22 +623,26 @@ h1 {
 }
 
 /* Heart Animation */
-@keyframes float-heart {
+.floating-heart {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: float-up 1.5s ease-out forwards;
+}
+
+.floating-heart i {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+@keyframes float-up {
   0% {
     transform: translateY(0) scale(1);
     opacity: 1;
   }
   100% {
-    transform: translateY(-100px) scale(0.5);
+    transform: translateY(-100px) scale(1.5);
     opacity: 0;
   }
-}
-
-.floating-heart {
-  position: fixed;
-  color: #ff4081;
-  font-size: 24px;
-  pointer-events: none;
-  animation: float-heart 1s ease-out forwards;
-  z-index: 9999;
 }
