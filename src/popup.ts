@@ -189,7 +189,7 @@ function setupEventListeners(): void {
             reject(new Error('Timeout waiting for AESR response'));
           }, 10000); // 10 second timeout
 
-          chrome.runtime.sendMessage(settings.aesrId, messageData, function (_response) {
+          chrome.runtime.sendMessage(settings.aesrId, messageData, function () {
             clearTimeout(timeout);
             if (chrome.runtime.lastError) {
               reject(new Error(chrome.runtime.lastError.message));

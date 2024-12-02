@@ -33,14 +33,14 @@ function getBrowser(): typeof chrome {
 /**
  * Open the options page
  */
-function openOptionsPage(): void {
+async function openOptionsPage(): Promise<void> {
   const browser = getBrowser();
-  if (browser.runtime && browser.runtime.openOptionsPage) {
-    browser.runtime.openOptionsPage();
+  if (browser.runtime.openOptionsPage) {
+    await browser.runtime.openOptionsPage();
   } else {
     // Fallback for older browsers or different manifest configurations
     const optionsUrl = browser.runtime.getURL('options.html');
-    browser.tabs.create({ url: optionsUrl });
+    await browser.tabs.create({ url: optionsUrl });
   }
 }
 

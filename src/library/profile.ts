@@ -29,11 +29,14 @@ interface StorageItems {
   [key: string]: ProfileData | OldProfileData | string | boolean;
 }
 
-export async function loadProfile(profileName: string): Promise<ProfileData> {
+export async function loadProfile(profileName: string): Promise<ProfileData | null> {
   const result = (await chrome.storage.sync.get(profileName)) as { [key: string]: ProfileData };
   const profileData = result[profileName];
-  setCurrentProfileData(profileData);
-  return profileData;
+  if (profileData) {
+    setCurrentProfileData(profileData);
+    return profileData;
+  }
+  return null;
 }
 
 export async function loadProfiles(): Promise<ProfilesResult> {
