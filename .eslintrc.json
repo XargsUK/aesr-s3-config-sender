@@ -14,7 +14,7 @@
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module",
-    "project": ["./tsconfig.json"]
+    "project": ["./tsconfig.json", "./tsconfig.node.json"]
   },
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
@@ -23,7 +23,7 @@
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-unused-vars": "error"
   },
-  "ignorePatterns": ["dist/**/*", "node_modules/**/*", "jest.config.js"],
+  "ignorePatterns": ["dist/**/*", "node_modules/**/*"],
   "overrides": [
     {
       "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
@@ -32,6 +32,13 @@
       },
       "rules": {
         "@typescript-eslint/no-explicit-any": "off"
+      }
+    },
+    {
+      "files": ["*.js", "*.mjs"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.node.json"
       }
     }
   ]

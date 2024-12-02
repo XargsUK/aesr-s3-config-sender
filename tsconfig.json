@@ -6,16 +6,16 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "types": ["jest", "chrome", "node"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "outDir": "./dist"
   },
   "include": [
     "src/**/*.ts",
@@ -23,5 +23,5 @@
     "test/**/*.ts",
     "test/**/*.tsx",
     "jest.config.mjs"
-, "test/setup.mjs"  ]
+  ]
 }

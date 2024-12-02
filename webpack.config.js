@@ -44,11 +44,10 @@ export default {
           {
             loader: 'ts-loader',
             options: {
-              transpileOnly: false,
+              transpileOnly: true,
               compilerOptions: {
-                module: 'ES2022',
+                module: 'ESNext',
                 moduleResolution: 'Node',
-                target: 'ES2022',
               },
             },
           },

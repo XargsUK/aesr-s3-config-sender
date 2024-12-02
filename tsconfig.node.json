@@ -1,11 +1,16 @@
 {
   "extends": "./tsconfig.json",
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
-  },
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true
+  },
+  "include": [
+    "webpack.config.js",
+    "jest.config.mjs",
+    "scripts/**/*",
+    ".eslintrc.json"
+  ]
 }
