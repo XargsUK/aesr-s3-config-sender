@@ -65,7 +65,7 @@ async function saveProfileAndUpdateUI(): Promise<void> {
   };
 
   const missingFields = Object.entries(requiredFields)
-    .filter(([_, value]) => !value)
+    .filter(([, value]) => !value)
     .map(([field]) => field);
 
   if (missingFields.length > 0) {
@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         data: configTextArea.value,
       };
 
-      chrome.runtime.sendMessage(settings.aesrId, messageData, function (_response) {
+      chrome.runtime.sendMessage(settings.aesrId, messageData, function () {
         if (chrome.runtime.lastError) {
           logErrorMessage('Failed to send data: ' + chrome.runtime.lastError.message);
           showToastMessage('danger', 'Failed to send data');

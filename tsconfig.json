@@ -17,11 +17,5 @@
     "esModuleInterop": true,
     "outDir": "./dist"
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "test/**/*.ts",
-    "test/**/*.tsx",
-    "jest.config.mjs"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "test/**/*.tsx", "jest.config.mjs"]
 }

@@ -44,7 +44,7 @@ export async function saveProfileAndUpdateUI(): Promise<void> {
   };
 
   const missingFields = Object.entries(requiredFields)
-    .filter(([_, value]) => !value)
+    .filter(([, value]) => !value)
     .map(([field]) => field);
 
   if (missingFields.length > 0) {
