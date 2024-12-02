@@ -1,16 +1,15 @@
-Changelog
-=========
+# Changelog
 
 ## v1.0.0
 
-### Major Release:
+### Major Release
 
 - Complete redesign with modern user interface
 - Improved profile management system
 - Enhanced SSO/SAML authentication handling
 - Better Firefox and Chrome compatibility
 
-### Features:
+### Features
 
 - New streamlined interface with dark/light theme support
 - Enhanced profile management:
@@ -22,7 +21,7 @@ Changelog
 - Faster performance and reduced memory usage
 - Improved browser compatibility for both Chrome and Firefox
 
-### Improvements:
+### Improvements
 
 - More reliable SAML capture and processing
 - Cleaner, more intuitive configuration interface
@@ -30,61 +29,55 @@ Changelog
 - Enhanced error reporting and troubleshooting
 - Improved extension stability
 
-## v0.2.6 - v0.2.7  (17/11/2023)
+## v0.2.6 - v0.2.7 (17/11/2023)
 
 - Bug fixes for Firefox support
 - Add debug mode for console logging
 - Resolve issue with background.js which was preventing SAML capture
 
-## v0.2.2 - v0.2.5  (15/11/2023)
+## v0.2.2 - v0.2.5 (15/11/2023)
 
 - Bug fixes for Firefox support
 - Permissions prompt in Firefox for AWS
 
-## v0.2.1  (12/11/2023)
-
-### Features:
+## v0.2.1 (12/11/2023)
 
 - Firefox support added
 
-## v0.2.0  (06/11/2023)
-
-### Features:
+## v0.2.0 (06/11/2023)
 
 - Changed S3 authentication method to utilise SSO SAML response
 - Removed Cognito support
 
-### Chores:
+### Chores
 
 - Remove UI elements for Cognito
 - Dependency and version updates.
 - Cleanup: Removed unused code and files.
 
-## v0.1.3  (15/09/2023)
-
-### Features:
+## v0.1.3 (15/09/2023)
 
 - Improved code comments for better maintainability.
 - Added document titles for better accessibility.
 
-### Chores:
+### Chores
 
 - Improved accessibility with updates to HTML attributes.
 - Font updates for better readability.
 - Dependency and version updates.
 - Cleanup: Removed unused code and files.
 
-### Fixes:
+### Fixes
 
 - Enhanced error handling in code.
 - Refactored event listeners for improved readability.
 - Fixed variable declaration issues.
 
-### Refactors:
+### Refactors
 
 - Code cleanup and added clarifying comments.
 
-## v0.1.1 - v0.1.2  (26/08/2023)
+## v0.1.1 - v0.1.2 (26/08/2023)
 
 - Bug fixes for profile management
 - Code refactoring
@@ -95,7 +88,7 @@ Changelog
 - UI Update: Options and Popup separated
 - Code refactor: Modularised codebase into libraries
 
-## v0.0.6 - v0.0.8  (23/05/2023)
+## v0.0.6 - v0.0.8 (23/05/2023)
 
 - Dependancy updates
 
