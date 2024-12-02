@@ -19,7 +19,7 @@ You can download the latest stable version from the [Chrome Web Store here](http
 3. Open Google Chrome and type `chrome://extensions` in the address bar.
 4. Turn on the "Developer mode" toggle switch (if it's not already on).
 5. Click the "Load unpacked" button and select the directory where you extracted the extension in step 2.
-6. The extension should now be loaded as an u   npacked extension and ready to use.
+6. The extension should now be loaded as an u npacked extension and ready to use.
 
 ## Authentication
 
@@ -32,7 +32,7 @@ The Security Token Service (STS) from AWS provides an API action assumeRoleWithS
 ### S3 Configuration
 
 | Field Name        | Description                                                             | Example                            |
-|-------------------|-------------------------------------------------------------------------|------------------------------------|
+| ----------------- | ----------------------------------------------------------------------- | ---------------------------------- |
 | AESR Extension ID | The chrome extension ID of AWS Extend Switch Roles                      | `jpmkfafbacpgapdghgdpembnojdlgkdl` |
 | Region            | The region where the AWS S3 objects are stored.                         | `us-west-2`                        |
 | Bucket Name       | The name of the S3 bucket where the AWS configuration file is stored.   | `my-s3-bucket`                     |

@@ -1,34 +1,34 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import { glob } from "glob";
-import { PurgeCSSPlugin } from "purgecss-webpack-plugin";
-import CopyPlugin from "copy-webpack-plugin";
+import path from 'path';
+import { fileURLToPath } from 'url';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { glob } from 'glob';
+import { PurgeCSSPlugin } from 'purgecss-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const isDevelopment = process.env.NODE_ENV === "development";
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 export default {
-  mode: isDevelopment ? "development" : "production",
+  mode: isDevelopment ? 'development' : 'production',
   entry: {
-    background: "./src/background.ts",
-    options: "./src/options.ts",
-    popup: "./src/popup.ts",
+    background: './src/background.ts',
+    options: './src/options.ts',
+    popup: './src/popup.ts',
   },
   output: {
-    filename: "[name].js",
-    path: path.resolve(__dirname, "dist/extension"),
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist/extension'),
     clean: true,
   },
   optimization: {
     splitChunks: {
       cacheGroups: {
         styles: {
-          name: "modern",
-          type: "css/mini-extract",
-          chunks: "all",
+          name: 'modern',
+          type: 'css/mini-extract',
+          chunks: 'all',
           enforce: true,
         },
       },
@@ -42,13 +42,13 @@ export default {
         test: /\.tsx?$/,
         use: [
           {
-            loader: "ts-loader",
+            loader: 'ts-loader',
             options: {
               transpileOnly: false,
               compilerOptions: {
-                module: "ES2022",
-                moduleResolution: "Node",
-                target: "ES2022",
+                module: 'ES2022',
+                moduleResolution: 'Node',
+                target: 'ES2022',
               },
             },
           },
@@ -60,7 +60,7 @@ export default {
         use: [
           MiniCssExtractPlugin.loader,
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
               importLoaders: 1,
               url: false,
@@ -71,46 +71,38 @@ export default {
     ],
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".jsx"],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
     extensionAlias: {
-      ".js": [".js", ".ts"],
-      ".cjs": [".cjs", ".cts"],
-      ".mjs": [".mjs", ".mts"],
+      '.js': ['.js', '.ts'],
+      '.cjs': ['.cjs', '.cts'],
+      '.mjs': ['.mjs', '.mts'],
     },
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "modern.css",
+      filename: 'modern.css',
     }),
     new PurgeCSSPlugin({
       paths: glob.sync(`src/**/*`, { nodir: true }),
       safelist: {
-        standard: [
-          /^toast-/,
-          /^show/,
-          /^icon/,
-          /^lucide/,
-          "icon",
-          "icon-wrapper",
-          /data-lucide/,
-        ],
+        standard: [/^toast-/, /^show/, /^icon/, /^lucide/, 'icon', 'icon-wrapper', /data-lucide/],
       },
     }),
     new CopyPlugin({
       patterns: [
         {
-          from: "src/html/*.html",
-          to: "[name][ext]",
+          from: 'src/html/*.html',
+          to: '[name][ext]',
         },
         {
-          from: "icons",
-          to: "icons",
+          from: 'icons',
+          to: 'icons',
         },
         {
           from: isDevelopment
-            ? "src/manifest/manifest-chrome.json"
-            : "src/manifest/manifest-chrome.json",
-          to: "manifest.json",
+            ? 'src/manifest/manifest-chrome.json'
+            : 'src/manifest/manifest-chrome.json',
+          to: 'manifest.json',
           transform(content) {
             const manifest = JSON.parse(content.toString());
             manifest.content_security_policy = {
@@ -124,5 +116,5 @@ export default {
       ],
     }),
   ],
-  devtool: isDevelopment ? "inline-source-map" : false,
+  devtool: isDevelopment ? 'inline-source-map' : false,
 };

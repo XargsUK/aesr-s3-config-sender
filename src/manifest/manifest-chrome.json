@@ -3,14 +3,8 @@
   "version": "0.2.13",
   "description": "Downloads Extend Switch Role configurations from S3 and pushes to Extend Switch Roles",
   "short_name": "AESR Sender",
-  "permissions": [
-    "webRequest",
-    "storage",
-    "tabs"
-  ],
-  "host_permissions": [
-    "https://signin.aws.amazon.com/saml"
-  ],
+  "permissions": ["webRequest", "storage", "tabs"],
+  "host_permissions": ["https://signin.aws.amazon.com/saml"],
   "icons": {
     "48": "icons/Icon_48x48.png",
     "128": "icons/Icon_128x128.png"

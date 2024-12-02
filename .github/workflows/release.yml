@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main
-      - 'feature/**'
+      - feature/**
+
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
   version:
@@ -28,7 +32,7 @@ jobs:
           else
             echo "is_beta=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Bump version and push tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.1
@@ -43,7 +47,7 @@ jobs:
         id: format_version
         run: |
           TAG=${{ steps.tag_version.outputs.new_tag }}
-          # Remove 'v' prefix for manifest files
+          # Remove v prefix for manifest files
           echo "version=${TAG#v}" >> $GITHUB_OUTPUT
 
   build:
@@ -51,65 +55,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
-      
+          node-version: 22
+          cache: npm
+
       - name: Update versions
         run: |
           VERSION=${{ needs.version.outputs.new_version }}
           # Update package.json
           npm version $VERSION --no-git-tag-version --allow-same-version
-          
+
           # Update manifest files
           for file in src/manifest/manifest-*.json; do
             jq ".version = \"$VERSION\"" $file > temp.json && mv temp.json $file
           done
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Type check
         run: npm run type-check
-      
+
       - name: Build Chrome extension
         run: npm run build:chrome
-      
+
       - name: Build Firefox extension
         run: npm run build:firefox
-      
+
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.version.outputs.new_tag }}
-          release_name: Release ${{ needs.version.outputs.new_tag }}
+          name: Release ${{ needs.version.outputs.new_tag }}
           draft: false
           prerelease: ${{ needs.version.outputs.is_beta }}
-          body: |
-            ${{ needs.version.outputs.changelog }}
-      
-      - name: Upload Chrome Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/aesr-s3-config-sender-chrome.zip
-          asset_name: aesr-s3-config-sender-chrome.zip
-          asset_content_type: application/zip
-      
-      - name: Upload Firefox Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/aesr-s3-config-sender-firefox.zip
-          asset_name: aesr-s3-config-sender-firefox.zip
-          asset_content_type: application/zip 
+          body: ${{ needs.version.outputs.changelog }}
+          files: |
+            dist/aesr-s3-config-sender-chrome.zip
+            dist/aesr-s3-config-sender-firefox.zip

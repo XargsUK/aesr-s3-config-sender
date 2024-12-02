@@ -51,5 +51,5 @@
     "node": true,
     "webextensions": true
   },
-  "ignorePatterns": ["dist/**/*", "node_modules/**/*", "webpack.config.js"]
-} 
+  "ignorePatterns": ["dist/**/*", "node_modules/**/*", "webpack.config.js", "scripts/**/*"]
+}

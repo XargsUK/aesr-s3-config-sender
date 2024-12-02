@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xml:lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -46,7 +46,10 @@
             <span class="step-number">3</span>
             <div class="step-content">
               <h3>Get AESR extension ID:</h3>
-              <p>Copy the extension ID from AWS Extend Switch Roles' address bar (it looks like "chrome-extension://[ID]/options.html")</p>
+              <p>
+                Copy the extension ID from AWS Extend Switch Roles' address bar (it looks like
+                "chrome-extension://[ID]/options.html")
+              </p>
             </div>
           </div>
           <div class="setup-step">
@@ -72,7 +75,11 @@
             <div class="form-group">
               <label for="profileList">Active Profile:</label>
               <div class="profile-controls">
-                <select id="profileList" class="form-control" data-tooltip="Select a profile to work with">
+                <select
+                  id="profileList"
+                  class="form-control"
+                  data-tooltip="Select a profile to work with"
+                >
                   <option value="" disabled selected>Select a profile...</option>
                 </select>
                 <button id="newProfileButton" class="btn secondary" title="Create New Profile">
@@ -108,12 +115,14 @@
                   </div>
                 </div>
               </div>
-              
+
               <div class="config-container">
-                <textarea id="awsConfigTextArea" 
-                         class="form-control" 
-                         rows="8" 
-                         placeholder="Configuration will appear here after pulling from S3..."></textarea>
+                <textarea
+                  id="awsConfigTextArea"
+                  class="form-control"
+                  rows="8"
+                  placeholder="Configuration will appear here after pulling from S3..."
+                ></textarea>
                 <div class="config-status">
                   <i data-lucide="check-circle"></i>
                   <span>Config pulled successfully</span>
@@ -138,19 +147,39 @@
             <div id="profileSetup" class="profile-setup">
               <div class="form-group">
                 <label for="profileName">Profile Name:</label>
-                <input type="text" id="profileName" class="form-control" placeholder="e.g. Production" />
+                <input
+                  type="text"
+                  id="profileName"
+                  class="form-control"
+                  placeholder="e.g. Production"
+                />
               </div>
               <div class="form-group">
                 <label for="awsRegion">Region:</label>
-                <input type="text" id="awsRegion" class="form-control" placeholder="e.g. eu-west-2" />
+                <input
+                  type="text"
+                  id="awsRegion"
+                  class="form-control"
+                  placeholder="e.g. eu-west-2"
+                />
               </div>
               <div class="form-group">
                 <label for="bucketName">Bucket Name:</label>
-                <input type="text" id="bucketName" class="form-control" placeholder="e.g. my-config-bucket" />
+                <input
+                  type="text"
+                  id="bucketName"
+                  class="form-control"
+                  placeholder="e.g. my-config-bucket"
+                />
               </div>
               <div class="form-group">
                 <label for="fileKey">File Key:</label>
-                <input type="text" id="fileKey" class="form-control" placeholder="path/to/config.json" />
+                <input
+                  type="text"
+                  id="fileKey"
+                  class="form-control"
+                  placeholder="path/to/config.json"
+                />
               </div>
               <div class="profile-actions">
                 <button id="saveProfileButton" class="btn primary">
@@ -188,8 +217,16 @@
             <div class="form-group">
               <label for="aesrIdText">AESR Extension ID:</label>
               <div class="input-with-help">
-                <input type="text" id="aesrIdText" class="form-control" placeholder="Paste the ID from AWS Extend Switch Roles address bar" />
-                <div class="help-text">This is the ID you copied from AWS Extend Switch Roles' address bar (after "chrome-extension://")</div>
+                <input
+                  type="text"
+                  id="aesrIdText"
+                  class="form-control"
+                  placeholder="Paste the ID from AWS Extend Switch Roles address bar"
+                />
+                <div class="help-text">
+                  This is the ID you copied from AWS Extend Switch Roles' address bar (after
+                  "chrome-extension://")
+                </div>
               </div>
             </div>
             <div class="form-group">
