@@ -621,3 +621,24 @@ h1 {
 .toast-info {
   background-color: var(--primary);
 }
+
+/* Heart Animation */
+@keyframes float-heart {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.floating-heart {
+  position: fixed;
+  color: #ff4081;
+  font-size: 24px;
+  pointer-events: none;
+  animation: float-heart 1s ease-out forwards;
+  z-index: 9999;
+}

@@ -39,6 +39,16 @@ function setupOptionsLink(): void {
   }
 }
 
+function createFloatingHeart(x: number, y: number): void {
+  const heart = document.createElement('div');
+  heart.innerHTML = '❤️';
+  heart.className = 'floating-heart';
+  heart.style.left = `${x}px`;
+  heart.style.top = `${y}px`;
+  document.body.appendChild(heart);
+  heart.addEventListener('animationend', () => heart.remove());
+}
+
 function setupEventListeners(): void {
   // Credits link handler
   document.getElementById('openCreditsLink')?.addEventListener('click', (e) => {
@@ -64,7 +74,7 @@ function setupEventListeners(): void {
   }
 
   // Sync button handler
-  document.getElementById('syncButton')?.addEventListener('click', async function () {
+  document.getElementById('syncButton')?.addEventListener('click', async function (e) {
     const profileData = getCurrentProfileData();
     const settings = getGlobalSettings();
 
@@ -85,6 +95,18 @@ function setupEventListeners(): void {
       if (!hasPermission) {
         showRequestPermissionButton();
         return;
+      }
+    }
+
+    // Easter egg
+    if (profileData.key.toLowerCase().includes('ans')) {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const rect = (e.target as HTMLElement).getBoundingClientRect();
+          const x = rect.left + Math.random() * rect.width;
+          const y = rect.top + Math.random() * rect.height;
+          createFloatingHeart(x, y);
+        }, i * 200);
       }
     }
 
