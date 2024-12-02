@@ -65,125 +65,98 @@ function setupEventListeners(): void {
 
   // Sync button handler
   document.getElementById('syncButton')?.addEventListener('click', async function () {
-    if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-      const hasPermission = await checkHostPermission();
-      hasPermission ? handleSyncButtonClick() : showRequestPermissionButton();
-    } else {
-      handleSyncButtonClick();
-    }
-  });
-
-  // Pull S3 Config button handler
-  document.getElementById('pullS3ConfigButton')?.addEventListener('click', async function () {
     const profileData = getCurrentProfileData();
     const settings = getGlobalSettings();
+
     if (!profileData) {
       showToastMessage('warning', 'Please select a profile first');
       return;
     }
+
     if (!settings?.aesrId) {
       showToastMessage('warning', 'Please set your AESR Extension ID in Settings');
       chrome.runtime.openOptionsPage();
       return;
     }
 
-    const requiredFields = {
-      region: profileData.region,
-      bucket: profileData.bucket,
-      key: profileData.key,
-    };
-
-    const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => !value)
-      .map(([field]) => field);
-
-    if (missingFields.length > 0) {
-      showToastMessage(
-        'warning',
-        `Please fill in the following required fields: ${missingFields.join(', ')}`,
-      );
-      return;
+    // For Firefox, check permissions first
+    if (isFirefox()) {
+      const hasPermission = await checkHostPermission();
+      if (!hasPermission) {
+        showRequestPermissionButton();
+        return;
+      }
     }
 
-    handleSyncButtonClick();
+    // Set button to loading state
+    const syncButton = document.getElementById('syncButton') as HTMLButtonElement;
+    const originalContent = syncButton.innerHTML;
+    syncButton.disabled = true;
+    syncButton.innerHTML = '<i data-lucide="refresh-cw"></i> Syncing...';
+    createIcons({ icons });
+
+    try {
+      // Step 1: Pull from S3
+      const data = await chrome.storage.local.get(['awsCredentials']);
+      const awsCredentials = data.awsCredentials;
+
+      if (!awsCredentials) {
+        showToastMessage('warning', 'No AWS credentials found. Please sign in to AWS first.');
+        return;
+      }
+
+      const configContent = await getS3FileContent(
+        awsCredentials.accessKeyId,
+        awsCredentials.secretAccessKey,
+        awsCredentials.sessionToken,
+        profileData.region,
+        profileData.bucket,
+        profileData.key,
+      );
+
+      logDebugMessage('S3 file content pulled successfully');
+
+      // Step 2: Push to AESR
+      const messageData = {
+        action: 'updateConfig',
+        dataType: 'ini',
+        data: configContent,
+      };
+
+      if (isFirefox()) {
+        await browser.runtime.sendMessage(settings.aesrId, messageData);
+        setLastSentTimestamp(Date.now());
+        getLastSentTimestamp();
+        showToastMessage('success', 'Configuration synced successfully');
+      } else {
+        await new Promise<void>((resolve, reject) => {
+          chrome.runtime.sendMessage(settings.aesrId, messageData, function (_response) {
+            if (chrome.runtime.lastError) {
+              reject(new Error(chrome.runtime.lastError.message));
+              return;
+            }
+            setLastSentTimestamp(Date.now());
+            getLastSentTimestamp();
+            resolve();
+          });
+        });
+        showToastMessage('success', 'Configuration synced successfully');
+      }
+    } catch (error) {
+      logErrorMessage('Sync failed:', error);
+      showToastMessage('danger', 'Failed to sync configuration: ' + (error as Error).message);
+    } finally {
+      // Reset button state
+      syncButton.disabled = false;
+      syncButton.innerHTML = originalContent;
+      createIcons({ icons });
+    }
   });
 }
 
 function initialize(): void {
   getLastSentTimestamp();
   loadProfilesIntoDropdown(null, 'profileList');
-}
-
-async function handleSyncButtonClick(): Promise<void> {
-  const profileData = getCurrentProfileData();
-  const settings = getGlobalSettings();
-  if (profileData && settings?.aesrId) {
-    try {
-      const data = await (isFirefox()
-        ? (browser.storage.local.get(['awsCredentials']) as Promise<{
-            awsCredentials: {
-              accessKeyId: string;
-              secretAccessKey: string;
-              sessionToken: string;
-            };
-          }>)
-        : chrome.storage.local.get(['awsCredentials']));
-      const awsCredentials = data.awsCredentials;
-      if (awsCredentials) {
-        const bucket = profileData.bucket;
-        const key = profileData.key;
-        const region = profileData.region;
-        const configContent = await getS3FileContent(
-          awsCredentials.accessKeyId,
-          awsCredentials.secretAccessKey,
-          awsCredentials.sessionToken,
-          region,
-          bucket,
-          key,
-        );
-
-        logDebugMessage('S3 file content: ', configContent);
-
-        const messageData = {
-          action: 'updateConfig',
-          dataType: 'ini',
-          data: configContent,
-        };
-
-        if (isFirefox()) {
-          try {
-            await browser.runtime.sendMessage(settings.aesrId, messageData);
-            setLastSentTimestamp(Date.now());
-            getLastSentTimestamp();
-            showToastMessage('success', 'Sync successful!');
-          } catch (error) {
-            logErrorMessage('Failed to send data: ' + (error as Error).message);
-            showToastMessage('danger', 'Failed to send data');
-          }
-        } else {
-          chrome.runtime.sendMessage(settings.aesrId, messageData, function (_response) {
-            if (chrome.runtime.lastError) {
-              logErrorMessage('Failed to send data: ' + chrome.runtime.lastError.message);
-              showToastMessage('danger', 'Failed to send data');
-              return;
-            }
-            setLastSentTimestamp(Date.now());
-            getLastSentTimestamp();
-            showToastMessage('success', 'Sync successful!');
-          });
-        }
-      } else {
-        logDebugMessage('No AWS credentials found');
-        showToastMessage('warning', 'No AWS credentials found');
-      }
-    } catch (error) {
-      logErrorMessage('An error occurred', error);
-      showToastMessage('danger', 'An error occurred: ' + (error as Error).message);
-    }
-  } else {
-    logDebugMessage('No profile selected or AESR ID not set');
-    showToastMessage('warning', 'Please select a profile and set your AESR Extension ID');
-  }
 }
 
 function isFirefox(): boolean {
