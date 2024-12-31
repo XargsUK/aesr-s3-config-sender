@@ -1,42 +1,50 @@
-name: Webpack Build
+name: Build & Test
 
 on:
   push:
     branches:
+      - develop
+  pull_request:
+    branches:
       - main
-      - code-cleanup
-    paths:
-      - '**.js'
+      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run Webpack
-      run: npx webpack --config webpack.config.js
+      - name: Type check
+        run: npm run type-check
 
-    - name: Upload JS artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: webpacked-js-files
-        path: js
-        if-no-files-found: warn
+      - name: Build Chrome extension
+        run: npm run build:chrome
 
-    - name: Upload CSS artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: webpacked-css-files
-        path: css
-        if-no-files-found: warn
+      - name: Build Firefox extension
+        run: npm run build:firefox
+
+      - name: Upload Chrome extension
+        uses: actions/upload-artifact@v3
+        with:
+          name: chrome-extension
+          path: dist/aesr-s3-config-sender-chrome.zip
+          if-no-files-found: error
+
+      - name: Upload Firefox extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-extension
+          path: dist/aesr-s3-config-sender-firefox.zip
+          if-no-files-found: error

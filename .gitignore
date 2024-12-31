@@ -1,5 +1,14 @@
-node_modules
-dist
-js/
-css/
-.vscode/
+# Build output
+dist/
+
+# Dependencies
+node_modules/
+
+# IDE
+.vscode/*
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
