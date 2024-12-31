@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en" xml:lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AESR Config Sender</title>
+    <link href="modern.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div class="container">
+      <h1>AESR Config Sender</h1>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state">
+        <i data-lucide="settings-2" class="empty-state-icon"></i>
+        <h2>Welcome to AESR Config Sender</h2>
+        <p>Let's connect with AWS Extend Switch Roles</p>
+        <div class="setup-steps">
+          <div class="setup-step">
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <h3>Copy this extension's ID:</h3>
+              <div class="copy-id-container">
+                <input type="text" id="thisExtensionId" class="form-control" readonly />
+                <button id="copyThisId" class="btn secondary" title="Copy ID">
+                  <i data-lucide="copy"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="setup-step">
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <h3>Configure AWS Extend Switch Roles:</h3>
+              <ol class="substeps">
+                <li>Open AWS Extend Switch Roles extension options</li>
+                <li>Paste the copied ID into "Config sender extension ID"</li>
+                <li>Change "Storage" setting to "Local"</li>
+                <li>Click Save in AWS Extend Switch Roles</li>
+              </ol>
+            </div>
+          </div>
+          <div class="setup-step">
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <h3>Get AESR extension ID:</h3>
+              <p>
+                Copy the extension ID from AWS Extend Switch Roles' address bar (it looks like
+                "chrome-extension://[ID]/options.html")
+              </p>
+            </div>
+          </div>
+          <div class="setup-step">
+            <span class="step-number">4</span>
+            <div class="step-content">
+              <h3>Complete the setup:</h3>
+              <button id="emptyStateSettings" class="btn primary">
+                <i data-lucide="settings"></i>
+                Open Settings to Paste AESR ID
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div id="mainContent">
+        <!-- Main Configuration Card -->
+        <div class="card">
+          <div class="card-header">AESR Configuration</div>
+          <div class="card-body">
+            <!-- Profile Selection -->
+            <div class="form-group">
+              <label for="profileList">Active Profile:</label>
+              <div class="profile-controls">
+                <select
+                  id="profileList"
+                  class="form-control"
+                  data-tooltip="Select a profile to work with"
+                >
+                  <option value="" disabled selected>Select a profile...</option>
+                </select>
+                <button id="newProfileButton" class="btn secondary" title="Create New Profile">
+                  <i data-lucide="plus"></i>
+                  New
+                </button>
+                <button id="editProfileButton" class="btn secondary" title="Edit Profile">
+                  <i data-lucide="edit"></i>
+                  Edit
+                </button>
+                <button id="importProfileButton" class="btn secondary" title="Import Profile">
+                  <i data-lucide="download"></i>
+                  Import
+                </button>
+                <button id="exportProfileButton" class="btn secondary" title="Export Profile">
+                  <i data-lucide="upload"></i>
+                  Export
+                </button>
+                <button id="settingsButton" class="btn icon-button" title="Global Settings">
+                  <i data-lucide="settings"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Configuration Area -->
+            <div id="configSection" class="config-section">
+              <div class="config-header">
+                <div class="config-title">
+                  <label for="awsConfigTextArea">Configuration</label>
+                  <div class="last-sync" title="Last time config was pushed to AESR">
+                    <i data-lucide="clock"></i>
+                    <span id="lastSent">Last pushed: Never</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="config-container">
+                <textarea
+                  id="awsConfigTextArea"
+                  class="form-control"
+                  rows="8"
+                  placeholder="Configuration will appear here after pulling from S3..."
+                ></textarea>
+                <div class="config-status">
+                  <i data-lucide="check-circle"></i>
+                  <span>Config pulled successfully</span>
+                </div>
+              </div>
+
+              <div class="action-buttons">
+                <button id="pullConfigButton" class="btn primary">
+                  <i data-lucide="download-cloud"></i>
+                  Pull from S3
+                  <div class="button-loader"></div>
+                </button>
+                <button id="saveButton" class="btn primary">
+                  <i data-lucide="upload-cloud"></i>
+                  Push to AESR
+                  <div class="button-loader"></div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Profile Setup (Initially Hidden) -->
+            <div id="profileSetup" class="profile-setup">
+              <div class="form-group">
+                <label for="profileName">Profile Name:</label>
+                <input
+                  type="text"
+                  id="profileName"
+                  class="form-control"
+                  placeholder="e.g. Production"
+                />
+              </div>
+              <div class="form-group">
+                <label for="awsRegion">Region:</label>
+                <input
+                  type="text"
+                  id="awsRegion"
+                  class="form-control"
+                  placeholder="e.g. eu-west-2"
+                />
+              </div>
+              <div class="form-group">
+                <label for="bucketName">Bucket Name:</label>
+                <input
+                  type="text"
+                  id="bucketName"
+                  class="form-control"
+                  placeholder="e.g. my-config-bucket"
+                />
+              </div>
+              <div class="form-group">
+                <label for="fileKey">File Key:</label>
+                <input
+                  type="text"
+                  id="fileKey"
+                  class="form-control"
+                  placeholder="path/to/config.json"
+                />
+              </div>
+              <div class="profile-actions">
+                <button id="saveProfileButton" class="btn primary">
+                  <i data-lucide="save"></i>
+                  Save
+                </button>
+                <button id="setDefaultProfileButton" class="btn accent">
+                  <i data-lucide="star"></i>
+                  Default
+                </button>
+                <button id="deleteProfileButton" class="btn danger">
+                  <i data-lucide="trash-2"></i>
+                  Delete
+                </button>
+                <button id="closeProfileButton" class="btn secondary">
+                  <i data-lucide="x"></i>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Modal -->
+      <div id="settingsModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Settings</h2>
+            <button class="close-button" id="closeSettingsModal">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="aesrIdText">AESR Extension ID:</label>
+              <div class="input-with-help">
+                <input
+                  type="text"
+                  id="aesrIdText"
+                  class="form-control"
+                  placeholder="Paste the ID from AWS Extend Switch Roles address bar"
+                />
+                <div class="help-text">
+                  This is the ID you copied from AWS Extend Switch Roles' address bar (after
+                  "chrome-extension://")
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="debugModeCheckbox" />
+                Enable Debug Mode
+              </label>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button id="saveSettingsButton" class="btn primary">
+              <i data-lucide="save"></i>
+              Save Settings
+            </button>
+            <button id="cancelSettingsButton" class="btn secondary">
+              <i data-lucide="x"></i>
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete Confirmation Modal -->
+      <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content">
+          <h3>Delete Profile</h3>
+          <p>Are you sure you want to delete this profile? This action cannot be undone.</p>
+          <div class="modal-actions">
+            <button id="confirmDelete" class="btn danger">Delete</button>
+            <button id="cancelDelete" class="btn secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="options.js"></script>
+  </body>
+</html>

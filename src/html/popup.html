@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en" xml:lang="en">
+  <head>
+    <title>AESR S3 Config Sender</title>
+    <link href="modern.css" rel="stylesheet" />
+    <style>
+      body {
+        width: 280px;
+        min-height: 200px;
+        padding: var(--spacing-sm);
+        margin: 0;
+      }
+
+      .popup-container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+      }
+
+      .main-pane {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+      }
+
+      .menu-pane {
+        border-top: 1px solid var(--border-color);
+        padding-top: var(--spacing-sm);
+      }
+
+      .option-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .option-menu a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-xs);
+        padding: var(--spacing-xs);
+        border-radius: var(--radius-sm);
+        transition: all 0.2s;
+        font-size: 0.75rem;
+        min-width: 48px;
+        text-align: center;
+      }
+
+      .option-menu a:hover {
+        color: var(--text-primary);
+      }
+
+      #openOptionsLink {
+        color: var(--accent-primary);
+      }
+
+      #lastSent {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        margin: 0;
+        text-align: center;
+      }
+
+      #profileList {
+        width: 100%;
+        background-color: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      #syncButton {
+        width: 100%;
+        background-color: var(--accent-primary);
+        border: none;
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        border-radius: var(--radius-sm);
+      }
+
+      #syncButton:hover {
+        background-color: var(--accent-hover);
+      }
+
+      .icon {
+        width: 1.2rem;
+        height: 1.2rem;
+      }
+
+      /* Spinning animation for sync icon */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      #syncButton:hover i[data-lucide='refresh-cw'] {
+        animation: spin 1s linear infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toastContainer" class="toast-container"></div>
+    <div class="popup-container">
+      <div class="main-pane">
+        <select id="profileList" title="Select a profile">
+          <option value="" disabled selected>Select a Profile</option>
+        </select>
+        <button id="syncButton" title="Sync configuration">
+          <i data-lucide="refresh-cw"></i>
+          Sync
+        </button>
+        <p id="lastSent">Last sent: Never</p>
+      </div>
+      <div class="menu-pane">
+        <ul class="option-menu">
+          <li>
+            <a href="#" id="openOptionsLink" title="Configuration">
+              <i data-lucide="settings"></i>
+              Config
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/XargsUK/aesr-s3-config-sender/blob/master/CHANGELOG.md#changelog"
+              rel="noopener noreferrer"
+              target="_blank"
+              title="Change Log"
+            >
+              <i data-lucide="file-text"></i>
+              Log
+            </a>
+          </li>
+          <li>
+            <a href="#" id="openCreditsLink" title="Credits">
+              <i data-lucide="heart"></i>
+              Credits
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/XargsUK/aesr-s3-config-sender"
+              rel="noopener noreferrer"
+              target="_blank"
+              title="GitHub Repository"
+            >
+              <i data-lucide="github"></i>
+              GitHub
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
