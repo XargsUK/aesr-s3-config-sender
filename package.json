@@ -33,7 +33,10 @@
     "@aws-sdk/client-s3": "^3.758.0",
     "@aws-sdk/client-sts": "^3.758.0",
     "fast-xml-parser": "^4.5.3",
-    "lucide": "^0.462.0"
+    "glob-stream": "^8.0.2",
+    "lucide": "^0.462.0",
+    "minipass": "^7.1.2",
+    "path-scurry": "^2.0.0"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.287",
