@@ -36,7 +36,7 @@ jobs:
         run: npm run build:firefox
 
       - name: Upload Chrome extension
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: chrome-extension
           path: dist/aesr-s3-config-sender-chrome.zip
