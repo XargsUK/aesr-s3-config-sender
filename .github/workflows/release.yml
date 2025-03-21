@@ -56,16 +56,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 20
+          cache: 'npm'
 
       - name: Update versions
         run: |
           VERSION=${{ needs.version.outputs.new_version }}
           # Update package.json
-          bun x npm version $VERSION --no-git-tag-version --allow-same-version
+          npm version $VERSION --no-git-tag-version --allow-same-version
 
           # Update manifest files
           for file in src/manifest/manifest-*.json; do
@@ -73,26 +74,16 @@ jobs:
           done
 
       - name: Install dependencies
-        run: bun install
-
-      # Use Node.js for webpack compatibility
-      - name: Setup Node.js for webpack compatibility
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install webpack-related dependencies with npm
-        run: npm install -g webpack webpack-cli
+        run: npm ci
 
       - name: Type check
-        run: bun run type-check
+        run: npm run type-check
 
       - name: Build Chrome extension
-        run: bun run build:chrome
+        run: npm run build:chrome
 
       - name: Build Firefox extension
-        run: bun run build:firefox
+        run: npm run build:firefox
 
       - name: Create Release
         id: create_release

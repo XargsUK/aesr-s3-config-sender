@@ -17,32 +17,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      # Use Node.js for webpack compatibility
-      - name: Setup Node.js for webpack compatibility
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: 'npm'
 
-      - name: Install webpack-related dependencies with npm
-        run: npm install -g webpack webpack-cli
+      - name: Install dependencies
+        run: npm ci
 
       - name: Type check
-        run: bun run type-check
+        run: npm run type-check
 
       - name: Build Chrome extension
-        run: bun run build:chrome
+        run: npm run build:chrome
 
       - name: Build Firefox extension
-        run: bun run build:firefox
+        run: npm run build:firefox
 
       - name: Upload Chrome extension
         uses: actions/upload-artifact@v4
