@@ -75,6 +75,16 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      # Use Node.js for webpack compatibility
+      - name: Setup Node.js for webpack compatibility
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install webpack-related dependencies with npm
+        run: npm install -g webpack webpack-cli
+
       - name: Type check
         run: bun run type-check
 
