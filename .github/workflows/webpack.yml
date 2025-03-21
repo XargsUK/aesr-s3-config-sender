@@ -21,19 +21,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: bun
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Type check
-        run: npm run type-check
+        run: bun run type-check
 
       - name: Build Chrome extension
-        run: npm run build:chrome
+        run: bun run build:chrome
 
       - name: Build Firefox extension
-        run: npm run build:firefox
+        run: bun run build:firefox
 
       - name: Upload Chrome extension
         uses: actions/upload-artifact@v4
