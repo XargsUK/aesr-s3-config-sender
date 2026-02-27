@@ -12,3 +12,7 @@ node_modules/
 # Logs
 *.log
 npm-debug.log*
+
+# AESR Source 
+aws-extend-switch-roles/
+docs/

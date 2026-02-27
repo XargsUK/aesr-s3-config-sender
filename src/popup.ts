@@ -1,26 +1,26 @@
 import './styles/modern.css';
-import { createIcons, icons } from 'lucide';
+import { createIcons, Settings, RefreshCw, FileText, Heart, Github } from 'lucide';
 
+import { getValidCredentials } from './library/credentials';
 import { logDebugMessage, logErrorMessage } from './library/debug';
+import { sendConfigToAesr } from './library/messaging';
 import { loadProfilesIntoDropdown, loadProfile } from './library/profile';
 import { getS3FileContent } from './library/s3';
-import { getCurrentProfileData, setCurrentProfileData, setGlobalSettings } from './library/state';
-import { getLastSentTimestamp, setLastSentTimestamp } from './library/timestamp';
+import {
+  GlobalSettings,
+  getCurrentProfileData,
+  setCurrentProfileData,
+  setGlobalSettings,
+} from './library/state';
+import { getLastSentTimestamp } from './library/timestamp';
 import { showToastMessage } from './library/toast';
 
 // Initialize Lucide icons
 createIcons({
-  icons: {
-    Settings: icons.Settings,
-    RefreshCw: icons.RefreshCw,
-    FileText: icons.FileText,
-    Heart: icons.Heart,
-    Github: icons.Github,
-  },
+  icons: { Settings, RefreshCw, FileText, Heart, Github },
 });
 
-// Basic console log to verify script loading
-console.log('Popup script starting...');
+logDebugMessage('Popup script starting...');
 
 document.addEventListener('DOMContentLoaded', () => {
   setupOptionsLink();
@@ -52,12 +52,7 @@ function createFloatingHeart(x: number, y: number): void {
   heart.appendChild(icon);
 
   document.body.appendChild(heart);
-  // Initialize the icon
-  createIcons({
-    icons: {
-      Heart: icons.Heart,
-    },
-  });
+  createIcons({ icons: { Heart } });
 
   heart.addEventListener('animationend', () => heart.remove());
 }
@@ -100,7 +95,7 @@ function setupEventListeners(): void {
 
       // Load settings from storage first
       const data = await chrome.storage.local.get(['globalSettings']);
-      const settings = data.globalSettings;
+      const settings = (data.globalSettings as GlobalSettings) ?? null;
       setGlobalSettings(settings);
 
       if (!profileData) {
@@ -139,27 +134,13 @@ function setupEventListeners(): void {
       const originalContent = syncButton.innerHTML;
       syncButton.disabled = true;
       syncButton.innerHTML = '<i data-lucide="refresh-cw"></i> Syncing...';
-      createIcons({ icons });
+      createIcons({ icons: { RefreshCw } });
 
       try {
-        // Step 1: Pull from S3
-        const data = await chrome.storage.local.get(['awsCredentials']);
-        const awsCredentials = data.awsCredentials;
+        const awsCredentials = await getValidCredentials();
 
         if (!awsCredentials) {
-          showToastMessage('warning', 'No AWS credentials found. Please sign in to AWS first.');
-          return;
-        }
-
-        if (
-          !awsCredentials.accessKeyId ||
-          !awsCredentials.secretAccessKey ||
-          !awsCredentials.sessionToken
-        ) {
-          showToastMessage(
-            'warning',
-            'AWS credentials are incomplete. Please sign in to AWS again.',
-          );
+          showToastMessage('warning', 'Session expired — please sign in to AWS again.');
           return;
         }
 
@@ -177,29 +158,8 @@ function setupEventListeners(): void {
           return;
         }
 
-        const messageData = {
-          action: 'updateConfig',
-          dataType: 'ini',
-          data: configContent,
-        };
-
-        await new Promise<void>((resolve, reject) => {
-          // Add timeout
-          const timeout = setTimeout(() => {
-            reject(new Error('Timeout waiting for AESR response'));
-          }, 10000); // 10 second timeout
-
-          chrome.runtime.sendMessage(settings.aesrId, messageData, function () {
-            clearTimeout(timeout);
-            if (chrome.runtime.lastError) {
-              reject(new Error(chrome.runtime.lastError.message));
-              return;
-            }
-            setLastSentTimestamp(Date.now());
-            getLastSentTimestamp();
-            resolve();
-          });
-        });
+        await sendConfigToAesr(settings.aesrId, configContent);
+        await getLastSentTimestamp();
 
         showToastMessage('success', 'Configuration synced successfully');
       } catch (error) {
@@ -209,7 +169,7 @@ function setupEventListeners(): void {
         // Reset button state
         syncButton.disabled = false;
         syncButton.innerHTML = originalContent;
-        createIcons({ icons });
+        createIcons({ icons: { RefreshCw } });
       }
     } finally {
       syncInProgress = false;
@@ -218,7 +178,7 @@ function setupEventListeners(): void {
 }
 
 function initialize(): void {
-  getLastSentTimestamp();
+  getLastSentTimestamp().catch(logErrorMessage);
   loadProfilesIntoDropdown(null, 'profileList');
 }
 

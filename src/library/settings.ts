@@ -1,4 +1,4 @@
-import { createIcons, icons } from 'lucide';
+import { createIcons, UserPlus, Plus } from 'lucide';
 
 import { logErrorMessage } from './debug';
 import { GlobalSettings, setGlobalSettings } from './state';
@@ -30,7 +30,7 @@ export async function saveSettings(): Promise<void> {
           Create First Profile
         </button>
       `;
-      createIcons({ icons });
+      createIcons({ icons: { UserPlus, Plus } });
 
       const newProfileButton = document.getElementById('emptyStateNewProfile');
       newProfileButton?.addEventListener('click', () => {

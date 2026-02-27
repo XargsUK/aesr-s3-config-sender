@@ -1,21 +1,35 @@
-import { createIcons, icons } from 'lucide';
+import {
+  createIcons,
+  Settings,
+  RefreshCw,
+  FileText,
+  Heart,
+  Github,
+  AlertCircle,
+  ArrowRight,
+  ArrowLeft,
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  Check,
+  X,
+} from 'lucide';
 
-// Initialize all icons we need
 const iconNames = {
-  settings: icons.Settings,
-  'refresh-cw': icons.RefreshCw,
-  'file-text': icons.FileText,
-  heart: icons.Heart,
-  github: icons.Github,
-  'alert-circle': icons.AlertCircle,
-  'arrow-right': icons.ArrowRight,
-  'arrow-left': icons.ArrowLeft,
-  'chevron-right': icons.ChevronRight,
-  'chevron-left': icons.ChevronLeft,
-  'chevron-down': icons.ChevronDown,
-  check: icons.Check,
-  x: icons.X,
-  alert: icons.AlertCircle,
+  settings: Settings,
+  'refresh-cw': RefreshCw,
+  'file-text': FileText,
+  heart: Heart,
+  github: Github,
+  'alert-circle': AlertCircle,
+  'arrow-right': ArrowRight,
+  'arrow-left': ArrowLeft,
+  'chevron-right': ChevronRight,
+  'chevron-left': ChevronLeft,
+  'chevron-down': ChevronDown,
+  check: Check,
+  x: X,
+  alert: AlertCircle,
 };
 
 // Initialize icons

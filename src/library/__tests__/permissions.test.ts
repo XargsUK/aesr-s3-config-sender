@@ -26,7 +26,7 @@ describe('Permissions Module', () => {
   };
 
   const requiredPermissions = {
-    permissions: ['webRequest', 'webRequestBlocking', 'storage'],
+    permissions: ['webRequest', 'storage'],
     origins: ['https://signin.aws.amazon.com/saml'],
   };
 

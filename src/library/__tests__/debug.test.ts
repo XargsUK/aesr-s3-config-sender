@@ -19,24 +19,38 @@ describe('Debug Module', () => {
 
   describe('logDebugMessage', () => {
     it('should log message when debug mode is enabled', async () => {
-      const getSpy = chrome.storage.sync.get as jest.Mock;
-      getSpy.mockImplementationOnce(() => Promise.resolve({ debugMode: true }));
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: '', debugMode: true } }),
+      );
 
       await logDebugMessage('test message');
       expect(consoleSpy.log).toHaveBeenCalledWith('test message');
     });
 
     it('should not log message when debug mode is disabled', async () => {
-      const getSpy = chrome.storage.sync.get as jest.Mock;
-      getSpy.mockImplementationOnce(() => Promise.resolve({ debugMode: false }));
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: '', debugMode: false } }),
+      );
+
+      await logDebugMessage('test message');
+      expect(consoleSpy.log).not.toHaveBeenCalled();
+    });
+
+    it('should not log when globalSettings is missing', async () => {
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() => Promise.resolve({}));
 
       await logDebugMessage('test message');
       expect(consoleSpy.log).not.toHaveBeenCalled();
     });
 
     it('should handle multiple arguments', async () => {
-      const getSpy = chrome.storage.sync.get as jest.Mock;
-      getSpy.mockImplementationOnce(() => Promise.resolve({ debugMode: true }));
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: '', debugMode: true } }),
+      );
 
       await logDebugMessage('test', 123, { key: 'value' });
       expect(consoleSpy.log).toHaveBeenCalledWith('test', 123, { key: 'value' });
@@ -45,16 +59,20 @@ describe('Debug Module', () => {
 
   describe('logErrorMessage', () => {
     it('should log error when debug mode is enabled', async () => {
-      const getSpy = chrome.storage.sync.get as jest.Mock;
-      getSpy.mockImplementationOnce(() => Promise.resolve({ debugMode: true }));
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: '', debugMode: true } }),
+      );
 
       await logErrorMessage('error message');
       expect(consoleSpy.error).toHaveBeenCalledWith('error message');
     });
 
     it('should not log error when debug mode is disabled', async () => {
-      const getSpy = chrome.storage.sync.get as jest.Mock;
-      getSpy.mockImplementationOnce(() => Promise.resolve({ debugMode: false }));
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: '', debugMode: false } }),
+      );
 
       await logErrorMessage('error message');
       expect(consoleSpy.error).not.toHaveBeenCalled();
@@ -63,22 +81,34 @@ describe('Debug Module', () => {
 
   describe('saveDebugModeSetting', () => {
     it('should save debug mode setting when checkbox is checked', async () => {
-      const setSpy = chrome.storage.sync.set;
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: 'test-id', debugMode: false } }),
+      );
+      const setSpy = chrome.storage.local.set;
       const checkbox = document.getElementById('debugModeCheckbox') as HTMLInputElement;
       checkbox.checked = true;
 
       await saveDebugModeSetting();
-      expect(setSpy).toHaveBeenCalledWith({ debugMode: true });
+      expect(setSpy).toHaveBeenCalledWith({
+        globalSettings: { aesrId: 'test-id', debugMode: true },
+      });
       expect(consoleSpy.log).toHaveBeenCalledWith('Debug mode is on.');
     });
 
     it('should save debug mode setting when checkbox is unchecked', async () => {
-      const setSpy = chrome.storage.sync.set;
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: 'test-id', debugMode: true } }),
+      );
+      const setSpy = chrome.storage.local.set;
       const checkbox = document.getElementById('debugModeCheckbox') as HTMLInputElement;
       checkbox.checked = false;
 
       await saveDebugModeSetting();
-      expect(setSpy).toHaveBeenCalledWith({ debugMode: false });
+      expect(setSpy).toHaveBeenCalledWith({
+        globalSettings: { aesrId: 'test-id', debugMode: false },
+      });
       expect(consoleSpy.log).toHaveBeenCalledWith('Debug mode is off.');
     });
 
@@ -90,8 +120,10 @@ describe('Debug Module', () => {
 
   describe('restoreDebugModeSetting', () => {
     it('should restore debug mode setting when enabled', async () => {
-      const getSpy = chrome.storage.sync.get as jest.Mock;
-      getSpy.mockImplementationOnce(() => Promise.resolve({ debugMode: true }));
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: '', debugMode: true } }),
+      );
 
       await restoreDebugModeSetting();
       const checkbox = document.getElementById('debugModeCheckbox') as HTMLInputElement;
@@ -99,16 +131,18 @@ describe('Debug Module', () => {
     });
 
     it('should restore debug mode setting when disabled', async () => {
-      const getSpy = chrome.storage.sync.get as jest.Mock;
-      getSpy.mockImplementationOnce(() => Promise.resolve({ debugMode: false }));
+      const getSpy = chrome.storage.local.get as jest.Mock;
+      getSpy.mockImplementationOnce(() =>
+        Promise.resolve({ globalSettings: { aesrId: '', debugMode: false } }),
+      );
 
       await restoreDebugModeSetting();
       const checkbox = document.getElementById('debugModeCheckbox') as HTMLInputElement;
       expect(checkbox.checked).toBe(false);
     });
 
-    it('should handle undefined debug mode setting', async () => {
-      const getSpy = chrome.storage.sync.get as jest.Mock;
+    it('should handle missing globalSettings', async () => {
+      const getSpy = chrome.storage.local.get as jest.Mock;
       getSpy.mockImplementationOnce(() => Promise.resolve({}));
 
       await restoreDebugModeSetting();

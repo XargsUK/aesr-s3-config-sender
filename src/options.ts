@@ -1,7 +1,27 @@
 import './styles/modern.css';
-import { createIcons, icons } from 'lucide';
+import {
+  createIcons,
+  CheckCircle,
+  Clock,
+  Copy,
+  Download,
+  DownloadCloud,
+  Edit,
+  Plus,
+  Save,
+  Settings,
+  Settings2,
+  Star,
+  Trash2,
+  Upload,
+  UploadCloud,
+  UserPlus,
+  X,
+} from 'lucide';
 
+import { getValidCredentials } from './library/credentials';
 import { logDebugMessage, logErrorMessage, restoreDebugModeSetting } from './library/debug';
+import { sendConfigToAesr } from './library/messaging';
 import { showDeleteConfirmation } from './library/modal';
 import {
   loadProfile,
@@ -15,8 +35,8 @@ import {
 } from './library/profile';
 import { getS3FileContent } from './library/s3';
 import { saveSettings, loadSettings } from './library/settings';
-import { ProfileData, getGlobalSettings, setGlobalSettings } from './library/state';
-import { getLastSentTimestamp, setLastSentTimestamp } from './library/timestamp';
+import { GlobalSettings, ProfileData, getGlobalSettings, setGlobalSettings } from './library/state';
+import { getLastSentTimestamp } from './library/timestamp';
 import { showToastMessage } from './library/toast';
 import {
   setButtonLoading,
@@ -29,11 +49,28 @@ import {
   copyToClipboard,
 } from './library/ui';
 
-// Initialize Lucide icons
-createIcons({ icons });
+const optionsIcons = {
+  CheckCircle,
+  Clock,
+  Copy,
+  Download,
+  DownloadCloud,
+  Edit,
+  Plus,
+  Save,
+  Settings,
+  Settings2,
+  Star,
+  Trash2,
+  Upload,
+  UploadCloud,
+  UserPlus,
+  X,
+};
 
-// Basic console log to verify script loading
-console.log('Script loaded successfully');
+createIcons({ icons: optionsIcons });
+
+logDebugMessage('Script loaded successfully');
 
 // Profile Management Functions
 async function saveProfileAndUpdateUI(): Promise<void> {
@@ -160,7 +197,7 @@ async function setDefaultProfileAndUpdateUI(): Promise<void> {
     throw new Error('No profile selected');
   }
 
-  const selectedProfile = selectedOption.text;
+  const selectedProfile = selectedOption.value;
 
   try {
     const profileName = await setDefaultProfile(selectedProfile);
@@ -251,7 +288,7 @@ async function exportProfileAndUpdateUI(): Promise<void> {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('DOMContentLoaded event fired');
+  logDebugMessage('DOMContentLoaded event fired');
 
   try {
     // Attempt to migrate from old version if needed
@@ -270,44 +307,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load settings first
   const data = await chrome.storage.local.get(['globalSettings']);
   if (data.globalSettings) {
-    setGlobalSettings(data.globalSettings);
+    setGlobalSettings(data.globalSettings as GlobalSettings);
   }
 
   // Pull Config button
   const pullConfigButton = document.getElementById('pullConfigButton') as HTMLButtonElement;
-  console.log('Pull config button found:', !!pullConfigButton);
+  logDebugMessage('Pull config button found:', !!pullConfigButton);
 
   pullConfigButton?.addEventListener('click', async () => {
-    console.log('Pull config button clicked');
+    logDebugMessage('Pull config button clicked');
     setButtonLoading(pullConfigButton, true);
     try {
-      console.log('Getting config textarea and profile list...');
       const configTextArea = document.getElementById('awsConfigTextArea') as HTMLTextAreaElement;
       const profileList = document.getElementById('profileList') as HTMLSelectElement;
-      console.log('Selected profile:', profileList.value);
+      logDebugMessage('Selected profile:', profileList.value);
 
-      console.log('Loading profile data...');
       const profileData = await loadProfile(profileList.value);
-      console.log('Profile data:', profileData);
+      logDebugMessage('Profile data:', profileData);
 
       if (!profileData) {
-        console.log('No profile data found');
+        logDebugMessage('No profile data found');
         showToastMessage('danger', 'No profile selected');
         return;
       }
 
-      console.log('Getting AWS credentials...');
-      const data = await chrome.storage.local.get(['awsCredentials']);
-      console.log('AWS credentials found:', !!data.awsCredentials);
-
-      const awsCredentials = data.awsCredentials;
+      const awsCredentials = await getValidCredentials();
       if (!awsCredentials) {
-        console.log('No AWS credentials found');
-        showToastMessage('warning', 'No AWS credentials found. Please sign in to AWS first.');
+        showToastMessage('warning', 'Session expired — please sign in to AWS again.');
         return;
       }
 
-      console.log('Fetching S3 content...');
       const content = await getS3FileContent(
         awsCredentials.accessKeyId,
         awsCredentials.secretAccessKey,
@@ -316,13 +345,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         profileData.bucket,
         profileData.key,
       );
-      console.log('S3 content fetched successfully');
+      logDebugMessage('S3 content fetched successfully');
 
       configTextArea.value = content;
       showConfigSuccess();
       showToastMessage('success', 'Configuration pulled successfully');
     } catch (error) {
-      console.error('Error in pull config:', error);
       showToastMessage('danger', 'Failed to pull configuration');
       logErrorMessage('Failed to pull configuration:', error);
     } finally {
@@ -334,7 +362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadProfilesAndUpdateUI(null);
   await loadDefaultProfileAndUpdateUI();
   restoreDebugModeSetting();
-  getLastSentTimestamp();
+  await getLastSentTimestamp();
 
   // If default profile is loaded, show config section
   const profileList = document.getElementById('profileList') as HTMLSelectElement;
@@ -357,7 +385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           Create First Profile
         </button>
       `;
-      createIcons({ icons });
+      createIcons({ icons: { UserPlus, Plus } });
 
       const newProfileButton = document.getElementById('emptyStateNewProfile');
       newProfileButton?.addEventListener('click', () => {
@@ -414,25 +442,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-      const messageData = {
-        action: 'updateConfig',
-        dataType: 'ini',
-        data: configTextArea.value,
-      };
-
-      chrome.runtime.sendMessage(settings.aesrId, messageData, function () {
-        if (chrome.runtime.lastError) {
-          logErrorMessage('Failed to send data: ' + chrome.runtime.lastError.message);
-          showToastMessage('danger', 'Failed to send data');
-          return;
-        }
-        setLastSentTimestamp(Date.now());
-        getLastSentTimestamp();
-        showToastMessage('success', 'Configuration pushed successfully');
-      });
+      await sendConfigToAesr(settings.aesrId, configTextArea.value);
+      await getLastSentTimestamp();
+      showToastMessage('success', 'Configuration pushed successfully');
     } catch (error) {
       logErrorMessage('Failed to push configuration:', error);
-      showToastMessage('danger', 'Failed to push configuration');
+      showToastMessage('danger', 'Failed to send data: ' + (error as Error).message);
     }
   });
 
