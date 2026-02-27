@@ -1,3 +1,4 @@
+import { AWSCredentials } from './credentials';
 import { logDebugMessage } from './debug';
 import { getCurrentProfileData, setCurrentProfileData, ProfileData } from './state';
 
@@ -8,12 +9,6 @@ interface Profiles {
 interface ProfilesResult {
   profiles: Profiles;
   defaultProfileName: string | null;
-}
-
-interface AWSCredentials {
-  accessKeyId: string;
-  secretAccessKey: string;
-  sessionToken: string;
 }
 
 interface ExportResult {

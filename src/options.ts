@@ -1,6 +1,7 @@
 import './styles/modern.css';
 import { createIcons, icons } from 'lucide';
 
+import { getValidCredentials } from './library/credentials';
 import { logDebugMessage, logErrorMessage, restoreDebugModeSetting } from './library/debug';
 import { sendConfigToAesr } from './library/messaging';
 import { showDeleteConfirmation } from './library/modal';
@@ -297,18 +298,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      console.log('Getting AWS credentials...');
-      const data = await chrome.storage.local.get(['awsCredentials']);
-      console.log('AWS credentials found:', !!data.awsCredentials);
-
-      const awsCredentials = data.awsCredentials;
+      const awsCredentials = await getValidCredentials();
       if (!awsCredentials) {
-        console.log('No AWS credentials found');
-        showToastMessage('warning', 'No AWS credentials found. Please sign in to AWS first.');
+        showToastMessage('warning', 'Session expired — please sign in to AWS again.');
         return;
       }
 
-      console.log('Fetching S3 content...');
       const content = await getS3FileContent(
         awsCredentials.accessKeyId,
         awsCredentials.secretAccessKey,

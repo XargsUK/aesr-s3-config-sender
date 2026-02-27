@@ -1,13 +1,7 @@
 import { STSClient, AssumeRoleWithSAMLCommand } from '@aws-sdk/client-sts';
 import { XMLParser } from 'fast-xml-parser';
+import { AWSCredentials } from './library/credentials';
 import { logDebugMessage } from './library/debug';
-
-interface AWSCredentials {
-  accessKeyId: string;
-  secretAccessKey: string;
-  sessionToken: string;
-  expiration: Date;
-}
 
 interface SAMLAttribute {
   __Name: string;
@@ -147,13 +141,23 @@ function onBeforeRequestEvent(
             accessKeyId: response.Credentials.AccessKeyId,
             secretAccessKey: response.Credentials.SecretAccessKey,
             sessionToken: response.Credentials.SessionToken,
-            expiration: response.Credentials.Expiration,
+            expiration: response.Credentials.Expiration.toISOString(),
           };
 
           chrome.storage.local.set({ awsCredentials }).catch(() => {
             logDebugMessage('[SAML] Error saving credentials to storage');
           });
           logDebugMessage('[SAML] Credentials saved to storage');
+
+          const ttl = response.Credentials.Expiration.getTime() - Date.now();
+          if (ttl > 0) {
+            setTimeout(() => {
+              chrome.storage.local.remove('awsCredentials').catch(() => {
+                logDebugMessage('[SAML] Error clearing expired credentials');
+              });
+              logDebugMessage('[SAML] Expired credentials cleared from storage');
+            }, ttl);
+          }
         }
       })
       .catch(() => {

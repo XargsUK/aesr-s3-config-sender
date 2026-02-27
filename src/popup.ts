@@ -1,6 +1,7 @@
 import './styles/modern.css';
 import { createIcons, icons } from 'lucide';
 
+import { getValidCredentials } from './library/credentials';
 import { logDebugMessage, logErrorMessage } from './library/debug';
 import { sendConfigToAesr } from './library/messaging';
 import { loadProfilesIntoDropdown, loadProfile } from './library/profile';
@@ -143,24 +144,10 @@ function setupEventListeners(): void {
       createIcons({ icons });
 
       try {
-        // Step 1: Pull from S3
-        const data = await chrome.storage.local.get(['awsCredentials']);
-        const awsCredentials = data.awsCredentials;
+        const awsCredentials = await getValidCredentials();
 
         if (!awsCredentials) {
-          showToastMessage('warning', 'No AWS credentials found. Please sign in to AWS first.');
-          return;
-        }
-
-        if (
-          !awsCredentials.accessKeyId ||
-          !awsCredentials.secretAccessKey ||
-          !awsCredentials.sessionToken
-        ) {
-          showToastMessage(
-            'warning',
-            'AWS credentials are incomplete. Please sign in to AWS again.',
-          );
+          showToastMessage('warning', 'Session expired — please sign in to AWS again.');
           return;
         }
 

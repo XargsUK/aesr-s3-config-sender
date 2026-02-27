@@ -18,7 +18,7 @@ declare const browser: BrowserAPI;
 declare const chrome: BrowserAPI;
 
 const requiredPermissions: RequiredPermissions = {
-  permissions: ['webRequest', 'webRequestBlocking', 'storage'],
+  permissions: ['webRequest', 'storage'],
   origins: ['https://signin.aws.amazon.com/saml'],
 };
 
