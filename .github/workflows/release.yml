@@ -64,13 +64,13 @@ jobs:
 
       - name: Update versions
         run: |
-          VERSION=${{ needs.version.outputs.new_version }}
+          VERSION="${{ needs.version.outputs.new_version }}"
           # Update package.json
-          npm version $VERSION --no-git-tag-version --allow-same-version
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
 
           # Update manifest files
           for file in src/manifest/manifest-*.json; do
-            jq ".version = \"$VERSION\"" $file > temp.json && mv temp.json $file
+            jq --arg v "$VERSION" '.version = $v' "$file" > temp.json && mv temp.json "$file"
           done
 
       - name: Install dependencies
