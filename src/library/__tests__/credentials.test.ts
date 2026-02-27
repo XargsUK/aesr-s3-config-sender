@@ -44,6 +44,11 @@ describe('credentials', () => {
       const now = new Date();
       expect(areCredentialsExpired(now)).toBe(true);
     });
+
+    it('should return true for an invalid expiration value', () => {
+      expect(areCredentialsExpired('[object Object]')).toBe(true);
+      expect(areCredentialsExpired('')).toBe(true);
+    });
   });
 
   describe('getValidCredentials', () => {
