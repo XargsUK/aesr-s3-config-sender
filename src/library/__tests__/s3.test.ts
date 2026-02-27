@@ -19,7 +19,7 @@ jest.mock('@aws-sdk/client-s3', () => {
 // Mock TextDecoder and TextEncoder
 class MockTextDecoder {
   decode(buffer: Uint8Array | ArrayBuffer): string {
-    return Buffer.from(buffer).toString('utf-8');
+    return Buffer.from(buffer as ArrayBufferLike).toString('utf-8');
   }
 }
 
