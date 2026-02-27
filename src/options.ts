@@ -70,8 +70,7 @@ const optionsIcons = {
 
 createIcons({ icons: optionsIcons });
 
-// Basic console log to verify script loading
-console.log('Script loaded successfully');
+logDebugMessage('Script loaded successfully');
 
 // Profile Management Functions
 async function saveProfileAndUpdateUI(): Promise<void> {
@@ -289,7 +288,7 @@ async function exportProfileAndUpdateUI(): Promise<void> {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('DOMContentLoaded event fired');
+  logDebugMessage('DOMContentLoaded event fired');
 
   try {
     // Attempt to migrate from old version if needed
@@ -313,23 +312,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Pull Config button
   const pullConfigButton = document.getElementById('pullConfigButton') as HTMLButtonElement;
-  console.log('Pull config button found:', !!pullConfigButton);
+  logDebugMessage('Pull config button found:', !!pullConfigButton);
 
   pullConfigButton?.addEventListener('click', async () => {
-    console.log('Pull config button clicked');
+    logDebugMessage('Pull config button clicked');
     setButtonLoading(pullConfigButton, true);
     try {
-      console.log('Getting config textarea and profile list...');
       const configTextArea = document.getElementById('awsConfigTextArea') as HTMLTextAreaElement;
       const profileList = document.getElementById('profileList') as HTMLSelectElement;
-      console.log('Selected profile:', profileList.value);
+      logDebugMessage('Selected profile:', profileList.value);
 
-      console.log('Loading profile data...');
       const profileData = await loadProfile(profileList.value);
-      console.log('Profile data:', profileData);
+      logDebugMessage('Profile data:', profileData);
 
       if (!profileData) {
-        console.log('No profile data found');
+        logDebugMessage('No profile data found');
         showToastMessage('danger', 'No profile selected');
         return;
       }
@@ -348,13 +345,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         profileData.bucket,
         profileData.key,
       );
-      console.log('S3 content fetched successfully');
+      logDebugMessage('S3 content fetched successfully');
 
       configTextArea.value = content;
       showConfigSuccess();
       showToastMessage('success', 'Configuration pulled successfully');
     } catch (error) {
-      console.error('Error in pull config:', error);
       showToastMessage('danger', 'Failed to pull configuration');
       logErrorMessage('Failed to pull configuration:', error);
     } finally {

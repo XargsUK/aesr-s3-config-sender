@@ -15,8 +15,7 @@ createIcons({
   icons: { Settings, RefreshCw, FileText, Heart, Github },
 });
 
-// Basic console log to verify script loading
-console.log('Popup script starting...');
+logDebugMessage('Popup script starting...');
 
 document.addEventListener('DOMContentLoaded', () => {
   setupOptionsLink();
