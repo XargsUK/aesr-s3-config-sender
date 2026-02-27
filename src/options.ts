@@ -35,7 +35,7 @@ import {
 } from './library/profile';
 import { getS3FileContent } from './library/s3';
 import { saveSettings, loadSettings } from './library/settings';
-import { ProfileData, getGlobalSettings, setGlobalSettings } from './library/state';
+import { GlobalSettings, ProfileData, getGlobalSettings, setGlobalSettings } from './library/state';
 import { getLastSentTimestamp } from './library/timestamp';
 import { showToastMessage } from './library/toast';
 import {
@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load settings first
   const data = await chrome.storage.local.get(['globalSettings']);
   if (data.globalSettings) {
-    setGlobalSettings(data.globalSettings);
+    setGlobalSettings(data.globalSettings as GlobalSettings);
   }
 
   // Pull Config button

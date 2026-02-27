@@ -6,7 +6,12 @@ import { logDebugMessage, logErrorMessage } from './library/debug';
 import { sendConfigToAesr } from './library/messaging';
 import { loadProfilesIntoDropdown, loadProfile } from './library/profile';
 import { getS3FileContent } from './library/s3';
-import { getCurrentProfileData, setCurrentProfileData, setGlobalSettings } from './library/state';
+import {
+  GlobalSettings,
+  getCurrentProfileData,
+  setCurrentProfileData,
+  setGlobalSettings,
+} from './library/state';
 import { getLastSentTimestamp } from './library/timestamp';
 import { showToastMessage } from './library/toast';
 
@@ -90,7 +95,7 @@ function setupEventListeners(): void {
 
       // Load settings from storage first
       const data = await chrome.storage.local.get(['globalSettings']);
-      const settings = data.globalSettings;
+      const settings = (data.globalSettings as GlobalSettings) ?? null;
       setGlobalSettings(settings);
 
       if (!profileData) {

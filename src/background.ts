@@ -36,19 +36,19 @@ function addWebRequestListeners(): void {
 }
 
 function onBeforeRequestEvent(
-  details: chrome.webRequest.WebRequestBodyDetails,
-): void | chrome.webRequest.BlockingResponse {
+  details: chrome.webRequest.OnBeforeRequestDetails,
+): chrome.webRequest.BlockingResponse | undefined {
   logDebugMessage('[SAML] Request intercepted');
   let samlXmlDoc = '';
   let samlResponseBase64 = '';
 
   try {
     if (details.requestBody?.formData) {
-      samlResponseBase64 = details.requestBody.formData.SAMLResponse[0];
+      samlResponseBase64 = details.requestBody.formData.SAMLResponse[0] as string;
       samlXmlDoc = decodeURIComponent(unescape(atob(samlResponseBase64)));
     } else if (details.requestBody?.raw) {
       let combined = new ArrayBuffer(0);
-      details.requestBody.raw.forEach((element) => {
+      details.requestBody.raw.forEach((element: chrome.webRequest.UploadData) => {
         if (!element.bytes) return;
         const tmp = new Uint8Array(combined.byteLength + element.bytes.byteLength);
         tmp.set(new Uint8Array(combined), 0);
@@ -165,7 +165,7 @@ function onBeforeRequestEvent(
       .catch(() => {
         logDebugMessage('[SAML] Error assuming role');
       });
-  } catch (error) {
+  } catch {
     logDebugMessage('[SAML] Error processing request');
   }
 }

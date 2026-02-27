@@ -37,10 +37,9 @@ declare namespace chrome {
       QUOTA_BYTES_PER_ITEM: number;
     }
 
-    interface StorageChangedEvent
-      extends chrome.events.Event<
-        (changes: { [key: string]: StorageChange }, areaName: string) => void
-      > {}
+    type StorageChangedEvent = chrome.events.Event<
+      (changes: { [key: string]: StorageChange }, areaName: string) => void
+    >;
 
     interface Static {
       local: Local;
