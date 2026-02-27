@@ -1,5 +1,6 @@
 import { STSClient, AssumeRoleWithSAMLCommand } from '@aws-sdk/client-sts';
 import { XMLParser } from 'fast-xml-parser';
+import { logDebugMessage } from './library/debug';
 
 interface AWSCredentials {
   accessKeyId: string;
@@ -17,17 +18,9 @@ interface SAMLAttribute {
     | Array<{ '#text': string }>;
 }
 
-const DebugLogs = true;
-
-function debugLog(message: string, ...args: unknown[]): void {
-  if (DebugLogs) {
-    console.log(`[SAML Debug] ${message}`, ...args);
-  }
-}
-
 chrome.runtime.onInstalled.addListener(function (details: chrome.runtime.InstalledDetails): void {
   if (details.reason === 'install') {
-    debugLog('Extension installed. Permissions for capturing SAML are granted.');
+    logDebugMessage('[SAML] Extension installed');
   }
 });
 
@@ -35,7 +28,7 @@ addWebRequestListeners();
 
 function addWebRequestListeners(): void {
   const webRequest = chrome.webRequest;
-  debugLog('Extension is activated');
+  logDebugMessage('[SAML] Extension is activated');
 
   // SAML endpoint listener
   if (!webRequest.onBeforeRequest.hasListener(onBeforeRequestEvent)) {
@@ -44,14 +37,14 @@ function addWebRequestListeners(): void {
       { urls: ['https://signin.aws.amazon.com/saml'] },
       ['requestBody'],
     );
-    debugLog('SAML listener added successfully');
+    logDebugMessage('[SAML] Listener added');
   }
 }
 
 function onBeforeRequestEvent(
   details: chrome.webRequest.WebRequestBodyDetails,
 ): void | chrome.webRequest.BlockingResponse {
-  debugLog('SAML request intercepted');
+  logDebugMessage('[SAML] Request intercepted');
   let samlXmlDoc = '';
   let formDataPayload: URLSearchParams | undefined;
 
@@ -77,7 +70,7 @@ function onBeforeRequestEvent(
     }
 
     if (!samlXmlDoc) {
-      debugLog('No SAML document found in request');
+      logDebugMessage('[SAML] No SAML document found in request');
       return;
     }
 
@@ -89,32 +82,32 @@ function onBeforeRequestEvent(
       alwaysCreateTextNode: true,
     };
 
-    debugLog('Parsing SAML XML document');
+    logDebugMessage('[SAML] Parsing XML document');
     const parser = new XMLParser(options);
     const jsObj = parser.parse(samlXmlDoc);
-    debugLog('Successfully parsed SAML XML');
+    logDebugMessage('[SAML] Successfully parsed XML');
 
     // Extract the roles
     const attributes = jsObj['Response'].Assertion.AttributeStatement.Attribute as SAMLAttribute[];
     let roleClaimValue: string | undefined;
 
-    debugLog('Searching for role claim in SAML attributes');
+    logDebugMessage('[SAML] Searching for role claim in attributes');
     for (const attr of attributes) {
       if (attr.__Name === 'https://aws.amazon.com/SAML/Attributes/Role') {
         const attributeValue = attr.AttributeValue;
         if (Array.isArray(attributeValue)) {
           roleClaimValue = attributeValue[0]['#text'];
-          debugLog('Found role claim in array', roleClaimValue);
+          logDebugMessage('[SAML] Found role claim (array format)');
         } else {
           roleClaimValue = attributeValue['#text'];
-          debugLog('Found role claim in single value', roleClaimValue);
+          logDebugMessage('[SAML] Found role claim (single value)');
         }
         break;
       }
     }
 
     if (!roleClaimValue) {
-      debugLog('No role claim found in SAML attributes');
+      logDebugMessage('[SAML] No role claim found in attributes');
       return;
     }
 
@@ -125,7 +118,7 @@ function onBeforeRequestEvent(
     const principalMatch = roleClaimValue.match(rePrincipal);
 
     if (!roleMatch || !principalMatch) {
-      debugLog('Invalid role claim format', { roleMatch, principalMatch });
+      logDebugMessage('[SAML] Invalid role claim format');
       return;
     }
 
@@ -157,16 +150,16 @@ function onBeforeRequestEvent(
             expiration: response.Credentials.Expiration,
           };
 
-          chrome.storage.local.set({ awsCredentials }).catch((error) => {
-            debugLog('Error saving credentials to storage', error);
+          chrome.storage.local.set({ awsCredentials }).catch(() => {
+            logDebugMessage('[SAML] Error saving credentials to storage');
           });
-          debugLog('Successfully saved SAML credentials to storage');
+          logDebugMessage('[SAML] Credentials saved to storage');
         }
       })
-      .catch((error) => {
-        debugLog('Error assuming role with SAML', error);
+      .catch(() => {
+        logDebugMessage('[SAML] Error assuming role');
       });
   } catch (error) {
-    debugLog('Error processing SAML request', error);
+    logDebugMessage('[SAML] Error processing request');
   }
 }
