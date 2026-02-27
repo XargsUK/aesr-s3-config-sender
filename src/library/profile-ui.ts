@@ -196,7 +196,7 @@ export async function setDefaultProfileAndUpdateUI(): Promise<void> {
     throw new Error('No profile selected');
   }
 
-  const selectedProfile = selectedOption.text;
+  const selectedProfile = selectedOption.value;
 
   try {
     const profileName = await setDefaultProfile(selectedProfile);

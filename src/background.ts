@@ -40,11 +40,12 @@ function onBeforeRequestEvent(
 ): void | chrome.webRequest.BlockingResponse {
   logDebugMessage('[SAML] Request intercepted');
   let samlXmlDoc = '';
-  let formDataPayload: URLSearchParams | undefined;
+  let samlResponseBase64 = '';
 
   try {
     if (details.requestBody?.formData) {
-      samlXmlDoc = decodeURIComponent(unescape(atob(details.requestBody.formData.SAMLResponse[0])));
+      samlResponseBase64 = details.requestBody.formData.SAMLResponse[0];
+      samlXmlDoc = decodeURIComponent(unescape(atob(samlResponseBase64)));
     } else if (details.requestBody?.raw) {
       let combined = new ArrayBuffer(0);
       details.requestBody.raw.forEach((element) => {
@@ -56,10 +57,11 @@ function onBeforeRequestEvent(
       });
       const combinedView = new DataView(combined);
       const decoder = new TextDecoder('utf-8');
-      formDataPayload = new URLSearchParams(decoder.decode(combinedView));
+      const formDataPayload = new URLSearchParams(decoder.decode(combinedView));
       const samlResponse = formDataPayload.get('SAMLResponse');
       if (samlResponse) {
-        samlXmlDoc = decodeURIComponent(unescape(atob(samlResponse)));
+        samlResponseBase64 = samlResponse;
+        samlXmlDoc = decodeURIComponent(unescape(atob(samlResponseBase64)));
       }
     }
 
@@ -124,7 +126,7 @@ function onBeforeRequestEvent(
     const command = new AssumeRoleWithSAMLCommand({
       PrincipalArn,
       RoleArn,
-      SAMLAssertion: details.requestBody?.formData?.SAMLResponse[0],
+      SAMLAssertion: samlResponseBase64,
     });
 
     // Assume role with SAML
