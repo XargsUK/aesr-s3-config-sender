@@ -2,10 +2,11 @@ import './styles/modern.css';
 import { createIcons, icons } from 'lucide';
 
 import { logDebugMessage, logErrorMessage } from './library/debug';
+import { sendConfigToAesr } from './library/messaging';
 import { loadProfilesIntoDropdown, loadProfile } from './library/profile';
 import { getS3FileContent } from './library/s3';
 import { getCurrentProfileData, setCurrentProfileData, setGlobalSettings } from './library/state';
-import { getLastSentTimestamp, setLastSentTimestamp } from './library/timestamp';
+import { getLastSentTimestamp } from './library/timestamp';
 import { showToastMessage } from './library/toast';
 
 // Initialize Lucide icons
@@ -177,29 +178,8 @@ function setupEventListeners(): void {
           return;
         }
 
-        const messageData = {
-          action: 'updateConfig',
-          dataType: 'ini',
-          data: configContent,
-        };
-
-        await new Promise<void>((resolve, reject) => {
-          // Add timeout
-          const timeout = setTimeout(() => {
-            reject(new Error('Timeout waiting for AESR response'));
-          }, 10000); // 10 second timeout
-
-          chrome.runtime.sendMessage(settings.aesrId, messageData, function () {
-            clearTimeout(timeout);
-            if (chrome.runtime.lastError) {
-              reject(new Error(chrome.runtime.lastError.message));
-              return;
-            }
-            setLastSentTimestamp(Date.now());
-            getLastSentTimestamp();
-            resolve();
-          });
-        });
+        await sendConfigToAesr(settings.aesrId, configContent);
+        getLastSentTimestamp();
 
         showToastMessage('success', 'Configuration synced successfully');
       } catch (error) {

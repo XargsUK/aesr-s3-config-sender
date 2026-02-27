@@ -2,6 +2,7 @@ import './styles/modern.css';
 import { createIcons, icons } from 'lucide';
 
 import { logDebugMessage, logErrorMessage, restoreDebugModeSetting } from './library/debug';
+import { sendConfigToAesr } from './library/messaging';
 import { showDeleteConfirmation } from './library/modal';
 import {
   loadProfile,
@@ -16,7 +17,7 @@ import {
 import { getS3FileContent } from './library/s3';
 import { saveSettings, loadSettings } from './library/settings';
 import { ProfileData, getGlobalSettings, setGlobalSettings } from './library/state';
-import { getLastSentTimestamp, setLastSentTimestamp } from './library/timestamp';
+import { getLastSentTimestamp } from './library/timestamp';
 import { showToastMessage } from './library/toast';
 import {
   setButtonLoading,
@@ -414,25 +415,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-      const messageData = {
-        action: 'updateConfig',
-        dataType: 'ini',
-        data: configTextArea.value,
-      };
-
-      chrome.runtime.sendMessage(settings.aesrId, messageData, function () {
-        if (chrome.runtime.lastError) {
-          logErrorMessage('Failed to send data: ' + chrome.runtime.lastError.message);
-          showToastMessage('danger', 'Failed to send data');
-          return;
-        }
-        setLastSentTimestamp(Date.now());
-        getLastSentTimestamp();
-        showToastMessage('success', 'Configuration pushed successfully');
-      });
+      await sendConfigToAesr(settings.aesrId, configTextArea.value);
+      getLastSentTimestamp();
+      showToastMessage('success', 'Configuration pushed successfully');
     } catch (error) {
       logErrorMessage('Failed to push configuration:', error);
-      showToastMessage('danger', 'Failed to push configuration');
+      showToastMessage('danger', 'Failed to send data: ' + (error as Error).message);
     }
   });
 
