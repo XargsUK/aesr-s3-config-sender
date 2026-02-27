@@ -95,7 +95,7 @@ export async function deleteProfileAndUpdateUI(profileName: string): Promise<voi
             Create First Profile
           </button>
         `;
-        createIcons({ icons: { UserPlus, Plus } });
+        createIcons({ icons: { UserPlus, Plus }, root: emptyState });
 
         const newProfileButton = document.getElementById('emptyStateNewProfile');
         newProfileButton?.addEventListener('click', () => {

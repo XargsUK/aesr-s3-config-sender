@@ -30,7 +30,7 @@ export async function saveSettings(): Promise<void> {
           Create First Profile
         </button>
       `;
-      createIcons({ icons: { UserPlus, Plus } });
+      createIcons({ icons: { UserPlus, Plus }, root: emptyState });
 
       const newProfileButton = document.getElementById('emptyStateNewProfile');
       newProfileButton?.addEventListener('click', () => {

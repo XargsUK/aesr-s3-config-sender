@@ -52,7 +52,7 @@ function createFloatingHeart(x: number, y: number): void {
   heart.appendChild(icon);
 
   document.body.appendChild(heart);
-  createIcons({ icons: { Heart } });
+  createIcons({ icons: { Heart }, root: heart });
 
   heart.addEventListener('animationend', () => heart.remove());
 }
@@ -134,7 +134,7 @@ function setupEventListeners(): void {
       const originalContent = syncButton.innerHTML;
       syncButton.disabled = true;
       syncButton.innerHTML = '<i data-lucide="refresh-cw"></i> Syncing...';
-      createIcons({ icons: { RefreshCw } });
+      createIcons({ icons: { RefreshCw }, root: syncButton });
 
       try {
         const awsCredentials = await getValidCredentials();
@@ -169,7 +169,7 @@ function setupEventListeners(): void {
         // Reset button state
         syncButton.disabled = false;
         syncButton.innerHTML = originalContent;
-        createIcons({ icons: { RefreshCw } });
+        createIcons({ icons: { RefreshCw }, root: syncButton });
       }
     } finally {
       syncInProgress = false;

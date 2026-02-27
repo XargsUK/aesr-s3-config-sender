@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           Create First Profile
         </button>
       `;
-      createIcons({ icons: { UserPlus, Plus } });
+      createIcons({ icons: { UserPlus, Plus }, root: emptyState });
 
       const newProfileButton = document.getElementById('emptyStateNewProfile');
       newProfileButton?.addEventListener('click', () => {
