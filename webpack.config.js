@@ -25,6 +25,14 @@ export default {
   optimization: {
     splitChunks: {
       cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks(chunk) {
+            return chunk.name !== 'background';
+          },
+          minSize: 0,
+        },
         styles: {
           name: 'modern',
           type: 'css/mini-extract',

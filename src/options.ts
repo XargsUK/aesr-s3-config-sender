@@ -1,5 +1,23 @@
 import './styles/modern.css';
-import { createIcons, icons } from 'lucide';
+import {
+  createIcons,
+  CheckCircle,
+  Clock,
+  Copy,
+  Download,
+  DownloadCloud,
+  Edit,
+  Plus,
+  Save,
+  Settings,
+  Settings2,
+  Star,
+  Trash2,
+  Upload,
+  UploadCloud,
+  UserPlus,
+  X,
+} from 'lucide';
 
 import { getValidCredentials } from './library/credentials';
 import { logDebugMessage, logErrorMessage, restoreDebugModeSetting } from './library/debug';
@@ -31,8 +49,26 @@ import {
   copyToClipboard,
 } from './library/ui';
 
-// Initialize Lucide icons
-createIcons({ icons });
+const optionsIcons = {
+  CheckCircle,
+  Clock,
+  Copy,
+  Download,
+  DownloadCloud,
+  Edit,
+  Plus,
+  Save,
+  Settings,
+  Settings2,
+  Star,
+  Trash2,
+  Upload,
+  UploadCloud,
+  UserPlus,
+  X,
+};
+
+createIcons({ icons: optionsIcons });
 
 // Basic console log to verify script loading
 console.log('Script loaded successfully');
@@ -330,7 +366,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadProfilesAndUpdateUI(null);
   await loadDefaultProfileAndUpdateUI();
   restoreDebugModeSetting();
-  getLastSentTimestamp();
+  await getLastSentTimestamp();
 
   // If default profile is loaded, show config section
   const profileList = document.getElementById('profileList') as HTMLSelectElement;
@@ -353,7 +389,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           Create First Profile
         </button>
       `;
-      createIcons({ icons });
+      createIcons({ icons: { UserPlus, Plus } });
 
       const newProfileButton = document.getElementById('emptyStateNewProfile');
       newProfileButton?.addEventListener('click', () => {
@@ -411,7 +447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       await sendConfigToAesr(settings.aesrId, configTextArea.value);
-      getLastSentTimestamp();
+      await getLastSentTimestamp();
       showToastMessage('success', 'Configuration pushed successfully');
     } catch (error) {
       logErrorMessage('Failed to push configuration:', error);

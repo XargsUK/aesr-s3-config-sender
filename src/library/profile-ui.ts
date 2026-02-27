@@ -1,4 +1,4 @@
-import { createIcons, icons } from 'lucide';
+import { createIcons, UserPlus, Plus } from 'lucide';
 
 import { logDebugMessage, logErrorMessage } from './debug';
 import {
@@ -95,7 +95,7 @@ export async function deleteProfileAndUpdateUI(profileName: string): Promise<voi
             Create First Profile
           </button>
         `;
-        createIcons({ icons });
+        createIcons({ icons: { UserPlus, Plus } });
 
         const newProfileButton = document.getElementById('emptyStateNewProfile');
         newProfileButton?.addEventListener('click', () => {

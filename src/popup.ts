@@ -1,5 +1,5 @@
 import './styles/modern.css';
-import { createIcons, icons } from 'lucide';
+import { createIcons, Settings, RefreshCw, FileText, Heart, Github } from 'lucide';
 
 import { getValidCredentials } from './library/credentials';
 import { logDebugMessage, logErrorMessage } from './library/debug';
@@ -12,13 +12,7 @@ import { showToastMessage } from './library/toast';
 
 // Initialize Lucide icons
 createIcons({
-  icons: {
-    Settings: icons.Settings,
-    RefreshCw: icons.RefreshCw,
-    FileText: icons.FileText,
-    Heart: icons.Heart,
-    Github: icons.Github,
-  },
+  icons: { Settings, RefreshCw, FileText, Heart, Github },
 });
 
 // Basic console log to verify script loading
@@ -54,12 +48,7 @@ function createFloatingHeart(x: number, y: number): void {
   heart.appendChild(icon);
 
   document.body.appendChild(heart);
-  // Initialize the icon
-  createIcons({
-    icons: {
-      Heart: icons.Heart,
-    },
-  });
+  createIcons({ icons: { Heart } });
 
   heart.addEventListener('animationend', () => heart.remove());
 }
@@ -141,7 +130,7 @@ function setupEventListeners(): void {
       const originalContent = syncButton.innerHTML;
       syncButton.disabled = true;
       syncButton.innerHTML = '<i data-lucide="refresh-cw"></i> Syncing...';
-      createIcons({ icons });
+      createIcons({ icons: { RefreshCw } });
 
       try {
         const awsCredentials = await getValidCredentials();
@@ -166,7 +155,7 @@ function setupEventListeners(): void {
         }
 
         await sendConfigToAesr(settings.aesrId, configContent);
-        getLastSentTimestamp();
+        await getLastSentTimestamp();
 
         showToastMessage('success', 'Configuration synced successfully');
       } catch (error) {
@@ -176,7 +165,7 @@ function setupEventListeners(): void {
         // Reset button state
         syncButton.disabled = false;
         syncButton.innerHTML = originalContent;
-        createIcons({ icons });
+        createIcons({ icons: { RefreshCw } });
       }
     } finally {
       syncInProgress = false;
@@ -185,7 +174,7 @@ function setupEventListeners(): void {
 }
 
 function initialize(): void {
-  getLastSentTimestamp();
+  getLastSentTimestamp().catch(logErrorMessage);
   loadProfilesIntoDropdown(null, 'profileList');
 }
 
