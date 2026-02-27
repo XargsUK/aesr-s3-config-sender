@@ -15,6 +15,7 @@ declare module 'lucide' {
     icons?: Record<string, Icon>;
     nameAttr?: string;
     attrs?: Record<string, string>;
+    root?: HTMLElement;
   }
 
   export function createIcons(options?: CreateIconsOptions): void;
