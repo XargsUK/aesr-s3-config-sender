@@ -6,7 +6,11 @@ export interface AWSCredentials {
 }
 
 export function areCredentialsExpired(expiration: string | Date): boolean {
-  return new Date(expiration).getTime() <= Date.now();
+  const time = new Date(expiration).getTime();
+  if (isNaN(time)) {
+    return true;
+  }
+  return time <= Date.now();
 }
 
 export async function getValidCredentials(): Promise<AWSCredentials | null> {
