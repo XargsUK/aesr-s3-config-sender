@@ -24,14 +24,8 @@ export async function getValidCredentials(): Promise<AWSCredentials | null> {
   if (
     !credentials.accessKeyId ||
     !credentials.secretAccessKey ||
-    !credentials.sessionToken ||
-    !credentials.expiration
+    !credentials.sessionToken
   ) {
-    return null;
-  }
-
-  if (areCredentialsExpired(credentials.expiration)) {
-    await chrome.storage.local.remove('awsCredentials');
     return null;
   }
 

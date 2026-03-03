@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const awsCredentials = await getValidCredentials();
       if (!awsCredentials) {
-        showToastMessage('warning', 'Session expired — please sign in to AWS again.');
+        showToastMessage('warning', 'No AWS credentials found. Please sign in to AWS first.');
         return;
       }
 
