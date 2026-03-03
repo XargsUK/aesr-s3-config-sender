@@ -68,13 +68,13 @@ describe('credentials', () => {
       expect(result).toBeNull();
     });
 
-    it('should return null and clear storage when credentials are expired', async () => {
+    it('should return expired credentials to let AWS reject them', async () => {
       const getSpy = chrome.storage.local.get as jest.Mock;
       getSpy.mockImplementationOnce(() => Promise.resolve({ awsCredentials: expiredCredentials }));
 
       const result = await getValidCredentials();
-      expect(result).toBeNull();
-      expect(chrome.storage.local.remove).toHaveBeenCalledWith('awsCredentials');
+      expect(result).toEqual(expiredCredentials);
+      expect(chrome.storage.local.remove).not.toHaveBeenCalled();
     });
 
     it('should return null when credentials are incomplete', async () => {
