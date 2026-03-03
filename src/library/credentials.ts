@@ -21,11 +21,7 @@ export async function getValidCredentials(): Promise<AWSCredentials | null> {
     return null;
   }
 
-  if (
-    !credentials.accessKeyId ||
-    !credentials.secretAccessKey ||
-    !credentials.sessionToken
-  ) {
+  if (!credentials.accessKeyId || !credentials.secretAccessKey || !credentials.sessionToken) {
     return null;
   }
 
