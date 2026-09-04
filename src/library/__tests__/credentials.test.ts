@@ -2,7 +2,9 @@ import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 import {
   areCredentialsExpired,
   getValidCredentials,
+  clearCredentials,
   clearExpiredCredentials,
+  isExpiredTokenError,
 } from '../credentials';
 
 describe('credentials', () => {
@@ -112,6 +114,41 @@ describe('credentials', () => {
 
       await clearExpiredCredentials();
       expect(chrome.storage.local.remove).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('isExpiredTokenError', () => {
+    it('should detect the S3 ExpiredToken error by name', () => {
+      const error = new Error('The provided token has expired.');
+      error.name = 'ExpiredToken';
+      expect(isExpiredTokenError(error)).toBe(true);
+    });
+
+    it('should detect the STS ExpiredTokenException error by name', () => {
+      const error = new Error('Token expired');
+      error.name = 'ExpiredTokenException';
+      expect(isExpiredTokenError(error)).toBe(true);
+    });
+
+    it('should detect a wrapped error by message', () => {
+      expect(
+        isExpiredTokenError(
+          new Error('Failed to get S3 file content: The provided token has expired.'),
+        ),
+      ).toBe(true);
+    });
+
+    it('should return false for other errors and non-errors', () => {
+      expect(isExpiredTokenError(new Error('Access Denied'))).toBe(false);
+      expect(isExpiredTokenError('token has expired')).toBe(false);
+      expect(isExpiredTokenError(undefined)).toBe(false);
+    });
+  });
+
+  describe('clearCredentials', () => {
+    it('should remove credentials from storage unconditionally', async () => {
+      await clearCredentials();
+      expect(chrome.storage.local.remove).toHaveBeenCalledWith('awsCredentials');
     });
   });
 });

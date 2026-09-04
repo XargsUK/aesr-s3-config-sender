@@ -195,5 +195,30 @@ describe('S3 Functions', () => {
         ),
       ).rejects.toThrow('Failed to get S3 file content: S3 error');
     });
+
+    it('should preserve the AWS error name when wrapping errors', async () => {
+      const awsError = new Error('The provided token has expired.');
+      awsError.name = 'ExpiredToken';
+      const mockSendFn = jest.fn() as jest.MockedFunction<S3SendFn>;
+      mockSendFn.mockRejectedValue(awsError);
+
+      (S3Client as jest.Mock).mockImplementation(() => ({
+        send: mockSendFn,
+      }));
+
+      await expect(
+        getS3FileContent(
+          mockCredentials.accessKeyId,
+          mockCredentials.secretAccessKey,
+          mockCredentials.sessionToken,
+          mockS3Config.region,
+          mockS3Config.bucket,
+          mockS3Config.key,
+        ),
+      ).rejects.toMatchObject({
+        name: 'ExpiredToken',
+        message: 'Failed to get S3 file content: The provided token has expired.',
+      });
+    });
   });
 });
