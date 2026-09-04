@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/chrome": "^0.1.37",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.0.0",
+    "@types/node": "^26.4.0",
     "archiver": "^7.0.1",
     "copy-webpack-plugin": "^14.0.0",
     "cross-env": "^10.1.0",
