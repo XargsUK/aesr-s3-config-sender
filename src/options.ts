@@ -19,7 +19,12 @@ import {
   X,
 } from 'lucide';
 
-import { getValidCredentials } from './library/credentials';
+import {
+  EXPIRED_SESSION_MESSAGE,
+  clearCredentials,
+  getValidCredentials,
+  isExpiredTokenError,
+} from './library/credentials';
 import { logDebugMessage, logErrorMessage, restoreDebugModeSetting } from './library/debug';
 import { sendConfigToAesr } from './library/messaging';
 import { showDeleteConfirmation } from './library/modal';
@@ -351,8 +356,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       showConfigSuccess();
       showToastMessage('success', 'Configuration pulled successfully');
     } catch (error) {
-      showToastMessage('danger', 'Failed to pull configuration');
       logErrorMessage('Failed to pull configuration:', error);
+      if (isExpiredTokenError(error)) {
+        await clearCredentials();
+        showToastMessage('warning', EXPIRED_SESSION_MESSAGE);
+        return;
+      }
+      showToastMessage('danger', 'Failed to pull configuration: ' + (error as Error).message);
     } finally {
       setButtonLoading(pullConfigButton, false);
     }

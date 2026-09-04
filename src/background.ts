@@ -146,10 +146,13 @@ function onBeforeRequestEvent(
             expiration: response.Credentials.Expiration.toISOString(),
           };
 
-          chrome.storage.local.set({ awsCredentials }).catch(() => {
-            logDebugMessage('[SAML] Error saving credentials to storage');
+          chrome.storage.local.set({ awsCredentials }).catch((error: Error) => {
+            logDebugMessage('[SAML] Error saving credentials to storage:', error.message);
           });
-          logDebugMessage('[SAML] Credentials saved to storage');
+          logDebugMessage(
+            '[SAML] Credentials saved to storage, expiring at',
+            awsCredentials.expiration,
+          );
 
           const ttl = response.Credentials.Expiration.getTime() - Date.now();
           if (ttl > 0) {
@@ -160,12 +163,14 @@ function onBeforeRequestEvent(
               logDebugMessage('[SAML] Expired credentials cleared from storage');
             }, ttl);
           }
+        } else {
+          logDebugMessage('[SAML] AssumeRoleWithSAML response contained no credentials');
         }
       })
-      .catch(() => {
-        logDebugMessage('[SAML] Error assuming role');
+      .catch((error: Error) => {
+        logDebugMessage('[SAML] Error assuming role:', error.name, error.message);
       });
-  } catch {
-    logDebugMessage('[SAML] Error processing request');
+  } catch (error) {
+    logDebugMessage('[SAML] Error processing request:', error);
   }
 }
