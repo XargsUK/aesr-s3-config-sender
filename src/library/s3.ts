@@ -37,6 +37,9 @@ export async function getS3FileContent(
     );
     return content;
   } catch (error) {
-    throw new Error(`Failed to get S3 file content: ${(error as Error).message}`);
+    const wrapped = new Error(`Failed to get S3 file content: ${(error as Error).message}`);
+    // Keep the AWS error name (e.g. ExpiredToken) so callers can react to it
+    wrapped.name = (error as Error).name || wrapped.name;
+    throw wrapped;
   }
 }

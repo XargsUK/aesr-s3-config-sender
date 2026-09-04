@@ -1,7 +1,12 @@
 import './styles/modern.css';
 import { createIcons, Settings, RefreshCw, FileText, Heart, Github } from 'lucide';
 
-import { getValidCredentials } from './library/credentials';
+import {
+  EXPIRED_SESSION_MESSAGE,
+  clearCredentials,
+  getValidCredentials,
+  isExpiredTokenError,
+} from './library/credentials';
 import { logDebugMessage, logErrorMessage } from './library/debug';
 import { sendConfigToAesr } from './library/messaging';
 import { loadProfilesIntoDropdown, loadProfile } from './library/profile';
@@ -164,6 +169,11 @@ function setupEventListeners(): void {
         showToastMessage('success', 'Configuration synced successfully');
       } catch (error) {
         logErrorMessage('Sync failed:', error);
+        if (isExpiredTokenError(error)) {
+          await clearCredentials();
+          showToastMessage('warning', EXPIRED_SESSION_MESSAGE);
+          return;
+        }
         showToastMessage('danger', 'Failed to sync configuration: ' + (error as Error).message);
       } finally {
         // Reset button state
