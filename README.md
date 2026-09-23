@@ -1,3 +1,5 @@
+
+
 # AESR S3 Config Sender
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
@@ -106,7 +108,7 @@ Before you begin, ensure you have the following installed:
    npm run clean      # Clean build directories
    npm run build     # Build both Chrome and Firefox extensions
    npm run package   # Create distribution packages
-   npm run typecheck # Run TypeScript type checking
+   npm run type-check # Run TypeScript type checking
    npm run lint      # Run ESLint checks
    npm run start     # Start development server
    ```
